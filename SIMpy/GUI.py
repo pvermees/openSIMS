@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.ttk as ttk
 import tkinter.scrolledtext as st
+import tkinter.font as font
 
 class gui(tk.Tk):
 
@@ -9,19 +10,28 @@ class gui(tk.Tk):
         super().__init__()
         self.title('SIMpy')
         self.sp = settings
-        self.stack = ["from SIMpy import SIMpy",
-                      "sp = SIMpy(gui=True)"]
-        self.log = None
+        self.stack = init_stack()
+        self.log_window = None
         self.create_open_button()
         self.create_method_button()
+        self.create_standard_button()
+        self.create_plot_button()
+        self.create_process_button()
+        self.create_export_button()
         self.create_log_button()
-        self.create_exit_button()
+        self.create_template_button()
+        self.create_help_button()
 
-    def run(self,cmd):
+    def log(self,cmd):
         self.stack.append(cmd)
         exec('self.' + cmd)
-        if self.log is not None:
-            self.log.refresh(self.stack)
+        if self.log_window is not None:
+            self.log_window.refresh(self.stack)
+
+    def run(self):
+        # self.sp.reset() TODO
+        for line in self.stack:
+            print(line)
 
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
@@ -37,30 +47,68 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Method',command=self.on_method)
         button.pack(expand=True)
 
-    def create_log_button(self):
-        button = ttk.Button(self,text='Log',command=self.toggle_log)
+    def create_standard_button(self):
+        button = ttk.Button(self,text='Standards',command=self.set_standard)
         button.pack(expand=True)
 
-    def create_exit_button(self):
-        button = ttk.Button(self,text='Exit',command=self.destroy)
+    def create_plot_button(self):
+        button = ttk.Button(self,text='Plot',command=self.on_plot)
+        button.pack(expand=True)
+
+    def create_process_button(self):
+        button = ttk.Button(self,text='Process',command=self.on_process)
+        button.pack(expand=True)
+
+    def create_export_button(self):
+        button = ttk.Button(self,text='Export',command=self.on_export)
+        button.pack(expand=True)
+
+    def create_log_button(self):
+        button = ttk.Button(self,text='Log',command=self.toggle_log_window)
+        button.pack(expand=True)
+
+    def create_template_button(self):
+        button = ttk.Button(self,text='Template',command=self.on_template)
+        button.pack(expand=True)
+
+    def create_help_button(self):
+        button = ttk.Button(self,text='Help',command=self.on_help)
         button.pack(expand=True)
 
     def on_open(self,instrument):
         data_dir = fd.askdirectory()
-        self.run("sp.set_instrument('{i}')".format(i=instrument))
-        self.run("sp.set_data_dir('{d}')".format(d=data_dir))
+        self.log("sp.set_instrument('{i}')".format(i=instrument))
+        self.log("sp.set_data_dir('{d}')".format(d=data_dir))
 
     def on_method(self):
         method = MethodWindow(self)
         method.grab_set()
+        
+    def set_standard(self):
+        print("TODO")
 
-    def toggle_log(self):
-        if self.log is None:
-            self.log = LogWindow(self)
-            self.log.refresh(self.stack)
+    def on_plot(self):
+        print("TODO")
+        
+    def on_process(self):
+        print("TODO")
+
+    def on_export(self):
+        print("TODO")
+
+    def toggle_log_window(self):
+        if self.log_window is None:
+            self.log_window = LogWindow(self)
+            self.log_window.refresh(self.stack)
         else:
-            self.log.destroy()
-            self.log = None
+            self.log_window.destroy()
+            self.log_window = None
+
+    def on_template(self):
+        print("TODO")
+        
+    def on_help(self):
+        print("TODO")
         
 class MethodWindow(tk.Toplevel):
     
@@ -78,7 +126,7 @@ class LogWindow(tk.Toplevel):
         width = top.winfo_width()
         y_offset = top.winfo_y()
         self.geometry("+{}+{}".format(x_offset+width, y_offset))
-        self.protocol('WM_DELETE_WINDOW',top.toggle_log)
+        self.protocol('WM_DELETE_WINDOW',top.toggle_log_window)
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
         open_button = ttk.Button(self,text='Open',
@@ -87,8 +135,7 @@ class LogWindow(tk.Toplevel):
         save_button = ttk.Button(self,text='Save',
                                  command=lambda t=top: self.save(t))
         save_button.pack(expand=True,side=tk.LEFT)
-        run_button = ttk.Button(self,text='Run',
-                                command=lambda t=top: self.run(t))
+        run_button = ttk.Button(self,text='Run',command=top.run)
         run_button.pack(expand=True,side=tk.LEFT)
         clear_button = ttk.Button(self,text='Clear',
                                   command=lambda t=top: self.clear(t))
@@ -109,8 +156,11 @@ class LogWindow(tk.Toplevel):
         file.writelines('\n'.join(top.stack))
         file.close()
 
-    def run(self,top):
-        print("TODO")
-
     def clear(self,top):
+        top.stack = init_stack()
         self.script.delete(1.0,tk.END)
+        self.script.insert(tk.INSERT,'\n'.join(top.stack))
+
+def init_stack():
+    return ["from SIMpy import SIMpy",
+            "sp = SIMpy(gui=True)"]

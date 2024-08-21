@@ -3,10 +3,13 @@ import SIMpy.GUI as GUI
 class SIMpy:
     
     def __init__(self,gui=False):
+        self.reset()
+        if gui: self.gui = GUI.gui(self)
+
+    def reset(self):
         self.data_dir = ''
         self.instrument = ''
-        self.method = ''
-        if gui: self.gui = GUI.gui(self)
+        self.method = ''        
 
     def set_data_dir(self,value):
         self.data_dir = value
