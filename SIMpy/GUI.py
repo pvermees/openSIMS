@@ -45,22 +45,22 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Exit',command=self.destroy)
         button.pack(expand=True)
 
-    def on_open(top,instrument):
+    def on_open(self,instrument):
         data_dir = fd.askdirectory()
-        top.run("sp.set_instrument('{i}')".format(i=instrument))
-        top.run("sp.set_data_dir('{d}')".format(d=data_dir))
+        self.run("sp.set_instrument('{i}')".format(i=instrument))
+        self.run("sp.set_data_dir('{d}')".format(d=data_dir))
 
-    def on_method(top):
-        method = MethodWindow(top)
+    def on_method(self):
+        method = MethodWindow(self)
         method.grab_set()
 
-    def toggle_log(top):
-        if top.log is None:
-            top.log = LogWindow(top)
-            top.log.refresh(top.stack)
+    def toggle_log(self):
+        if self.log is None:
+            self.log = LogWindow(self)
+            self.log.refresh(self.stack)
         else:
-            top.log.destroy()
-            top.log = None
+            self.log.destroy()
+            self.log = None
         
 class MethodWindow(tk.Toplevel):
     
@@ -74,14 +74,43 @@ class LogWindow(tk.Toplevel):
     def __init__(self,top):
         super().__init__(top)
         self.title('log')
-        self.script = st.ScrolledText(self)
-        self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
         x_offset = top.winfo_x()
         width = top.winfo_width()
         y_offset = top.winfo_y()
         self.geometry("+{}+{}".format(x_offset+width, y_offset))
         self.protocol('WM_DELETE_WINDOW',top.toggle_log)
+        self.script = st.ScrolledText(self)
+        self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
+        open_button = ttk.Button(self,text='Open',
+                                 command=lambda t=top: self.load(t))
+        open_button.pack(expand=True,side=tk.LEFT)
+        save_button = ttk.Button(self,text='Save',
+                                 command=lambda t=top: self.save(t))
+        save_button.pack(expand=True,side=tk.LEFT)
+        run_button = ttk.Button(self,text='Run',
+                                command=lambda t=top: self.run(t))
+        run_button.pack(expand=True,side=tk.LEFT)
+        clear_button = ttk.Button(self,text='Clear',
+                                  command=lambda t=top: self.clear(t))
+        clear_button.pack(expand=True,side=tk.LEFT)
 
     def refresh(self,stack):
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(stack))
+
+    def load(self,top):
+        file = fd.askopenfile()
+        top.stack = file.read().splitlines()
+        self.refresh(top.stack)
+        file.close()
+
+    def save(self,top):
+        file = fd.asksaveasfile(mode='w')
+        file.writelines('\n'.join(top.stack))
+        file.close()
+
+    def run(self,top):
+        print("TODO")
+
+    def clear(self,top):
+        self.script.delete(1.0,tk.END)
