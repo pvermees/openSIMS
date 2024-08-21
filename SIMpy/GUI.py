@@ -38,7 +38,7 @@ class gui(tk.Tk):
         button.pack(expand=True)
 
     def create_log_button(self):
-        button = ttk.Button(self,text='Log',command=self.on_log)
+        button = ttk.Button(self,text='Log',command=self.toggle_log)
         button.pack(expand=True)
 
     def create_exit_button(self):
@@ -54,10 +54,13 @@ class gui(tk.Tk):
         method = MethodWindow(top)
         method.grab_set()
 
-    def on_log(top):
+    def toggle_log(top):
         if top.log is None:
             top.log = LogWindow(top)
-            
+            top.log.refresh(top.stack)
+        else:
+            top.log.destroy()
+            top.log = None
         
 class MethodWindow(tk.Toplevel):
     
@@ -77,15 +80,8 @@ class LogWindow(tk.Toplevel):
         width = top.winfo_width()
         y_offset = top.winfo_y()
         self.geometry("+{}+{}".format(x_offset+width, y_offset))
-        self.protocol('WM_DELETE_WINDOW',lambda: self.on_close(top))
-        self.refresh(top.stack)
-
-    def on_close(self,top):
-        top.log = None
-        self.destroy()
+        self.protocol('WM_DELETE_WINDOW',top.toggle_log)
 
     def refresh(self,stack):
-        self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,stack)
-        self.script.config(state=tk.DISABLED)
+        self.script.insert(tk.INSERT,'\n'.join(stack))
