@@ -1,6 +1,7 @@
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.ttk as ttk
+import tkinter.scrolledtext as st
 
 class gui(tk.Tk):
 
@@ -10,6 +11,7 @@ class gui(tk.Tk):
         self.sp = settings
         self.stack = ["from SIMpy import SIMpy",
                       "sp = SIMpy(gui=True)"]
+        self.log = None
         self.create_open_button()
         self.create_method_button()
         self.create_log_button()
@@ -17,8 +19,9 @@ class gui(tk.Tk):
 
     def run(self,cmd):
         self.stack.append(cmd)
-        print(self.stack)
         exec('self.' + cmd)
+        if self.log is not None:
+            self.log.refresh(self.stack)
 
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
@@ -52,12 +55,37 @@ class gui(tk.Tk):
         method.grab_set()
 
     def on_log(top):
-        log = LogWindow(top)
+        if top.log is None:
+            top.log = LogWindow(top)
+            
         
 class MethodWindow(tk.Toplevel):
     
     def __init__(self,top):
         super().__init__(top)
         self.title('method')
-        print(top.sp.data_dir)
         ttk.Button(self,text='Close',command=self.destroy).pack()
+
+class LogWindow(tk.Toplevel):
+    
+    def __init__(self,top):
+        super().__init__(top)
+        self.title('log')
+        self.script = st.ScrolledText(self)
+        self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
+        x_offset = top.winfo_x()
+        width = top.winfo_width()
+        y_offset = top.winfo_y()
+        self.geometry("+{}+{}".format(x_offset+width, y_offset))
+        self.protocol('WM_DELETE_WINDOW',lambda: self.on_close(top))
+        self.refresh(top.stack)
+
+    def on_close(self,top):
+        top.log = None
+        self.destroy()
+
+    def refresh(self,stack):
+        self.script.config(state=tk.NORMAL)
+        self.script.delete(1.0,tk.END)
+        self.script.insert(tk.INSERT,stack)
+        self.script.config(state=tk.DISABLED)
