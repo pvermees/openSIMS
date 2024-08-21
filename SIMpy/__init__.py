@@ -1,3 +1,1 @@
-from .gui import gui
-
-
+from .main import SIMpy

@@ -1,3 +1,3 @@
-import SIMpy as sp
+from SIMpy import SIMpy
 
-sp.gui()
+sp = SIMpy(gui=True)
