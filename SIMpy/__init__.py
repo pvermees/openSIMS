@@ -1,3 +1,3 @@
-__all__ = ["gui"]
+from .gui import gui
 
-from . import gui
+

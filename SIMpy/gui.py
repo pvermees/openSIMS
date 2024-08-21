@@ -1,21 +1,31 @@
 import tkinter as tk
 import tkinter.filedialog as fd
+from tkinter import ttk
 
-def on_open():
-    fd.askdirectory()
-
-def on_method():
-    method = tk.Tk()
-    method.title("method")
-
-    test_button = tk.Button(method,text="Test",command=method.destroy).pack()
+class MethodWindow(tk.Toplevel):
     
-def start():
-    root = tk.Tk()
-    root.title("SIMpy")
+    def __init__(self,parent):
+        super().__init__(parent)
+        self.title('method')
+        
+        ttk.Button(self,text='Close',command=self.destroy).pack()
 
-    open_button = tk.Button(root,text="Open",command=on_open).pack()
-    method_button = tk.Button(root,text="Method",command=on_method).pack()
-    exit_button = tk.Button(root,text="Exit",command=root.destroy).pack()
+class gui(tk.Tk):
+    
+    def __init__(self):
+        super().__init__()
+        self.title('SIMpy')
+        ttk.Button(self,text='Open',command=self.on_open).pack()
+        ttk.Button(self,text='Method',command=self.on_method).pack()
+        ttk.Button(self,text='Exit',command=self.destroy).pack()
 
-    root.mainloop()
+    def on_open(self):
+        fd.askdirectory()
+
+    def on_method(self):
+        method = MethodWindow(self)
+        method.grab_set()
+
+if __name__ == "__main__":
+    app = gui()
+    app.mainloop()
