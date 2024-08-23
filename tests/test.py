@@ -1,6 +1,6 @@
 import unittest
 
-from simplex import simplex
+import SIMplex as sx
 
 class Test(unittest.TestCase):
 

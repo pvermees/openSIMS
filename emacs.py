@@ -1,3 +1,2 @@
-from simplex import simplex
-
-sp = simplex(gui=True)
+import SIMplex
+sp = SIMplex.simplex(gui=True)

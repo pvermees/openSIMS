@@ -1,4 +1,4 @@
-import simplex.GUI as GUI
+import SIMplex.GUI as GUI
 
 class simplex:
     

@@ -1,12 +1,12 @@
 from setuptools import setup
 
 setup(
-    name='simplex',
-    version='0.1.1',
+    name='SIMplex',
+    version='0.1.2',
     description='A Python package for SIMS data reduction',
     author='Pieter Vermeesch',
     author_email='p.vermeesch@ucl.ac.uk',
-    packages=['simplex'],
+    packages=['SIMplex'],
     classifiers=[
         'License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)',
         'Programming Language :: Python :: 3',

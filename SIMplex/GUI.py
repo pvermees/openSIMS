@@ -8,7 +8,7 @@ class gui(tk.Tk):
 
     def __init__(self,settings):
         super().__init__()
-        self.title('simplex')
+        self.title('SIMplex')
         self.sp = settings
         self.stack = init_stack()
         self.log_window = None
@@ -176,8 +176,8 @@ class LogWindow(tk.Toplevel):
         self.script.insert(tk.INSERT,'\n'.join(top.stack))
 
 def init_stack():
-    return ["from openSIMS import simplex",
-            "sp = simplex(gui=True)"]
+    return ["import SIMplex",
+            "sp = SIMplex.simplex(gui=True)"]
 
 def offset(parent,child):
     x_offset = parent.winfo_x()
