@@ -1,6 +1,6 @@
-import SIMpy.GUI as GUI
+import simplex.GUI as GUI
 
-class SIMpy:
+class simplex:
     
     def __init__(self,gui=False):
         self.reset()
@@ -28,3 +28,6 @@ class SIMpy:
 
     def get_method(self):
         return self.method
+
+    def TODO(self):
+        pass

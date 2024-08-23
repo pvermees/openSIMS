@@ -8,7 +8,7 @@ class gui(tk.Tk):
 
     def __init__(self,settings):
         super().__init__()
-        self.title('SIMpy')
+        self.title('simplex')
         self.sp = settings
         self.stack = init_stack()
         self.log_window = None
@@ -18,6 +18,7 @@ class gui(tk.Tk):
         self.create_plot_button()
         self.create_process_button()
         self.create_export_button()
+        self.create_settings_button()
         self.create_log_button()
         self.create_template_button()
         self.create_help_button()
@@ -63,6 +64,10 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Export',command=self.on_export)
         button.pack(expand=True)
 
+    def create_settings_button(self):
+        button = ttk.Button(self,text='Settings',command=self.on_settings)
+        button.pack(expand=True)
+
     def create_log_button(self):
         button = ttk.Button(self,text='Log',command=self.toggle_log_window)
         button.pack(expand=True)
@@ -85,16 +90,19 @@ class gui(tk.Tk):
         method.grab_set()
         
     def set_standard(self):
-        print("TODO")
+        self.log("sp.TODO()")
 
     def on_plot(self):
-        print("TODO")
+        self.log("sp.TODO()")
         
     def on_process(self):
-        print("TODO")
+        self.log("sp.TODO()")
 
     def on_export(self):
-        print("TODO")
+        self.log("sp.TODO()")
+
+    def on_settings(self):
+        self.log("sp.TODO()")
 
     def toggle_log_window(self):
         if self.log_window is None:
@@ -105,27 +113,33 @@ class gui(tk.Tk):
             self.log_window = None
 
     def on_template(self):
-        print("TODO")
+        self.log("sp.TODO()")
         
     def on_help(self):
-        print("TODO")
+        self.log("sp.TODO()")
         
 class MethodWindow(tk.Toplevel):
     
     def __init__(self,top):
         super().__init__(top)
         self.title('method')
-        ttk.Button(self,text='Close',command=self.destroy).pack()
+        self.create_test_button(top)
+        offset(top,self)
+
+    def create_test_button(self,top):
+        button = ttk.Button(self,text='Test',command=lambda t=top: self.on_test(t))
+        button.pack(expand=True)
+
+    def on_test(self,top):
+        top.log("sp.TODO()")
+        self.destroy()
 
 class LogWindow(tk.Toplevel):
     
     def __init__(self,top):
         super().__init__(top)
         self.title('log')
-        x_offset = top.winfo_x()
-        width = top.winfo_width()
-        y_offset = top.winfo_y()
-        self.geometry("+{}+{}".format(x_offset+width, y_offset))
+        offset(top,self)
         self.protocol('WM_DELETE_WINDOW',top.toggle_log_window)
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
@@ -162,5 +176,11 @@ class LogWindow(tk.Toplevel):
         self.script.insert(tk.INSERT,'\n'.join(top.stack))
 
 def init_stack():
-    return ["from SIMpy import SIMpy",
-            "sp = SIMpy(gui=True)"]
+    return ["from openSIMS import simplex",
+            "sp = simplex(gui=True)"]
+
+def offset(parent,child):
+    x_offset = parent.winfo_x()
+    width = parent.winfo_width()
+    y_offset = parent.winfo_y()
+    child.geometry("+{}+{}".format(x_offset+width, y_offset))
