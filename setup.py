@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='simplex',
-    version='0.1.0',
+    version='0.1.1',
     description='A Python package for SIMS data reduction',
     author='Pieter Vermeesch',
     author_email='p.vermeesch@ucl.ac.uk',
