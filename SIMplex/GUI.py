@@ -10,7 +10,9 @@ class gui(tk.Tk):
         super().__init__()
         self.title('SIMplex')
         self.sp = settings
-        self.stack = init_stack()
+        self.stack = []
+        self.header = ["import SIMplex",
+                       "sp = SIMplex.simplex(gui=True)"]
         self.log_window = None
         self.create_open_button()
         self.create_method_button()
@@ -27,11 +29,11 @@ class gui(tk.Tk):
         self.stack.append(cmd)
         exec('self.' + cmd)
         if self.log_window is not None:
-            self.log_window.refresh(self.stack)
+            self.log_window.refresh(self)
 
     def run(self):
         self.sp.reset()
-        for cmd in self.stack[3:]:
+        for cmd in self.stack:
             exec('self.' + cmd)
 
     def create_open_button(self):
@@ -82,8 +84,9 @@ class gui(tk.Tk):
 
     def on_open(self,instrument):
         data_dir = fd.askdirectory()
-        self.log("sp.set_instrument('{i}')".format(i=instrument))
-        self.log("sp.set_data_dir('{d}')".format(d=data_dir))
+        if data_dir != '':
+            self.log("sp.set_instrument('{i}')".format(i=instrument))
+            self.log("sp.set_data_dir('{d}')".format(d=data_dir))
 
     def on_method(self):
         method = MethodWindow(self)
@@ -107,7 +110,7 @@ class gui(tk.Tk):
     def toggle_log_window(self):
         if self.log_window is None:
             self.log_window = LogWindow(self)
-            self.log_window.refresh(self.stack)
+            self.log_window.refresh(self)
         else:
             self.log_window.destroy()
             self.log_window = None
@@ -155,29 +158,28 @@ class LogWindow(tk.Toplevel):
                                   command=lambda t=top: self.clear(t))
         clear_button.pack(expand=True,side=tk.LEFT)
 
-    def refresh(self,stack):
+    def refresh(self,top):
         self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(stack))
+        self.script.insert(tk.INSERT,'\n'.join(top.header))
+        self.script.insert(tk.INSERT,'\n')
+        self.script.insert(tk.INSERT,'\n'.join(top.stack))
 
     def load(self,top):
         file = fd.askopenfile()
-        top.stack = file.read().splitlines()
-        self.refresh(top.stack)
+        top.stack = file.read().splitlines()[len(top.header):]
+        self.refresh(top)
         file.close()
 
     def save(self,top):
         file = fd.asksaveasfile(mode='w')
+        file.writelines('\n'.join(top.header))
         file.writelines('\n'.join(top.stack))
         file.close()
 
     def clear(self,top):
-        top.stack = init_stack()
+        top.stack = []
         self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(top.stack))
-
-def init_stack():
-    return ["import SIMplex",
-            "sp = SIMplex.simplex(gui=True)"]
+        self.script.insert(tk.INSERT,'\n'.join(top.header))
 
 def offset(parent,child):
     x_offset = parent.winfo_x()
