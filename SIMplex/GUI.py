@@ -30,9 +30,9 @@ class gui(tk.Tk):
             self.log_window.refresh(self.stack)
 
     def run(self):
-        # self.sp.reset() TODO
-        for line in self.stack:
-            print(line)
+        self.sp.reset()
+        for cmd in self.stack[3:]:
+            exec('self.' + cmd)
 
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
