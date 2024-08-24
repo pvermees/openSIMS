@@ -159,11 +159,13 @@ class LogWindow(tk.Toplevel):
         clear_button.pack(expand=True,side=tk.LEFT)
 
     def refresh(self,top):
+        self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(top.header))
         self.script.insert(tk.INSERT,'\n')
         self.script.insert(tk.INSERT,'\n'.join(top.stack))
-
+        self.script.config(state=tk.DISABLED)
+        
     def load(self,top):
         file = fd.askopenfile()
         top.stack = file.read().splitlines()[len(top.header):]
