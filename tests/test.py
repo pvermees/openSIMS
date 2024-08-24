@@ -5,14 +5,16 @@ from SIMplex.Sample import Sample
 
 class Test(unittest.TestCase):
 
-    def test_test(self):
-        self.assertEqual(1,1)
-
-    def testCameca(self):
+    def testSample(self):
         cam = sp.Cameca.Cameca_Sample()
         shr = sp.SHRIMP.SHRIMP_Sample()
         self.assertIsInstance(cam,Sample)
         self.assertIsInstance(cam,Sample)
+
+    def testRead(self):
+        samp = sp.Cameca.Cameca_Sample()
+        samp.read("data/Cameca_UPb/Plesovice@01.asc")
+        self.assertEqual(samp.x,-5327)
 
 if __name__ == '__main__':
     unittest.main()
