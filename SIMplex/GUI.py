@@ -3,6 +3,10 @@ import tkinter.filedialog as fd
 import tkinter.ttk as ttk
 import tkinter.scrolledtext as st
 import tkinter.font as font
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
+                                               NavigationToolbar2Tk)
 
 class gui(tk.Tk):
 
@@ -39,10 +43,10 @@ class gui(tk.Tk):
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
         menu = tk.Menu(button, tearoff=0)
-        menu.add_command(label="SHRIMP",
-                         command=lambda inst="SHRIMP": self.on_open(inst))
         menu.add_command(label="Cameca",
                          command=lambda inst="Cameca": self.on_open(inst))
+        menu.add_command(label="SHRIMP",
+                         command=lambda inst="SHRIMP": self.on_open(inst))
         button["menu"] = menu
         button.pack(expand=True)
         
@@ -96,7 +100,7 @@ class gui(tk.Tk):
         self.log("sp.TODO()")
 
     def on_plot(self):
-        self.log("sp.plot()")
+        plot_window = PlotWindow(self)
         
     def on_process(self):
         self.log("sp.TODO()")
@@ -130,7 +134,8 @@ class MethodWindow(tk.Toplevel):
         offset(top,self)
 
     def create_test_button(self,top):
-        button = ttk.Button(self,text='Test',command=lambda t=top: self.on_test(t))
+        button = ttk.Button(self,text='Test',
+                            command=lambda t=top: self.on_test(t))
         button.pack(expand=True)
 
     def on_test(self,top):
@@ -182,6 +187,42 @@ class LogWindow(tk.Toplevel):
         top.stack = []
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(top.header))
+
+class PlotWindow(tk.Toplevel):
+    
+    def __init__(self,top):
+        super().__init__()
+        self.title('Plot')
+        offset(top,self)
+        fig, axs = top.sp.plot(show=False)
+  
+        canvas = FigureCanvasTkAgg(fig,master=self)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+        toolbar = NavigationToolbar2Tk(canvas,self)
+        toolbar.update()
+  
+        canvas.get_tk_widget().pack(fill='both',expand=True)
+        previous_button = ttk.Button(self,text='<',
+                                     command=lambda c=canvas,t=top:
+                                     self.plot_previous(t,c))
+        previous_button.pack(expand=True,side=tk.LEFT)
+        next_button = ttk.Button(self,text='>',
+                                 command=lambda c=canvas,t=top:
+                                 self.plot_next(t,c))
+        next_button.pack(expand=True,side=tk.LEFT)
+
+    def plot_previous(self,top,canvas):
+        ns = len(top.sp.samples)
+        top.sp.i = (top.sp.i + 1) % ns
+        canvas.figure, axs = top.sp.plot(show=False)
+        canvas.draw()
+
+    def plot_next(self,top,canvas):
+        ns = len(top.sp.samples)
+        top.sp.i = (top.sp.i - 1) % ns
+        canvas.figure, axs = top.sp.plot(show=False)
+        canvas.draw()
 
 def offset(parent,child):
     x_offset = parent.winfo_x()

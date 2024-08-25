@@ -1,6 +1,7 @@
 import SIMplex
 from pathlib import Path
 import pandas as pd
+import tkinter as tk
 import glob
 import os
 
@@ -15,6 +16,7 @@ class simplex:
         self.path = None
         self.method = None
         self.samples = pd.Series()
+        self.i = 0
 
     def set_instrument(self,instrument):
         self.instrument = instrument
@@ -38,11 +40,15 @@ class simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
 
-    def plot(self,i=1,sname=None):
+    def plot(self,i=None,sname=None,show=True):
         snames = self.samples.index
-        if sname not in snames:
-            sname = snames[i % len(snames)]
-        self.samples[sname].plot()
+        if sname in snames:
+            self.i = snames.index(sname)
+        else:
+            if i is not None:
+                self.i = i % len(snames)
+            sname = snames[self.i]
+        return self.samples[sname].plot(title=sname,show=show)
             
     def TODO(self):
         pass
