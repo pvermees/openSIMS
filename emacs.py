@@ -1,2 +1,8 @@
 import SIMplex, tests
-sp = SIMplex.simplex(gui=True)
+
+t = tests.Test()
+
+if False:
+    sp = SIMplex.simplex(gui=True)
+elif True:
+    t.testCameca()
