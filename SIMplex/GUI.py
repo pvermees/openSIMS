@@ -3,7 +3,7 @@ import tkinter.filedialog as fd
 import tkinter.ttk as ttk
 import tkinter.scrolledtext as st
 import tkinter.font as font
-import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
@@ -100,7 +100,8 @@ class gui(tk.Tk):
         self.log("sp.TODO()")
 
     def on_plot(self):
-        plot_window = PlotWindow(self)
+        if len(self.sp.samples)>0:
+            plot_window = PlotWindow(self)
         
     def on_process(self):
         self.log("sp.TODO()")
@@ -185,8 +186,10 @@ class LogWindow(tk.Toplevel):
 
     def clear(self,top):
         top.stack = []
+        self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(top.header))
+        self.script.config(state=tk.DISABLED)
 
 class PlotWindow(tk.Toplevel):
     
@@ -213,17 +216,18 @@ class PlotWindow(tk.Toplevel):
         next_button.pack(expand=True,side=tk.LEFT)
 
     def plot_previous(self,top,canvas):
-        ns = len(top.sp.samples)
-        top.sp.i = (top.sp.i + 1) % ns
-        canvas.figure, axs = top.sp.plot(show=False)
-        canvas.draw()
+        refresh_canvas(self,top,canvas,-1)
 
     def plot_next(self,top,canvas):
-        ns = len(top.sp.samples)
-        top.sp.i = (top.sp.i - 1) % ns
-        canvas.figure, axs = top.sp.plot(show=False)
-        canvas.draw()
+        refresh_canvas(self,top,canvas,+1)
 
+def refresh_canvas(self,top,canvas,di):
+    ns = len(top.sp.samples)
+    top.sp.i = (top.sp.i + di) % ns
+    plt.close(canvas.figure)
+    canvas.figure, axs = top.sp.plot(show=False)
+    canvas.draw()
+        
 def offset(parent,child):
     x_offset = parent.winfo_x()
     width = parent.winfo_width()
