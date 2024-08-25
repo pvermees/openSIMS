@@ -1,6 +1,7 @@
 from SIMplex import Sample
 import pandas as pd
 import csv
+import os
 
 class Cameca_Sample(Sample):
 

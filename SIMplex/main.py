@@ -1,33 +1,48 @@
-import SIMplex.GUI as GUI
+import SIMplex
+from pathlib import Path
+import pandas as pd
+import glob
+import os
 
 class simplex:
     
     def __init__(self,gui=False):
         self.reset()
-        if gui: self.gui = GUI.gui(self)
+        if gui: self.gui = SIMplex.gui(self)
 
     def reset(self):
-        self.data_dir = ''
-        self.instrument = ''
-        self.method = ''        
+        self.instrument = None
+        self.path = None
+        self.method = None
+        self.samples = pd.Series()
 
-    def set_data_dir(self,value):
-        self.data_dir = value
-
-    def get_data_dir(self,value):
-        return self.data_dir
-
-    def set_instrument(self,value):
-        self.instrument = value
-
+    def set_instrument(self,instrument):
+        self.instrument = instrument
     def get_instrument(self):
-        return self.instrument
+        return(self.instrument)
 
-    def set_method(self,value):
-        self.method = value
+    def set_path(self,path):
+        self.path = path
+    def get_path(self):
+        return(self.path)
 
-    def get_method(self):
-        return self.method
+    def read(self):
+        if self.instrument == 'Cameca':
+            fnames = glob.glob(os.path.join(self.path,'*.asc'))
+            for fname in fnames:
+                sname = Path(fname).stem
+                self.samples[sname] = SIMplex.Cameca_Sample()
+                self.samples[sname].read(fname)
+        elif self.instrument == 'SHRIMP':
+            todo(self)
+        else:
+            raise ValueError('Unrecognised instrument type.')
 
+    def plot(self,i=1,sname=None):
+        snames = self.samples.index
+        if sname not in snames:
+            sname = snames[i % len(snames)]
+        self.samples[sname].plot()
+            
     def TODO(self):
         pass

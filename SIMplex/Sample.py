@@ -24,3 +24,4 @@ class Sample:
                 ax[r,c].set_title(channel)
         if show:
             plt.show()
+        return fig, ax

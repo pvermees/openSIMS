@@ -83,10 +83,10 @@ class gui(tk.Tk):
         button.pack(expand=True)
 
     def on_open(self,instrument):
-        data_dir = fd.askdirectory()
-        if data_dir != '':
-            self.log("sp.set_instrument('{i}')".format(i=instrument))
-            self.log("sp.set_data_dir('{d}')".format(d=data_dir))
+        self.log("sp.set_instrument('{i}')".format(i=instrument))
+        path = fd.askdirectory() if instrument=='Cameca' else fd.askopenfile()
+        self.log("sp.set_path('{p}')".format(p=path))
+        self.log("sp.read()")
 
     def on_method(self):
         method = MethodWindow(self)
@@ -96,7 +96,7 @@ class gui(tk.Tk):
         self.log("sp.TODO()")
 
     def on_plot(self):
-        self.log("sp.TODO()")
+        self.log("sp.plot()")
         
     def on_process(self):
         self.log("sp.TODO()")
