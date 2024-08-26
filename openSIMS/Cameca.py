@@ -1,4 +1,4 @@
-from SIMplex import Sample
+from openSIMS import Sample
 import pandas as pd
 import csv
 import os

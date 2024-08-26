@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openSIMS"
+version = "0.0.2"
+authors = [
+  { name="Pieter Vermeesch", email="p.vermeesch@ucl.ac.uk" },
+]
+description = "A Python package for SIMS data reduction"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/pvermees/openSIMS"
+Issues = "https://github.com/pvermees/openSIMS/issues"
+
+[tool.setuptools]
+packages = ["openSIMS"]

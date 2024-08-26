@@ -1,4 +1,4 @@
-import SIMplex
+import openSIMS
 from pathlib import Path
 import pandas as pd
 import tkinter as tk
@@ -9,7 +9,7 @@ class simplex:
     
     def __init__(self,gui=False):
         self.reset()
-        if gui: self.gui = SIMplex.gui(self)
+        if gui: self.gui = openSIMS.gui(self)
 
     def reset(self):
         self.instrument = None
@@ -33,7 +33,7 @@ class simplex:
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
                 sname = Path(fname).stem
-                self.samples[sname] = SIMplex.Cameca_Sample()
+                self.samples[sname] = openSIMS.Cameca_Sample()
                 self.samples[sname].read(fname)
         elif self.instrument == 'SHRIMP':
             todo(self)

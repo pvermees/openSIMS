@@ -1,4 +1,4 @@
-from SIMplex import Sample
+from openSIMS import Sample
 
 class SHRIMP_Sample(Sample):
 

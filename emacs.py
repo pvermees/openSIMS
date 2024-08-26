@@ -1,4 +1,4 @@
-import SIMplex, tests
+import openSIMS, tests
 import matplotlib.pyplot as plt
 
 t = tests.Test()
@@ -9,4 +9,4 @@ elif False:
     t.testSample()
     plt.show()
 else:
-    sp = SIMplex.simplex(gui=True)
+    sp = openSIMS.simplex(gui=True)

@@ -12,11 +12,11 @@ class gui(tk.Tk):
 
     def __init__(self,settings):
         super().__init__()
-        self.title('SIMplex')
+        self.title('openSIMS')
         self.sp = settings
         self.stack = []
-        self.header = ["import SIMplex",
-                       "sp = SIMplex.simplex(gui=True)"]
+        self.header = ["import openSIMS",
+                       "sp = openSIMS.simplex(gui=True)"]
         self.log_window = None
         self.create_open_button()
         self.create_method_button()
