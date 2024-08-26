@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
+from openSIMS import doc
 
 class gui(tk.Tk):
 
@@ -19,6 +20,7 @@ class gui(tk.Tk):
         self.header = ["import openSIMS",
                        "sp = openSIMS.simplex(gui=True)"]
         self.log_window = None
+        self.help_window = None
         self.create_open_button()
         self.create_method_button()
         self.create_standard_button()
@@ -51,7 +53,7 @@ class gui(tk.Tk):
                          command=lambda inst="SHRIMP": self.on_open(inst))
         button["menu"] = menu
         button.pack(expand=True)
-        
+
     def create_method_button(self):
         button = ttk.Button(self,text='Method',command=self.on_method)
         button.pack(expand=True)
@@ -75,7 +77,7 @@ class gui(tk.Tk):
     def create_list_button(self):
         button = ttk.Button(self,text='List',command=self.on_list)
         button.pack(expand=True)
-        
+
     def create_log_button(self):
         button = ttk.Button(self,text='Log',command=self.toggle_log_window)
         button.pack(expand=True)
@@ -101,7 +103,7 @@ class gui(tk.Tk):
     def on_method(self):
         method = MethodWindow(self)
         method.grab_set()
-        
+
     def set_standard(self):
         self.log("sp.TODO()")
 
@@ -114,10 +116,10 @@ class gui(tk.Tk):
     def on_plot(self):
         if len(self.sp.samples)>0:
             plot_window = PlotWindow(self)
-        
+
     def on_list(self):
         self.log("sp.TODO()")
-        
+
     def toggle_log_window(self):
         if self.log_window is None:
             self.log_window = LogWindow(self)
@@ -128,18 +130,22 @@ class gui(tk.Tk):
 
     def on_template(self):
         self.log("sp.TODO()")
-        
+
     def on_settings(self):
         self.log("sp.TODO()")
 
     def on_help(self):
-        self.log("sp.TODO()")
-        
+        if self.help_window is None:
+            self.help_window = HelpWindow(self,item='top')
+        else:
+            self.help_window.destroy()
+            self.help_window = None
+
 class MethodWindow(tk.Toplevel):
-    
+
     def __init__(self,top):
         super().__init__(top)
-        self.title('method')
+        self.title('Method')
         self.create_test_button(top)
         offset(top,self)
 
@@ -152,8 +158,18 @@ class MethodWindow(tk.Toplevel):
         top.log("sp.TODO()")
         self.destroy()
 
+class HelpWindow(tk.Toplevel):
+
+    def __init__(self,top,item='top'):
+        super().__init__(top)
+        self.title('Help')
+        offset(top,self)
+        label = tk.Label(self,text=doc.Help(item),anchor='w',justify='left')
+        label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
+        label.pack(expand=True,fill=tk.BOTH)
+
 class LogWindow(tk.Toplevel):
-    
+
     def __init__(self,top):
         super().__init__(top)
         self.title('log')
