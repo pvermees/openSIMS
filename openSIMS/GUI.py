@@ -14,6 +14,7 @@ class gui(tk.Tk):
         super().__init__()
         self.title('openSIMS')
         self.sp = settings
+        self.figs = [111]
         self.stack = []
         self.header = ["import openSIMS",
                        "sp = openSIMS.simplex(gui=True)"]
@@ -21,12 +22,13 @@ class gui(tk.Tk):
         self.create_open_button()
         self.create_method_button()
         self.create_standard_button()
-        self.create_plot_button()
         self.create_process_button()
         self.create_export_button()
-        self.create_settings_button()
+        self.create_plot_button()
+        self.create_list_button()
         self.create_log_button()
         self.create_template_button()
+        self.create_settings_button()
         self.create_help_button()
 
     def log(self,cmd):
@@ -58,10 +60,6 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Standards',command=self.set_standard)
         button.pack(expand=True)
 
-    def create_plot_button(self):
-        button = ttk.Button(self,text='Plot',command=self.on_plot)
-        button.pack(expand=True)
-
     def create_process_button(self):
         button = ttk.Button(self,text='Process',command=self.on_process)
         button.pack(expand=True)
@@ -70,16 +68,24 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Export',command=self.on_export)
         button.pack(expand=True)
 
-    def create_settings_button(self):
-        button = ttk.Button(self,text='Settings',command=self.on_settings)
+    def create_plot_button(self):
+        button = ttk.Button(self,text='Plot',command=self.on_plot)
         button.pack(expand=True)
 
+    def create_list_button(self):
+        button = ttk.Button(self,text='List',command=self.on_list)
+        button.pack(expand=True)
+        
     def create_log_button(self):
         button = ttk.Button(self,text='Log',command=self.toggle_log_window)
         button.pack(expand=True)
 
     def create_template_button(self):
         button = ttk.Button(self,text='Template',command=self.on_template)
+        button.pack(expand=True)
+
+    def create_settings_button(self):
+        button = ttk.Button(self,text='Settings',command=self.on_settings)
         button.pack(expand=True)
 
     def create_help_button(self):
@@ -99,19 +105,19 @@ class gui(tk.Tk):
     def set_standard(self):
         self.log("sp.TODO()")
 
-    def on_plot(self):
-        if len(self.sp.samples)>0:
-            plot_window = PlotWindow(self)
-        
     def on_process(self):
         self.log("sp.TODO()")
 
     def on_export(self):
         self.log("sp.TODO()")
 
-    def on_settings(self):
+    def on_plot(self):
+        if len(self.sp.samples)>0:
+            plot_window = PlotWindow(self)
+        
+    def on_list(self):
         self.log("sp.TODO()")
-
+        
     def toggle_log_window(self):
         if self.log_window is None:
             self.log_window = LogWindow(self)
@@ -123,6 +129,9 @@ class gui(tk.Tk):
     def on_template(self):
         self.log("sp.TODO()")
         
+    def on_settings(self):
+        self.log("sp.TODO()")
+
     def on_help(self):
         self.log("sp.TODO()")
         
@@ -197,23 +206,22 @@ class PlotWindow(tk.Toplevel):
         super().__init__()
         self.title('Plot')
         offset(top,self)
-        fig, axs = top.sp.plot(show=False)
+        fig, axs = top.sp.plot(show=False,num=top.figs[0])
   
         canvas = FigureCanvasTkAgg(fig,master=self)
+        canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         canvas.draw()
-        canvas.get_tk_widget().pack()
         toolbar = NavigationToolbar2Tk(canvas,self)
         toolbar.update()
   
-        canvas.get_tk_widget().pack(fill='both',expand=True)
         previous_button = ttk.Button(self,text='<',
                                      command=lambda c=canvas,t=top:
                                      self.plot_previous(t,c))
-        previous_button.pack(expand=True,side=tk.LEFT)
+        previous_button.pack(expand=tk.TRUE,side=tk.LEFT)
         next_button = ttk.Button(self,text='>',
                                  command=lambda c=canvas,t=top:
                                  self.plot_next(t,c))
-        next_button.pack(expand=True,side=tk.LEFT)
+        next_button.pack(expand=tk.TRUE,side=tk.LEFT)
 
     def plot_previous(self,top,canvas):
         refresh_canvas(self,top,canvas,-1)
@@ -224,8 +232,8 @@ class PlotWindow(tk.Toplevel):
 def refresh_canvas(self,top,canvas,di):
     ns = len(top.sp.samples)
     top.sp.i = (top.sp.i + di) % ns
-    plt.close(canvas.figure)
-    canvas.figure, axs = top.sp.plot(show=False)
+    canvas.figure.clf()
+    canvas.figure, axs = top.sp.plot(show=False,num=top.figs[0])
     canvas.draw()
         
 def offset(parent,child):

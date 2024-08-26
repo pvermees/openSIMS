@@ -40,7 +40,7 @@ class simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
 
-    def plot(self,i=None,sname=None,show=True):
+    def plot(self,i=None,sname=None,show=True,num=None):
         snames = self.samples.index
         if sname in snames:
             self.i = snames.index(sname)
@@ -48,7 +48,7 @@ class simplex:
             if i is not None:
                 self.i = i % len(snames)
             sname = snames[self.i]
-        return self.samples[sname].plot(title=sname,show=show)
+        return self.samples[sname].plot(title=sname,show=show,num=num)
             
     def TODO(self):
         pass

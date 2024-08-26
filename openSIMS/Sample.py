@@ -11,12 +11,12 @@ class Sample:
         self.channels = pd.DataFrame()
         self.detector = pd.DataFrame()
 
-    def plot(self,channels=None,title=None,show=True):
+    def plot(self,channels=None,title=None,show=True,num=None):
         if channels is None:
             channels = self.signal.columns
         nr = math.ceil(math.sqrt(len(channels)))
         nc = math.ceil(len(channels)/nr)
-        fig, ax = plt.subplots(nr,nc)
+        fig, ax = plt.subplots(nr,nc,num=num)
         if title is not None:
             plt.suptitle(title)
         for r in range(nr):

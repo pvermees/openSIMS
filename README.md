@@ -5,7 +5,7 @@ Python package for SIMS data reduction
 ## Installation
 
 ```
-python3 -m pip install openSIMS
+python -m pip install openSIMS --upgrade
 ```
 
 ## Usage
