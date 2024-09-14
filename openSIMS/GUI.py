@@ -183,26 +183,16 @@ class LogWindow(tk.Toplevel):
 
     def log(self,cmd=None):
         self.script.config(state=tk.NORMAL)
-<<<<<<< HEAD
         if cmd is None:
             self.script.delete(1.0,tk.END)
         else:
             self.script.insert(tk.INSERT,cmd)
             self.script.insert(tk.INSERT,'\n')
-=======
-        self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(S.get('stack')))
->>>>>>> 536228a2cc15722faddfa7b4c7ef825a0c75a7d1
         self.script.config(state=tk.DISABLED)
         
     def load(self):
         file = fd.askopenfile()
         stack = file.read().splitlines()
-<<<<<<< HEAD
-=======
-        S.set('stack',stack)
-        self.refresh(top)
->>>>>>> 536228a2cc15722faddfa7b4c7ef825a0c75a7d1
         file.close()
         S.set('stack',stack)
         self.run()
@@ -217,21 +207,11 @@ class LogWindow(tk.Toplevel):
         file.writelines('\n'.join(S.get('stack')))
         file.close()
 
-<<<<<<< HEAD
     def clear(self):
         header = S.get('header')
         S.set('stack',[header])
         self.log()
         self.log(cmd=header)
-=======
-    def clear(self,top):
-        header = S.get('header')
-        S.set('stack',[header])
-        self.script.config(state=tk.NORMAL)
-        self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,header)
-        self.script.config(state=tk.DISABLED)
->>>>>>> 536228a2cc15722faddfa7b4c7ef825a0c75a7d1
 
 class PlotWindow(tk.Toplevel):
     
