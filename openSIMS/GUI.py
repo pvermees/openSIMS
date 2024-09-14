@@ -1,3 +1,4 @@
+import openSIMS as S
 import tkinter as tk
 import tkinter.filedialog as fd
 import tkinter.ttk as ttk
@@ -7,7 +8,6 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-import openSIMS as S
 
 class gui(tk.Tk):
 
@@ -15,7 +15,6 @@ class gui(tk.Tk):
         super().__init__()
         self.title('openSIMS')
         self.figs = [111]
-        self.header = ["import openSIMS as S"]
         self.log_window = None
         self.help_window = None
         self.create_open_button()
@@ -30,16 +29,11 @@ class gui(tk.Tk):
         self.create_settings_button()
         self.create_help_button()
 
-    def log(self,cmd):
+    def run(self,cmd):
         S.get('stack').append(cmd)
         exec(cmd)
         if self.log_window is not None:
-            self.log_window.refresh(self)
-
-    def run(self):
-        S.reset()
-        for cmd in S.get('stack'):
-            exec(cmd)
+            self.log_window.log(cmd=cmd)
 
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
@@ -92,44 +86,44 @@ class gui(tk.Tk):
         button.pack(expand=True)
 
     def on_open(self,instrument):
-        self.log("S.set('instrument','{i}')".format(i=instrument))
+        self.run("S.set('instrument','{i}')".format(i=instrument))
         path = fd.askdirectory() if instrument=='Cameca' else fd.askopenfile()
-        self.log("S.set('path','{p}')".format(p=path))
-        self.log("S.read()")
+        self.run("S.set('path','{p}')".format(p=path))
+        self.run("S.read()")
 
     def on_method(self):
         method = MethodWindow(self)
         method.grab_set()
 
     def set_standard(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def on_process(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def on_export(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def on_plot(self):
         if len(S.get('samples'))>0:
             plot_window = PlotWindow(self)
 
     def on_list(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def toggle_log_window(self):
         if self.log_window is None:
             self.log_window = LogWindow(self)
-            self.log_window.refresh(self)
+            self.log_window.show()
         else:
             self.log_window.destroy()
             self.log_window = None
 
     def on_template(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def on_settings(self):
-        self.log("S.TODO()")
+        self.run("S.TODO()")
 
     def on_help(self):
         if self.help_window is None:
@@ -152,7 +146,7 @@ class MethodWindow(tk.Toplevel):
         button.pack(expand=True)
 
     def on_test(self,top):
-        top.log("S.TODO()")
+        top.run("S.TODO()")
         self.destroy()
 
 class HelpWindow(tk.Toplevel):
@@ -161,7 +155,8 @@ class HelpWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Help')
         offset(top,self)
-        label = tk.Label(self,text=S.doc.Help(item),anchor='w',justify='left')
+        from openSIMS import doc
+        label = tk.Label(self,text=doc.Help(item),anchor='w',justify='left')
         label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)
 
@@ -174,46 +169,49 @@ class LogWindow(tk.Toplevel):
         self.protocol('WM_DELETE_WINDOW',top.toggle_log_window)
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
-        open_button = ttk.Button(self,text='Open',
-                                 command=lambda t=top: self.load(t))
+        open_button = ttk.Button(self,text='Open',command=self.load)
         open_button.pack(expand=True,side=tk.LEFT)
-        save_button = ttk.Button(self,text='Save',
-                                 command=lambda t=top: self.save(t))
+        save_button = ttk.Button(self,text='Save',command=self.save)
         save_button.pack(expand=True,side=tk.LEFT)
-        run_button = ttk.Button(self,text='Run',command=top.run)
-        run_button.pack(expand=True,side=tk.LEFT)
-        clear_button = ttk.Button(self,text='Clear',
-                                  command=lambda t=top: self.clear(t))
+        clear_button = ttk.Button(self,text='Clear',command=self.clear)
         clear_button.pack(expand=True,side=tk.LEFT)
 
-    def refresh(self,top):
+    def show(self,run=False):
+        for cmd in S.get('stack'):
+            self.log(cmd=cmd)
+            if run: exec(cmd)
+
+    def log(self,cmd=None):
         self.script.config(state=tk.NORMAL)
-        self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(top.header))
-        self.script.insert(tk.INSERT,'\n')
-        self.script.insert(tk.INSERT,'\n'.join(S.get('stack')))
+        if cmd is None:
+            self.script.delete(1.0,tk.END)
+        else:
+            self.script.insert(tk.INSERT,cmd)
+            self.script.insert(tk.INSERT,'\n')
         self.script.config(state=tk.DISABLED)
         
-    def load(self,top):
+    def load(self):
         file = fd.askopenfile()
-        stack = file.read().splitlines()[len(top.header):]
-        S.set('stack',stack)
-        self.refresh(top)
+        stack = file.read().splitlines()
         file.close()
+        S.set('stack',stack)
+        self.run()
 
-    def save(self,top):
+    def run(self):
+        S.reset()
+        self.log()
+        self.show(run=True)
+
+    def save(self):
         file = fd.asksaveasfile(mode='w')
-        file.writelines('\n'.join(top.header))
-        file.writelines('\n')
         file.writelines('\n'.join(S.get('stack')))
         file.close()
 
-    def clear(self,top):
-        S.set('stack',[])
-        self.script.config(state=tk.NORMAL)
-        self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(top.header))
-        self.script.config(state=tk.DISABLED)
+    def clear(self):
+        header = S.get('header')
+        S.set('stack',[header])
+        self.log()
+        self.log(cmd=header)
 
 class PlotWindow(tk.Toplevel):
     
@@ -239,18 +237,18 @@ class PlotWindow(tk.Toplevel):
         next_button.pack(expand=tk.TRUE,side=tk.LEFT)
 
     def plot_previous(self,top,canvas):
-        refresh_canvas(self,top,canvas,-1)
+        self.refresh_canvas(top,canvas,-1)
 
     def plot_next(self,top,canvas):
-        refresh_canvas(self,top,canvas,+1)
+        self.refresh_canvas(top,canvas,+1)
 
-def refresh_canvas(self,top,canvas,di):
-    ns = len(S.get('samples'))
-    i = (S.get('i') + di) % ns
-    S.set('i',i)
-    canvas.figure.clf()
-    canvas.figure, axs = S.plot(show=False,num=top.figs[0])
-    canvas.draw()
+    def refresh_canvas(self,top,canvas,di):
+        ns = len(S.get('samples'))
+        i = (S.get('i') + di) % ns
+        S.set('i',i)
+        canvas.figure.clf()
+        canvas.figure, axs = S.plot(show=False,num=top.figs[0])
+        canvas.draw()
         
 def offset(parent,child):
     x_offset = parent.winfo_x()

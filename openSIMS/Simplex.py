@@ -10,7 +10,8 @@ class simplex:
     def __init__(self):
         self.reset()
         self.i = 0
-        self.stack = []
+        self.header = 'import openSIMS as S'
+        self.stack = [self.header]
 
     def reset(self):
         self.instrument = None

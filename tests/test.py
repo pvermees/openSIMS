@@ -1,6 +1,6 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS import Cameca, SHRIMP, Sample
+from openSIMS import Cameca, SHRIMP, Sample, Simplex
 import openSIMS as S
 
 class Test(unittest.TestCase):
