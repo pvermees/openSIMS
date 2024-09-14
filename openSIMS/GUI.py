@@ -15,7 +15,6 @@ class gui(tk.Tk):
         super().__init__()
         self.title('openSIMS')
         self.figs = [111]
-        self.header = ["import openSIMS as S"]
         self.log_window = None
         self.help_window = None
         self.create_open_button()
@@ -161,7 +160,8 @@ class HelpWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Help')
         offset(top,self)
-        label = tk.Label(self,text=S.doc.Help(item),anchor='w',justify='left')
+        from openSIMS import doc
+        label = tk.Label(self,text=doc.Help(item),anchor='w',justify='left')
         label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)
 
@@ -189,30 +189,27 @@ class LogWindow(tk.Toplevel):
     def refresh(self,top):
         self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(top.header))
-        self.script.insert(tk.INSERT,'\n')
         self.script.insert(tk.INSERT,'\n'.join(S.get('stack')))
         self.script.config(state=tk.DISABLED)
         
     def load(self,top):
         file = fd.askopenfile()
-        stack = file.read().splitlines()[len(top.header):]
+        stack = file.read().splitlines()
         S.set('stack',stack)
         self.refresh(top)
         file.close()
 
     def save(self,top):
         file = fd.asksaveasfile(mode='w')
-        file.writelines('\n'.join(top.header))
-        file.writelines('\n')
         file.writelines('\n'.join(S.get('stack')))
         file.close()
 
     def clear(self,top):
-        S.set('stack',[])
+        header = S.get('header')
+        S.set('stack',[header])
         self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
-        self.script.insert(tk.INSERT,'\n'.join(top.header))
+        self.script.insert(tk.INSERT,header)
         self.script.config(state=tk.DISABLED)
 
 class PlotWindow(tk.Toplevel):
