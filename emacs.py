@@ -1,12 +1,13 @@
-import openSIMS, tests
+import openSIMS as S
 import matplotlib.pyplot as plt
+import tests
 
 t = tests.Test()
 
 if False:
-    t.testRun()
+    t.newCamecaSHRIMPinstance()
 elif False:
-    t.testSample()
+    t.createButDontShowPlot()
     plt.show()
 else:
-    sp = openSIMS.simplex(gui=True)
+    S.gui()

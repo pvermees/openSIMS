@@ -1,4 +1,4 @@
-import openSIMS
+import openSIMS as S
 from pathlib import Path
 import pandas as pd
 import tkinter as tk
@@ -7,36 +7,26 @@ import os
 
 class simplex:
     
-    def __init__(self,gui=False):
+    def __init__(self):
         self.reset()
-        if gui: self.gui = openSIMS.gui(self)
+        self.i = 0
+        self.stack = []
 
     def reset(self):
         self.instrument = None
         self.path = None
         self.method = None
         self.samples = pd.Series()
-        self.i = 0
-
-    def set_instrument(self,instrument):
-        self.instrument = instrument
-    def get_instrument(self):
-        return(self.instrument)
-
-    def set_path(self,path):
-        self.path = path
-    def get_path(self):
-        return(self.path)
 
     def read(self):
         if self.instrument == 'Cameca':
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
                 sname = Path(fname).stem
-                self.samples[sname] = openSIMS.Cameca_Sample()
+                self.samples[sname] = S.Cameca.Cameca_Sample()
                 self.samples[sname].read(fname)
         elif self.instrument == 'SHRIMP':
-            todo(self)
+            self.TODO(self)
         else:
             raise ValueError('Unrecognised instrument type.')
 

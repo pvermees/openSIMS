@@ -1,29 +1,34 @@
 import unittest
-import time
-import openSIMS
 import matplotlib.pyplot as plt
-from openSIMS.Sample import Sample
+from openSIMS import Cameca, SHRIMP, Sample
+import openSIMS as S
 
 class Test(unittest.TestCase):
 
-    def testSample(self):
-        cam = openSIMS.Cameca.Cameca_Sample()
-        shr = openSIMS.SHRIMP.SHRIMP_Sample()
-        self.assertIsInstance(cam,Sample)
-        self.assertIsInstance(cam,Sample)
+    def test_newCamecaSHRIMPinstance(self):
+        cam = S.Cameca.Cameca_Sample()
+        shr = S.SHRIMP.SHRIMP_Sample()
+        self.assertIsInstance(cam,S.Sample.Sample)
+        self.assertIsInstance(cam,S.Sample.Sample)
 
-    def testSample(self):
-        samp = openSIMS.Cameca.Cameca_Sample()
+    def test_openCamecaASCfile(self):
+        samp = S.Cameca.Cameca_Sample()
         samp.read("data/Cameca_UPb/Plesovice@01.asc")
         self.assertEqual(samp.signal.size,84)
         samp.plot(show=False)
 
-    def testRun(self):
-        sp = openSIMS.simplex()
-        sp.set_instrument('Cameca')
-        sp.set_path('data/Cameca_UPb')
-        sp.read()
-        sp.plot(show=False)
+    def test_createButDontShowPlot(self):
+        self.loadCamecaData()
+        S.plot(show=False)
 
+    def test_gui(self):
+        self.loadCamecaData()
+        S.gui()
+
+    def loadCamecaData(self):
+        S.set('instrument','Cameca')
+        S.set('path','data/Cameca_UPb')
+        S.read()        
+        
 if __name__ == '__main__':
     unittest.main()

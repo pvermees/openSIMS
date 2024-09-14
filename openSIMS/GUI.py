@@ -7,18 +7,15 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
-from openSIMS import doc
+import openSIMS as S
 
 class gui(tk.Tk):
 
-    def __init__(self,settings):
+    def __init__(self):
         super().__init__()
         self.title('openSIMS')
-        self.sp = settings
         self.figs = [111]
-        self.stack = []
-        self.header = ["import openSIMS",
-                       "sp = openSIMS.simplex(gui=True)"]
+        self.header = ["import openSIMS as S"]
         self.log_window = None
         self.help_window = None
         self.create_open_button()
@@ -34,15 +31,15 @@ class gui(tk.Tk):
         self.create_help_button()
 
     def log(self,cmd):
-        self.stack.append(cmd)
-        exec('self.' + cmd)
+        S.get('stack').append(cmd)
+        exec(cmd)
         if self.log_window is not None:
             self.log_window.refresh(self)
 
     def run(self):
-        self.sp.reset()
-        for cmd in self.stack:
-            exec('self.' + cmd)
+        S.reset()
+        for cmd in S.get('stack'):
+            exec(cmd)
 
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
@@ -95,30 +92,30 @@ class gui(tk.Tk):
         button.pack(expand=True)
 
     def on_open(self,instrument):
-        self.log("sp.set_instrument('{i}')".format(i=instrument))
+        self.log("S.set('instrument','{i}')".format(i=instrument))
         path = fd.askdirectory() if instrument=='Cameca' else fd.askopenfile()
-        self.log("sp.set_path('{p}')".format(p=path))
-        self.log("sp.read()")
+        self.log("S.set('path','{p}')".format(p=path))
+        self.log("S.read()")
 
     def on_method(self):
         method = MethodWindow(self)
         method.grab_set()
 
     def set_standard(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def on_process(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def on_export(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def on_plot(self):
-        if len(self.sp.samples)>0:
+        if len(S.get('samples'))>0:
             plot_window = PlotWindow(self)
 
     def on_list(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def toggle_log_window(self):
         if self.log_window is None:
@@ -129,10 +126,10 @@ class gui(tk.Tk):
             self.log_window = None
 
     def on_template(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def on_settings(self):
-        self.log("sp.TODO()")
+        self.log("S.TODO()")
 
     def on_help(self):
         if self.help_window is None:
@@ -155,7 +152,7 @@ class MethodWindow(tk.Toplevel):
         button.pack(expand=True)
 
     def on_test(self,top):
-        top.log("sp.TODO()")
+        top.log("S.TODO()")
         self.destroy()
 
 class HelpWindow(tk.Toplevel):
@@ -164,7 +161,7 @@ class HelpWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Help')
         offset(top,self)
-        label = tk.Label(self,text=doc.Help(item),anchor='w',justify='left')
+        label = tk.Label(self,text=S.doc.Help(item),anchor='w',justify='left')
         label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)
 
@@ -194,23 +191,25 @@ class LogWindow(tk.Toplevel):
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(top.header))
         self.script.insert(tk.INSERT,'\n')
-        self.script.insert(tk.INSERT,'\n'.join(top.stack))
+        self.script.insert(tk.INSERT,'\n'.join(S.get('stack')))
         self.script.config(state=tk.DISABLED)
         
     def load(self,top):
         file = fd.askopenfile()
-        top.stack = file.read().splitlines()[len(top.header):]
+        stack = file.read().splitlines()[len(top.header):]
+        S.set('stack',stack)
         self.refresh(top)
         file.close()
 
     def save(self,top):
         file = fd.asksaveasfile(mode='w')
         file.writelines('\n'.join(top.header))
-        file.writelines('\n'.join(top.stack))
+        file.writelines('\n')
+        file.writelines('\n'.join(S.get('stack')))
         file.close()
 
     def clear(self,top):
-        top.stack = []
+        S.set('stack',[])
         self.script.config(state=tk.NORMAL)
         self.script.delete(1.0,tk.END)
         self.script.insert(tk.INSERT,'\n'.join(top.header))
@@ -222,7 +221,7 @@ class PlotWindow(tk.Toplevel):
         super().__init__()
         self.title('Plot')
         offset(top,self)
-        fig, axs = top.sp.plot(show=False,num=top.figs[0])
+        fig, axs = S.plot(show=False,num=top.figs[0])
   
         canvas = FigureCanvasTkAgg(fig,master=self)
         canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
@@ -246,10 +245,11 @@ class PlotWindow(tk.Toplevel):
         refresh_canvas(self,top,canvas,+1)
 
 def refresh_canvas(self,top,canvas,di):
-    ns = len(top.sp.samples)
-    top.sp.i = (top.sp.i + di) % ns
+    ns = len(S.get('samples'))
+    i = (S.get('i') + di) % ns
+    S.set('i',i)
     canvas.figure.clf()
-    canvas.figure, axs = top.sp.plot(show=False,num=top.figs[0])
+    canvas.figure, axs = S.plot(show=False,num=top.figs[0])
     canvas.draw()
         
 def offset(parent,child):

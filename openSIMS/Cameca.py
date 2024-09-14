@@ -1,9 +1,9 @@
-from openSIMS import Sample
 import pandas as pd
 import csv
 import os
+from openSIMS import Sample
 
-class Cameca_Sample(Sample):
+class Cameca_Sample(Sample.Sample):
 
     def __init__(self):
         super().__init__()
