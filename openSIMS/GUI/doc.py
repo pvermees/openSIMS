@@ -1,3 +1,16 @@
+import tkinter as tk
+from . import main
+
+class HelpWindow(tk.Toplevel):
+
+    def __init__(self,top,item='top'):
+        super().__init__(top)
+        self.title('Help')
+        main.offset(top,self)
+        label = tk.Label(self,text=Help(item),anchor='w',justify='left')
+        label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
+        label.pack(expand=True,fill=tk.BOTH)
+
 def Help(item):
     if item=="top":
         out = "Choose one of the following options:\n" + \
