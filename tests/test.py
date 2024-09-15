@@ -1,18 +1,18 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS import Cameca, SHRIMP, Sample, Simplex
+from openSIMS.API import Cameca, SHRIMP, Sample, Simplex
 import openSIMS as S
 
 class Test(unittest.TestCase):
 
     def test_newCamecaSHRIMPinstance(self):
-        cam = S.Cameca.Cameca_Sample()
-        shr = S.SHRIMP.SHRIMP_Sample()
-        self.assertIsInstance(cam,S.Sample.Sample)
-        self.assertIsInstance(cam,S.Sample.Sample)
+        cam = Cameca.Cameca_Sample()
+        shr = SHRIMP.SHRIMP_Sample()
+        self.assertIsInstance(cam,Sample.Sample)
+        self.assertIsInstance(cam,Sample.Sample)
 
     def test_openCamecaASCfile(self):
-        samp = S.Cameca.Cameca_Sample()
+        samp = Cameca.Cameca_Sample()
         samp.read("data/Cameca_UPb/Plesovice@01.asc")
         self.assertEqual(samp.signal.size,84)
         samp.plot(show=False)

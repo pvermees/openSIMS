@@ -155,8 +155,8 @@ class HelpWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Help')
         offset(top,self)
-        from openSIMS import doc
-        label = tk.Label(self,text=doc.Help(item),anchor='w',justify='left')
+        from .doc import Help
+        label = tk.Label(self,text=Help(item),anchor='w',justify='left')
         label.bind('<Configure>', lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)
 

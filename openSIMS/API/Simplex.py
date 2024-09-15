@@ -1,4 +1,4 @@
-import openSIMS as S
+from . import Cameca
 from pathlib import Path
 import pandas as pd
 import tkinter as tk
@@ -24,7 +24,7 @@ class simplex:
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
                 sname = Path(fname).stem
-                self.samples[sname] = S.Cameca.Cameca_Sample()
+                self.samples[sname] = Cameca.Cameca_Sample()
                 self.samples[sname].read(fname)
         elif self.instrument == 'SHRIMP':
             self.TODO(self)

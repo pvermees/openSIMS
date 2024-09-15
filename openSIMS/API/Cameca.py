@@ -1,7 +1,7 @@
 import pandas as pd
 import csv
 import os
-from openSIMS import Sample
+from . import Sample
 
 class Cameca_Sample(Sample.Sample):
 
