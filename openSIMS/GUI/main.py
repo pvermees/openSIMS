@@ -33,15 +33,17 @@ class gui(tk.Tk):
     def create_open_button(self):
         button = ttk.Menubutton(self,text='Open',direction="right")
         menu = tk.Menu(button, tearoff=0)
-        menu.add_command(label="Cameca",
-                         command=lambda inst="Cameca": self.on_open(inst))
-        menu.add_command(label="SHRIMP",
-                         command=lambda inst="SHRIMP": self.on_open(inst))
+        for inst in ['Cameca','SHRIMP']:
+            menu.add_command(label=inst,command=lambda i=inst: self.on_open(i))
         button["menu"] = menu
         button.pack(expand=True)
 
     def create_method_button(self):
-        button = ttk.Button(self,text='Method',command=self.on_method)
+        button = ttk.Menubutton(self,text='Method',direction="right")
+        menu = tk.Menu(button, tearoff=0)
+        for method in ['U-Pb','Th-Pb','O','S']:
+            menu.add_command(label=method,command=lambda m=method: self.on_method(m))
+        button["menu"] = menu
         button.pack(expand=True)
 
     def create_standard_button(self):
@@ -80,14 +82,14 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Help',command=self.on_help)
         button.pack(expand=True)
 
-    def on_open(self,instrument):
-        self.run("S.set('instrument','{i}')".format(i=instrument))
-        path = fd.askdirectory() if instrument=='Cameca' else fd.askopenfile()
+    def on_open(self,inst):
+        self.run("S.set('instrument','{i}')".format(i=inst))
+        path = fd.askdirectory() if inst=='Cameca' else fd.askopenfile()
         self.run("S.set('path','{p}')".format(p=path))
         self.run("S.read()")
 
-    def on_method(self):
-        m = method.MethodWindow(self)
+    def on_method(self,meth):
+        m = method.MethodWindow(self,meth)
         m.grab_set()
 
     def set_standard(self):

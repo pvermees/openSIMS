@@ -21,9 +21,12 @@ class Test(unittest.TestCase):
         self.loadCamecaData()
         S.plot(show=False)
 
-    def test_gui(self):
+    def test_getCamecaChannels(self):
         self.loadCamecaData()
-        S.gui()
+        self.assertEqual(S.get('channels'),
+                         ['90Zr2 16O','92Zr2 16O','200.5','94Zr2 16O',
+                          '204Pb','206Pb','207Pb','208Pb','238U',
+                          '232Th 16O2','238U 16O2','270.1'])
 
     def loadCamecaData(self):
         S.set('instrument','Cameca')

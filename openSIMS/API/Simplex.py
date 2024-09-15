@@ -40,6 +40,13 @@ class simplex:
                 self.i = i % len(snames)
             sname = snames[self.i]
         return self.samples[sname].plot(title=sname,show=show,num=num)
-            
+
+    def channels(self):
+        run = self.samples
+        if len(run)>0:
+            return self.samples.iloc[0].channels.index.tolist()
+        else:
+            return None
+
     def TODO(self):
         pass

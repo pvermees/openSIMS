@@ -5,9 +5,6 @@ import tests
 t = tests.Test()
 
 if False:
-    t.newCamecaSHRIMPinstance()
-elif False:
-    t.createButDontShowPlot()
-    plt.show()
-else:
     S.gui()
+else:
+    t.test_getCamecaChannels()

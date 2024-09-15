@@ -7,7 +7,10 @@ def set(prop,val):
     setattr(__S,prop,val)
 
 def get(prop):
-    return(getattr(__S,prop))
+    if prop == 'channels':
+        return __S.channels()
+    else:
+        return getattr(__S,prop)
 
 def reset():
     __S.reset()
