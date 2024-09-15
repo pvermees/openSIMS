@@ -7,4 +7,4 @@ t = tests.Test()
 if False:
     S.gui()
 else:
-    t.test_getCamecaChannels()
+    t.test_methodPairing()

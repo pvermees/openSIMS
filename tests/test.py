@@ -1,6 +1,6 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS.API import Cameca, SHRIMP, Sample, Simplex
+from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex
 import openSIMS as S
 
 class Test(unittest.TestCase):
@@ -27,6 +27,12 @@ class Test(unittest.TestCase):
                          ['90Zr2 16O','92Zr2 16O','200.5','94Zr2 16O',
                           '204Pb','206Pb','207Pb','208Pb','238U',
                           '232Th 16O2','238U 16O2','270.1'])
+
+    def test_methodPairing(self):
+        m = Method.method('U-Pb',
+                          U='238U',UO='238U 16O2',
+                          Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        self.assertEqual(m.ions['UO'],'238U 16O2')
 
     def loadCamecaData(self):
         S.set('instrument','Cameca')
