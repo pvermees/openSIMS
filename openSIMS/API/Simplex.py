@@ -2,7 +2,7 @@ import pandas as pd
 import tkinter as tk
 import glob
 import os
-from . import Cameca, Method
+from . import Cameca
 from pathlib import Path
 
 class simplex:

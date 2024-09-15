@@ -2,7 +2,7 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
-from . import main
+from . import Main
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
@@ -12,7 +12,7 @@ class PlotWindow(tk.Toplevel):
     def __init__(self,top):
         super().__init__()
         self.title('Plot')
-        main.offset(top,self)
+        Main.offset(top,self)
         fig, axs = S.plot(show=False,num=top.figs[0])
   
         canvas = FigureCanvasTkAgg(fig,master=self)

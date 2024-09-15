@@ -1,5 +1,5 @@
 from .API import Simplex, Method
-from .GUI.main import gui
+from .GUI.Main import gui
 
 __S = Simplex.simplex()
 

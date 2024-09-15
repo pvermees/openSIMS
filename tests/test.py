@@ -29,10 +29,11 @@ class Test(unittest.TestCase):
                           '232Th 16O2','238U 16O2','270.1'])
 
     def test_methodPairing(self):
-        m = Method.method('U-Pb',
-                          U='238U',UO='238U 16O2',
-                          Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
-        self.assertEqual(m.ions['UO'],'238U 16O2')
+        S.set('method',
+              'U-Pb',
+              U='238U',UO='238U 16O2',
+              Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        self.assertEqual(S.get('method').ions['UO'],'238U 16O2')
 
     def loadCamecaData(self):
         S.set('instrument','Cameca')

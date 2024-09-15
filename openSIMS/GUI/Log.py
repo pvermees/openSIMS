@@ -3,14 +3,14 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
 import tkinter.scrolledtext as st
-from . import main
+from . import Main
 
 class LogWindow(tk.Toplevel):
 
     def __init__(self,top):
         super().__init__(top)
         self.title('log')
-        main.offset(top,self)
+        Main.offset(top,self)
         self.protocol('WM_DELETE_WINDOW',top.toggle_log_window)
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
