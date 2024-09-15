@@ -1,10 +1,13 @@
-from .API.Simplex import simplex
+from .API import Simplex, Method
 from .GUI.main import gui
 
-__S = simplex()
+__S = Simplex.simplex()
 
-def set(prop,val):
-    setattr(__S,prop,val)
+def set(prop,val,**kwargs):
+    if prop == 'method':
+        __S.method = Method.method(val,**kwargs)
+    else:
+        setattr(__S,prop,val)
 
 def get(prop):
     if prop == 'channels':
