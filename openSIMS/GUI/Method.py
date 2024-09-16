@@ -6,8 +6,6 @@ from ..API import Method
 
 class MethodWindow(tk.Toplevel):
 
-    combo_placeholder = 'Pick a channel'
-
     def __init__(self,top,m):
         super().__init__(top)
         self.title('Pair the ions with the channels')
@@ -22,7 +20,7 @@ class MethodWindow(tk.Toplevel):
             label.grid(row=row,column=0,padx=2,pady=2)
             selections[ion] = tk.StringVar()
             combo = ttk.Combobox(self,values=channels,textvariable=selections[ion])
-            default = self.guess_placeholder(ion,channels) if oldmethod is None else oldmethod.ions[ion]
+            default = self.guess(ion,channels) if oldmethod is None else oldmethod.ions[ion]
             combo.set(default)
             combo.grid(row=row,column=1,padx=2,pady=2)
             row += 1
@@ -30,7 +28,7 @@ class MethodWindow(tk.Toplevel):
                             command=lambda t=top,m=m,s=selections: self.on_click(t,m,s))
         button.grid(row=row,columnspan=2)
 
-    def guess_placeholder(self,ion,channels):
+    def guess(self,ion,channels):
         bestoverlap = 0
         out = channels[0]
         for channel in channels:
@@ -44,8 +42,7 @@ class MethodWindow(tk.Toplevel):
         cmd = "S.set('method','{m}'".format(m=m)
         for key in selections:
             val = selections[key].get()
-            if val != self.combo_placeholder:
-                cmd += "," + key + "='" + val + "'"
+            cmd += "," + key + "='" + val + "'"
         cmd += ")"
         top.run(cmd)
         self.destroy()

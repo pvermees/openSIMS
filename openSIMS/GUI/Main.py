@@ -2,7 +2,7 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from . import Doc, Log, Method, Plot
+from . import Doc, List, Log, Method, Plot
 
 class gui(tk.Tk):
 
@@ -16,9 +16,8 @@ class gui(tk.Tk):
         self.create_method_button()
         self.create_standard_button()
         self.create_process_button()
-        self.create_export_button()
         self.create_plot_button()
-        self.create_list_button()
+        self.create_export_button()
         self.create_log_button()
         self.create_template_button()
         self.create_settings_button()
@@ -47,23 +46,19 @@ class gui(tk.Tk):
             button.pack(expand=True,fill=tk.BOTH)
 
     def create_standard_button(self):
-        button = ttk.Button(self,text='Standards',command=self.set_standard)
+        button = ttk.Button(self,text='Standards',command=self.on_standard)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_process_button(self):
         button = ttk.Button(self,text='Process',command=self.on_process)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_export_button(self):
-        button = ttk.Button(self,text='Export',command=self.on_export)
-        button.pack(expand=True,fill=tk.BOTH)
-
     def create_plot_button(self):
         button = ttk.Button(self,text='Plot',command=self.on_plot)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_list_button(self):
-        button = ttk.Button(self,text='List',command=self.on_list)
+    def create_export_button(self):
+        button = ttk.Button(self,text='Export',command=self.on_export)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_log_button(self):
@@ -92,7 +87,8 @@ class gui(tk.Tk):
         method = Method.MethodWindow(self,m)
         method.grab_set()
 
-    def set_standard(self):
+    def on_standard(self):
+        List.ListWindow(self)
         self.run("S.TODO()")
 
     def on_process(self):
@@ -104,9 +100,6 @@ class gui(tk.Tk):
     def on_plot(self):
         if len(S.get('samples'))>0:
             plot_window = Plot.PlotWindow(self)
-
-    def on_list(self):
-        self.run("S.TODO()")
 
     def toggle_log_window(self):
         if self.log_window is None:
