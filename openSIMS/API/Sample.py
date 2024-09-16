@@ -5,6 +5,7 @@ import math
 class Sample:
 
     def __init__(self):
+        self.date = None
         self.time = pd.DataFrame()
         self.signal = pd.DataFrame()
         self.sbm = pd.DataFrame()

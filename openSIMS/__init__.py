@@ -3,7 +3,7 @@ from .GUI.Main import gui
 
 __S = Simplex.simplex()
 
-def set(prop,val,**kwargs):
+def set(prop,val):
     setattr(__S,prop,val)
 
 def get(prop):
@@ -14,6 +14,9 @@ def get(prop):
 
 def method(val,**kwargs):
     __S.method = Method.method(val,**kwargs)
+
+def standards(**kwargs):
+    __S.set_groups(**kwargs)
     
 def reset():
     __S.reset()

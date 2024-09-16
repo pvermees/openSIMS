@@ -17,12 +17,12 @@ class MethodWindow(tk.Toplevel):
         selections = dict.fromkeys(ions,None)
         for ion in ions:
             label = ttk.Label(self,text=ion)
-            label.grid(row=row,column=0,padx=2,pady=2)
+            label.grid(row=row,column=0,padx=1,pady=1)
             selections[ion] = tk.StringVar()
             combo = ttk.Combobox(self,values=channels,textvariable=selections[ion])
             default = self.guess(ion,channels) if oldmethod is None else oldmethod.ions[ion]
             combo.set(default)
-            combo.grid(row=row,column=1,padx=2,pady=2)
+            combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1
         button = ttk.Button(self,text='OK',
                             command=lambda t=top,m=m,s=selections: self.on_click(t,m,s))

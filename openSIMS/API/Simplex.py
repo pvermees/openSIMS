@@ -48,5 +48,12 @@ class simplex:
         else:
             return None
 
+    def set_groups(self,**kwargs):
+        for key, sample in self.samples.items():
+            sample.group = 'sample'
+        for name, indices in kwargs.items():
+            for i in indices:
+                self.samples.iloc[i].group = name
+
     def TODO(self):
         pass

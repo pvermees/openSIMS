@@ -38,6 +38,10 @@ class Test(unittest.TestCase):
                  U='238U',UO='238U 16O2',
                  Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         self.assertEqual(S.get('method').ions['UO'],'238U 16O2')
+
+    def test_setStandards(self):
+        S.standards(Plesovice=[0,1,3])
+        self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
         
 if __name__ == '__main__':
     unittest.main()
