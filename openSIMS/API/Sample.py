@@ -10,6 +10,7 @@ class Sample:
         self.sbm = pd.DataFrame()
         self.channels = pd.DataFrame()
         self.detector = pd.DataFrame()
+        self.group = 'sample'
 
     def plot(self,channels=None,title=None,show=True,num=None):
         if channels is None:

@@ -39,7 +39,7 @@ class MethodWindow(tk.Toplevel):
         return out
 
     def on_click(self,top,m,selections):
-        cmd = "S.set('method','{m}'".format(m=m)
+        cmd = "S.method('{m}'".format(m=m)
         for key in selections:
             val = selections[key].get()
             cmd += "," + key + "='" + val + "'"

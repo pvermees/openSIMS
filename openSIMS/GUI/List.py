@@ -14,11 +14,11 @@ class ListWindow(tk.Toplevel):
         row = 0
         samples = S.get('samples')
         if len(samples)>10: self.geometry('400x600')
-        for key, val in samples.items():
+        for key, sample in samples.items():
             label = ttk.Label(self,text=key)
             label.grid(row=row,column=0,padx=1,pady=1)
             combo = ttk.Combobox(self,values=self.refmats)
-            combo.set(self.refmats[0])
+            combo.set(sample.group)
             combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1
         button = ttk.Button(self,text='Set',

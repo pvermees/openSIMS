@@ -5,6 +5,11 @@ import openSIMS as S
 
 class Test(unittest.TestCase):
 
+    def loadCamecaData(self):
+        S.set('instrument','Cameca')
+        S.set('path','data/Cameca_UPb')
+        S.read() 
+
     def test_newCamecaSHRIMPinstance(self):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
@@ -29,16 +34,10 @@ class Test(unittest.TestCase):
                           '232Th 16O2','238U 16O2','270.1'])
 
     def test_methodPairing(self):
-        S.set('method',
-              'U-Pb',
-              U='238U',UO='238U 16O2',
-              Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        S.method('U-Pb',
+                 U='238U',UO='238U 16O2',
+                 Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         self.assertEqual(S.get('method').ions['UO'],'238U 16O2')
-
-    def loadCamecaData(self):
-        S.set('instrument','Cameca')
-        S.set('path','data/Cameca_UPb')
-        S.read()        
         
 if __name__ == '__main__':
     unittest.main()

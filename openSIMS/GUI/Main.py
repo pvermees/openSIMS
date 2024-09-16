@@ -11,6 +11,7 @@ class gui(tk.Tk):
         self.title('openSIMS')
         self.figs = [111]
         self.log_window = None
+        self.list_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
@@ -88,8 +89,11 @@ class gui(tk.Tk):
         method.grab_set()
 
     def on_standard(self):
-        List.ListWindow(self)
-        self.run("S.TODO()")
+        if self.list_window is None:
+            self.list_window = List.ListWindow(self)
+        else:
+            self.list_window.destroy()
+            self.list_window = None
 
     def on_process(self):
         self.run("S.TODO()")

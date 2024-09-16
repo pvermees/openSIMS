@@ -4,10 +4,7 @@ from .GUI.Main import gui
 __S = Simplex.simplex()
 
 def set(prop,val,**kwargs):
-    if prop == 'method':
-        __S.method = Method.method(val,**kwargs)
-    else:
-        setattr(__S,prop,val)
+    setattr(__S,prop,val)
 
 def get(prop):
     if prop == 'channels':
@@ -15,6 +12,9 @@ def get(prop):
     else:
         return getattr(__S,prop)
 
+def method(val,**kwargs):
+    __S.method = Method.method(val,**kwargs)
+    
 def reset():
     __S.reset()
 
