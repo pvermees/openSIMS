@@ -1,5 +1,6 @@
 import pandas as pd
 import tkinter as tk
+import numpy as np
 import glob
 import os
 from . import Cameca
@@ -30,6 +31,18 @@ class simplex:
             self.TODO(self)
         else:
             raise ValueError('Unrecognised instrument type.')
+        self.sort_samples()
+
+    def sort_samples(self):
+        order = np.argsort(self.get_dates())
+        new_index = self.samples.index[order.tolist()]
+        self.samples = self.samples.reindex(index=new_index)
+
+    def get_dates(self):
+        dates = np.array([])
+        for name, sample in self.samples.items():
+            dates = np.append(dates,sample.date)
+        return dates
 
     def plot(self,i=None,sname=None,show=True,num=None):
         snames = self.samples.index
