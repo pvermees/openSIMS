@@ -1,7 +1,9 @@
 import pandas as pd
 import csv
 import os
+import datetime
 from . import Sample
+from .Toolbox import toolbox
 
 class Cameca_Sample(Sample.Sample):
 
@@ -18,7 +20,10 @@ class Cameca_Sample(Sample.Sample):
                     pass
                 elif 'CAMECA' in row[0]:
                     datestring = row[1]
-                    timestring = clean_list(next(rows))
+                    timestring = clean_list(next(rows))[0]
+                    dt = toolbox.get_date(datestring)
+                    tm = toolbox.get_time(timestring)
+                    self.date = datetime.datetime.combine(dt,tm)
                 elif 'X POSITION' in row[0]:
                     self.x = float(row[1])
                     self.y = float(row[3])
