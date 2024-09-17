@@ -32,7 +32,9 @@ class ListWindow(tk.Toplevel):
         i = 0
         for key in selections:
             group = selections[key].get()
-            if group in groups:
+            if group == 'sample':
+                pass
+            elif group in groups:
                 groups[group].append(i)
             else:
                 groups[group] = [i]

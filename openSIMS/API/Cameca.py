@@ -16,6 +16,9 @@ class Cameca_Sample(Sample.Sample):
             for row in rows:
                 if len(row)<1:
                     pass
+                elif 'CAMECA' in row[0]:
+                    datestring = row[1]
+                    timestring = clean_list(next(rows))
                 elif 'X POSITION' in row[0]:
                     self.x = float(row[1])
                     self.y = float(row[3])
