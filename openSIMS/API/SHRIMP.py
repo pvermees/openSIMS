@@ -1,6 +1,6 @@
-from openSIMS import Sample
+from . import Sample
 
-class SHRIMP_Sample(Sample):
+class SHRIMP_Sample(Sample.Sample):
 
     def __init__(self):
         super().__init__()

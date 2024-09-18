@@ -5,11 +5,13 @@ import math
 class Sample:
 
     def __init__(self):
+        self.date = None
         self.time = pd.DataFrame()
         self.signal = pd.DataFrame()
         self.sbm = pd.DataFrame()
         self.channels = pd.DataFrame()
         self.detector = pd.DataFrame()
+        self.group = 'sample'
 
     def plot(self,channels=None,title=None,show=True,num=None):
         if channels is None:

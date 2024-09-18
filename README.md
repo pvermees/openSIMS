@@ -13,8 +13,8 @@ python -m pip install openSIMS --upgrade
 From the Python REPL:
 
 ```
-import openSIMS
-openSIMS.simplex(gui=True)
+import openSIMS as S
+S.gui()
 ```
 
 Click on the 'Log' button of the GUI to see what's going on.
