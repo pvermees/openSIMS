@@ -1,6 +1,6 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex
+from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats
 import openSIMS as S
 
 class Test(unittest.TestCase):
@@ -42,6 +42,10 @@ class Test(unittest.TestCase):
     def test_setStandards(self):
         S.standards(Plesovice=[0,1,3])
         self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
+
+    def test_loadRefMats(self):
+        NBS28 = Refmats.get('O','NBS28')
+        self.assertEqual(NBS28['O17/O16'],4.79)
         
 if __name__ == '__main__':
     unittest.main()
