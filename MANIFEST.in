@@ -1,1 +1,1 @@
-include openSIMS/API/aux/*.csv
+include openSIMS/API/settings/*.csv

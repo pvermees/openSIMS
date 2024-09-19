@@ -4,7 +4,7 @@ import pandas as pd
 
 def get_table(setting):
     if setting in ['O','S','U-Pb']:
-        fname = 'aux/' + setting + '.csv'
+        fname = 'settings/' + setting + '.csv'
     else:
         raise ValueError('Invalid setting.')
     return load_settings(fname)
