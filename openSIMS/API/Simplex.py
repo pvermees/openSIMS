@@ -18,9 +18,10 @@ class simplex:
         self.instrument = None
         self.path = None
         self.method = None
-        self.samples = pd.Series()
+        self.samples = None
 
     def read(self):
+        self.samples = pd.Series()
         if self.instrument == 'Cameca':
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
