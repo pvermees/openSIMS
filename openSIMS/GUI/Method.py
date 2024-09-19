@@ -20,7 +20,8 @@ class MethodWindow(tk.Toplevel):
             label.grid(row=row,column=0,padx=1,pady=1)
             selections[ion] = tk.StringVar()
             combo = ttk.Combobox(self,values=channels,textvariable=selections[ion])
-            default = self.guess(ion,channels) if oldmethod is None else oldmethod.ions[ion]
+            guess = oldmethod is None or ion not in oldmethod.ions.keys()
+            default = self.guess(ion,channels) if guess else oldmethod.ions[ion]
             combo.set(default)
             combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1

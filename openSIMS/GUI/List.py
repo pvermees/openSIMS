@@ -2,10 +2,9 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 from . import Main
+from ..API import Refmats
 
 class ListWindow(tk.Toplevel):
-
-    refmats = ['sample','Plesovice','GJ1']
 
     def __init__(self,top):
         super().__init__(top)
@@ -19,7 +18,9 @@ class ListWindow(tk.Toplevel):
             label = ttk.Label(self,text=key)
             label.grid(row=row,column=0,padx=1,pady=1)
             selections[key] = tk.StringVar()
-            combo = ttk.Combobox(self,values=self.refmats,textvariable=selections[key])
+            method = S.get('method').name
+            refmats = Refmats.get_names(method)
+            combo = ttk.Combobox(self,values=refmats,textvariable=selections[key])
             combo.set(sample.group)
             combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1

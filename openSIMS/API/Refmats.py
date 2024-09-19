@@ -9,7 +9,11 @@ def get_table(setting):
         raise ValueError('Invalid setting.')
     return load_settings(fname)
 
-def get(setting,refmat):
+def get_names(setting):
+    df = get_table(setting)
+    return df.standard.tolist()
+
+def get_values(setting,refmat):
     df = get_table(setting)
     out = df.loc[df['standard'] == refmat]
     return out.iloc[0][1:]

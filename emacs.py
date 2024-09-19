@@ -13,4 +13,4 @@ if True:
     S.standards(Plesovice=[0,1,3])
     S.gui()
 else:
-    t.test_loadRefMats()
+    t.test_getRefmatNames()
