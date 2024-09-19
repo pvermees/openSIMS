@@ -44,8 +44,12 @@ class Test(unittest.TestCase):
         self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
 
     def test_loadRefMats(self):
-        NBS28 = Refmats.get('O','NBS28')
+        NBS28 = Refmats.get_values('O','NBS28')
         self.assertEqual(NBS28['O17/O16'],4.79)
+
+    def test_getRefmatNames(self):
+        standards = Refmats.get_names('O')
+        print(standards)
         
 if __name__ == '__main__':
     unittest.main()
