@@ -17,9 +17,9 @@ def Help(item):
         "1. Open: Load SIMS data. There are two options:\n" + \
         "  - Cameca: select a folder with .asc files\n" + \
         "  - SHRIMP: select an .op or .pd file (TODO)\n" + \
-        "2. Method: Select an application and pair the relevant\n" +
+        "2. Method: Select an application and pair the relevant\n" + \
         "   ions with the corresponding mass spectrometer channels.\n" + \
-        "3. Standards: Mark which analyses correspond to" +
+        "3. Standards: Mark which analyses correspond to" + \
         "   primary reference materials.\n" + \
         "4. Process: TODO\n" + \
         "5. Plot: Plot the time resolved SIMS data\n" + \
