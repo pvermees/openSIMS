@@ -3,7 +3,7 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca
+from . import Cameca, Refmats
 from pathlib import Path
 
 class simplex:
@@ -19,6 +19,8 @@ class simplex:
         self.path = None
         self.method = None
         self.samples = None
+        self.prefixes = dict()
+        self.ignore = set()
 
     def read(self):
         self.samples = pd.Series()
