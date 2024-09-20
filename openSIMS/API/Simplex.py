@@ -19,7 +19,6 @@ class simplex:
         self.path = None
         self.method = None
         self.samples = None
-        self.prefixes = dict()
         self.ignore = set()
 
     def read(self):

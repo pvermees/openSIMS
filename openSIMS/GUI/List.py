@@ -1,6 +1,7 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
+import os.path
 from . import Main
 from ..API import Refmats
 
@@ -36,24 +37,51 @@ class ListWindow(tk.Toplevel):
         button.grid(row=row,columnspan=2)
 
     def on_change(self,event):
-        groups = self.all_groups()
-        prefixes = set(S.get('prefixes').keys())
-        i = self.combo_boxes.index(event.widget)
-        sname = self.combo_labels[i].cget('text')
-        group = event.widget.get()
-        ignore = S.get('ignore')
-        if group == 'sample':
-            ignore.add(sname)
-        elif sname in ignore:
-            ignore.remove(sname)
+        changed = self.combo_boxes.index(event.widget)
+        ignored = S.get('ignore')
+        if event.widget.get() == 'sample':
+            ignored.add(changed)
+        elif changed in ignored:
+            ignored.remove(changed)
         else:
             pass
-        removed = prefixes.difference(groups)
+        prefixes = self.get_prefixes()
+        self.set_prefixes(prefixes)
+
+    def get_prefixes(self):
+        groups = self.all_groups()
+        prefixes = dict.fromkeys(groups,None)
+        ignored = S.get('ignore')
+        for i, box in enumerate(self.combo_boxes):
+            group = box.get()
+            if i not in ignored and group != 'sample':
+                sname = self.combo_labels[i].cget('text')
+                if prefixes[group] is None:
+                    prefixes[group] = sname
+                else:
+                    prefixes[group] = os.path.commonprefix([sname,prefixes[group]])
+        return prefixes
+
+    def set_prefixes(self,prefixes):
+        ignored = S.get('ignore')
+        for i, box in enumerate(self.combo_boxes):
+            sname = self.combo_labels[i].cget('text')
+            if i not in ignored:
+                group = self.match_prefix(sname,prefixes)
+                box.set(group)
+
+    def match_prefix(self,sname,prefixes):
+        for group, prefix in prefixes.items():
+            if sname.startswith(prefix):
+                return group
+        return 'sample'
 
     def all_groups(self):
         out = set()
         for i, box in enumerate(self.combo_boxes):
-            out.add(box.get())
+            group = box.get()
+            if group != 'sample':
+                out.add(group)
         return out
 
     def on_click(self,top):
@@ -71,17 +99,3 @@ class ListWindow(tk.Toplevel):
             blocks.append(group + "=[" + ",".join(map(str,indices)) + "]")
         cmd = "S.standards(" + ",".join(blocks) + ")"
         top.run(cmd)
-
-
-def intersect(s1, s2):
-    m = len(s1)
-    n = len(s2)
-    res = 0
-    for i in range(m):
-        for j in range(n):
-            curr = 0
-            while (i + curr) < m and (j + curr) < n and s1[i + curr] == s2[j + curr]:
-                curr += 1
-            res = max(res, curr)
-    return res
-    
