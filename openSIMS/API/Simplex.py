@@ -3,7 +3,7 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca
+from . import Cameca, Refmats
 from pathlib import Path
 
 class simplex:
@@ -18,9 +18,11 @@ class simplex:
         self.instrument = None
         self.path = None
         self.method = None
-        self.samples = pd.Series()
+        self.samples = None
+        self.ignore = set()
 
     def read(self):
+        self.samples = pd.Series()
         if self.instrument == 'Cameca':
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
