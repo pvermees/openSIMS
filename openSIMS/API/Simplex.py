@@ -3,8 +3,9 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats
+from . import Cameca, Refmats, Crunch
 from pathlib import Path
+from scipy.optimize import minimize
 
 class simplex:
     
@@ -34,6 +35,21 @@ class simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()
+
+    def process(self):
+        standards = self.get_standards()
+        numpars = 3 + len(standards)
+        init = np.array([0.0]*numpars)
+        res = minimize(Crunch.misfit4,init,method='nelder-mead',
+                       args=(standards))
+        return res.x
+
+    def get_standards(self):
+        out = set()
+        for sample in self.samples:
+            if sample.group != 'sample':
+                out.add(sample.group)
+        return out
 
     def sort_samples(self):
         order = np.argsort(self.get_dates())

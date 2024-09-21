@@ -24,6 +24,9 @@ def reset():
 def read():
     __S.read()
 
+def process():
+    __S.process()
+
 def plot(i=None,sname=None,show=True,num=None):
     if i is None and sname is None:
         i = __S.i

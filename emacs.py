@@ -12,4 +12,4 @@ if False:
     S.method('U-Pb',U='238U',UO='238U 16O2',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
     S.gui()
 else:
-    t.test_cps()
+    t.test_process()
