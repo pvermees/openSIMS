@@ -32,5 +32,8 @@ def plot(i=None,sname=None,show=True,num=None):
         i = __S.i
     return __S.plot(i=i,sname=sname,show=show,num=num)
 
+def simplex():
+    return __S
+
 def TODO():
     pass

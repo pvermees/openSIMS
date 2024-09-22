@@ -21,6 +21,7 @@ class simplex:
         self.method = None
         self.samples = None
         self.ignore = set()
+        self.pars = None
 
     def read(self):
         self.samples = pd.Series()
@@ -38,17 +39,20 @@ class simplex:
 
     def process(self):
         standards = self.get_standards()
-        numpars = 3 + len(standards)
-        init = np.array([0.0]*numpars)
-        res = minimize(Crunch.misfit4,init,method='nelder-mead',
-                       args=(standards))
-        return res.x
+        standard_names = self.get_groups()
+        standard_names.remove('sample')
+        init = [0.0]*(2+len(standard_names))
+        res = minimize(Crunch.misfit3,
+                       init,
+                       method='nelder-mead',
+                       args=(standards,standard_names))
+        self.pars = res.x
 
     def get_standards(self):
-        out = set()
-        for sample in self.samples:
+        out = dict()
+        for sname, sample in self.samples.items():
             if sample.group != 'sample':
-                out.add(sample.group)
+                out[sname] = sample
         return out
 
     def sort_samples(self):
@@ -79,6 +83,12 @@ class simplex:
         else:
             return None
 
+    def get_groups(self):
+        out = set()
+        for sample in self.samples:
+            out.add(sample.group)
+        return out
+        
     def set_groups(self,**kwargs):
         for key, sample in self.samples.items():
             sample.group = 'sample'

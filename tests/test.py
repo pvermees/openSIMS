@@ -1,6 +1,8 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats
+import numpy as np
+import pandas as pd
+from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats, Crunch
 import openSIMS as S
 
 class Test(unittest.TestCase):
@@ -57,7 +59,6 @@ class Test(unittest.TestCase):
 
     def test_getRefmatNames(self):
         standards = Refmats.get_names('O')
-        print(standards)
 
     def test_cps(self):
         self.loadCamecaUPbMethod()

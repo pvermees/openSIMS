@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import math
+from . import Crunch, Refmats
+from scipy.optimize import minimize
 
 class Sample:
 
@@ -12,6 +15,13 @@ class Sample:
         self.channels = pd.DataFrame()
         self.detector = pd.DataFrame()
         self.group = 'sample'
+
+    def misfit_data_UPb(self):
+        U = self.cps('U')
+        UO = self.cps('UO')
+        Pb4 = self.cps('Pb204')
+        Pb6 = self.cps('Pb206')
+        return U['cps'], UO['cps'], Pb4['cps'], Pb6['cps'], Pb6['time']
 
     def plot(self,channels=None,title=None,show=True,num=None):
         if channels is None:
