@@ -3,7 +3,7 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats, Crunch
+from . import Cameca, Refmats, Crunch, Standards
 from pathlib import Path
 from scipy.optimize import minimize
 
@@ -38,21 +38,8 @@ class simplex:
         self.sort_samples()
 
     def process(self):
-        standards = self.get_standards()
-        res = minimize(Crunch.misfit,0.0,
-                       method='nelder-mead',
-                       args=(standards))
-        b = res.x[0]
-        x, y = Crunch.getxy(b,standards)
-        A, B = Crunch.linearfit(x,y)
-        self.pars = {'A':A, 'B':B, 'b':b}
-
-    def get_standards(self):
-        out = dict()
-        for sname, sample in self.samples.items():
-            if sample.group != 'sample':
-                out[sname] = sample
-        return out
+        standards = Standards.standards(self)
+        self.pars = standards.process()
 
     def sort_samples(self):
         order = np.argsort(self.get_dates())

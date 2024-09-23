@@ -26,11 +26,8 @@ def load_settings(fname):
     return pd.read_csv(csv_data)
 
 def offset(method,group):
-    a0par = Method.get(method,'y0')
-    a0 = get_values(method,group)[a0par]
     age = get_values(method,group)['t']
     L = Method.get(method,'lambda')
     y0t = np.log(np.exp(L*age)-1)
     y01 = np.log(np.exp(L)-1)
-    offset = y0t - y01
-    return offset, a0
+    return y0t - y01
