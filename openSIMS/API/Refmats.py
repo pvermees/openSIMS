@@ -1,12 +1,13 @@
 import pkgutil
 import io
+import os
 import pandas as pd
 import numpy as np
 from . import Method
 
 def get_table(setting):
     if setting in ['O','S','U-Pb']:
-        fname = 'settings/' + setting + '.csv'
+        fname = os.path.join('..','Settings',setting + '.csv')
     else:
         raise ValueError('Invalid setting.')
     return load_settings(fname)
