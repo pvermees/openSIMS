@@ -1,6 +1,7 @@
 import pkgutil
 import io
 import pandas as pd
+import numpy as np
 
 def get_table(setting):
     if setting in ['O','S','U-Pb']:
@@ -22,3 +23,10 @@ def load_settings(fname):
     data = pkgutil.get_data(__name__,fname)
     csv_data = io.StringIO(data.decode('utf-8'))
     return pd.read_csv(csv_data)
+
+def offset(method,group):
+    a0 = get_values('U-Pb',group)['Pb64_0']
+    age = get_values('U-Pb',group)['t']
+    l8 = 0.000155125
+    offset = np.log(np.exp(l8*age)-1)
+    return offset, a0

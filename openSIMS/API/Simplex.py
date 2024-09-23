@@ -39,14 +39,13 @@ class simplex:
 
     def process(self):
         standards = self.get_standards()
-        standard_names = self.get_groups()
-        standard_names.remove('sample')
-        init = [0.0]*(2+len(standard_names))
-        res = minimize(Crunch.misfit3,
-                       init,
+        res = minimize(Crunch.misfit,0.0,
                        method='nelder-mead',
-                       args=(standards,standard_names))
-        self.pars = res.x
+                       args=(standards))
+        b = res.x[0]
+        x, y = Crunch.getxy(b,standards)
+        A, B = Crunch.linearfit(x,y)
+        self.pars = {'A':A, 'B':B, 'b':b}
 
     def get_standards(self):
         out = dict()

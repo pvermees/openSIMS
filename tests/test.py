@@ -68,6 +68,8 @@ class Test(unittest.TestCase):
     def test_process(self):
         self.setCamecaStandards()
         S.process()
+        pars = S.get('pars')
+        self.assertEqual(pars['b'],0.000375)
         
 if __name__ == '__main__':
     unittest.main()
