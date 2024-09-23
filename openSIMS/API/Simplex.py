@@ -3,8 +3,9 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats
+from . import Cameca, Refmats, Crunch, Standards
 from pathlib import Path
+from scipy.optimize import minimize
 
 class simplex:
     
@@ -20,6 +21,7 @@ class simplex:
         self.method = None
         self.samples = None
         self.ignore = set()
+        self.pars = None
 
     def read(self):
         self.samples = pd.Series()
@@ -34,6 +36,10 @@ class simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()
+
+    def process(self):
+        standards = Standards.standards(self)
+        self.pars = standards.process()
 
     def sort_samples(self):
         order = np.argsort(self.get_dates())
@@ -63,6 +69,12 @@ class simplex:
         else:
             return None
 
+    def get_groups(self):
+        out = set()
+        for sample in self.samples:
+            out.add(sample.group)
+        return out
+        
     def set_groups(self,**kwargs):
         for key, sample in self.samples.items():
             sample.group = 'sample'

@@ -37,7 +37,8 @@ class ListWindow(tk.Toplevel):
         button.grid(row=row,columnspan=2)
 
     def on_change(self,event):
-        changed = self.combo_boxes.index(event.widget)
+        i = self.combo_boxes.index(event.widget)
+        changed = self.combo_labels[i].cget('text')
         ignored = S.get('ignore')
         if event.widget.get() == 'sample':
             ignored.add(changed)
@@ -53,9 +54,9 @@ class ListWindow(tk.Toplevel):
         prefixes = dict.fromkeys(groups,None)
         ignored = S.get('ignore')
         for i, box in enumerate(self.combo_boxes):
+            sname = self.combo_labels[i].cget('text')
             group = box.get()
-            if i not in ignored and group != 'sample':
-                sname = self.combo_labels[i].cget('text')
+            if sname not in ignored and group != 'sample':
                 if prefixes[group] is None:
                     prefixes[group] = sname
                 else:
@@ -66,7 +67,7 @@ class ListWindow(tk.Toplevel):
         ignored = S.get('ignore')
         for i, box in enumerate(self.combo_boxes):
             sname = self.combo_labels[i].cget('text')
-            if i not in ignored:
+            if sname not in ignored:
                 group = self.match_prefix(sname,prefixes)
                 box.set(group)
 

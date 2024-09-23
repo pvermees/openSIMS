@@ -13,7 +13,7 @@ class MethodWindow(tk.Toplevel):
         oldmethod = S.get('method')
         channels = S.get('channels')
         row = 0
-        ions = Method.method2ions(m)
+        ions = Method.get(m,'ions')
         selections = dict.fromkeys(ions,None)
         for ion in ions:
             label = ttk.Label(self,text=ion)

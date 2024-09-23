@@ -1,3 +1,4 @@
+import openSIMS as S
 import pandas as pd
 import csv
 import os
@@ -40,15 +41,16 @@ class Cameca_Sample(Sample.Sample):
                     dd['dtype'] = clean_list(next(rows)[1:])
                     self.channels = pd.DataFrame(dd,index=ions)
                 elif 'DETECTOR PARAMETERS' in row[0]:
-                    row = skip_block(rows,4)
+                    row = clean_list(skip_block(rows,4))
                     detector = []
                     dd = {'yield': [], 'bkg': [], 'deadtime': []}
                     while len(row)>1:
                         detector.append(row[0])
-                        dd['yield'].append(row[1])
-                        dd['bkg'].append(row[2])
-                        dd['deadtime'].append(row[3])
-                        row = next(rows)
+                        values = string2float(row[1:])
+                        dd['yield'].append(values[0])
+                        dd['bkg'].append(values[1])
+                        dd['deadtime'].append(values[2])
+                        row = clean_list(next(rows))
                     self.detector = pd.DataFrame(dd,index=detector)
                 elif 'RAW DATA' in row[0]:
                     skip_block(rows,5)
@@ -61,6 +63,20 @@ class Cameca_Sample(Sample.Sample):
                     read_asc_block(self.time,rows)
                 else:
                     pass
+
+    def cps(self,ion):
+        channel = S.get('method').ions[ion]
+        detector = self.channels.loc[channel,'detector']
+        dwelltime = self.channels.loc[channel,'dwelltime']
+        deadtime = self.detector.loc[detector,'deadtime']
+        raw_cps = self.signal[channel]
+        counts = raw_cps*dwelltime
+        adjusted_dwelltime = dwelltime - counts*deadtime/1e9
+        adjusted_cps = counts/adjusted_dwelltime
+        blank_cps = self.detector.loc[detector,'bkg']
+        blank_corrected_cps = adjusted_cps - blank_cps
+        return pd.DataFrame({'time': self.time[channel],
+                             'cps': blank_corrected_cps})
 
 def skip_block(rows,n=1):
     for _ in range(n-1):

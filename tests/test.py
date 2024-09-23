@@ -1,6 +1,8 @@
 import unittest
 import matplotlib.pyplot as plt
-from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats
+import numpy as np
+import pandas as pd
+from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats, Crunch
 import openSIMS as S
 
 class Test(unittest.TestCase):
@@ -8,8 +10,18 @@ class Test(unittest.TestCase):
     def loadCamecaData(self):
         S.set('instrument','Cameca')
         S.set('path','data/Cameca_UPb')
-        S.read() 
+        S.read()
 
+    def loadCamecaUPbMethod(self):
+        self.loadCamecaData()
+        S.method('U-Pb',
+                 U='238U',UO='238U 16O2',
+                 Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+
+    def setCamecaStandards(self):
+        self.loadCamecaUPbMethod()
+        S.standards(Plesovice=[0,1,3])
+        
     def test_newCamecaSHRIMPinstance(self):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
@@ -34,13 +46,11 @@ class Test(unittest.TestCase):
                           '232Th 16O2','238U 16O2','270.1'])
 
     def test_methodPairing(self):
-        S.method('U-Pb',
-                 U='238U',UO='238U 16O2',
-                 Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        self.loadCamecaUPbMethod()
         self.assertEqual(S.get('method').ions['UO'],'238U 16O2')
 
     def test_setStandards(self):
-        S.standards(Plesovice=[0,1,3])
+        self.setCamecaStandards()
         self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
 
     def test_loadRefMats(self):
@@ -49,7 +59,17 @@ class Test(unittest.TestCase):
 
     def test_getRefmatNames(self):
         standards = Refmats.get_names('O')
-        print(standards)
+
+    def test_cps(self):
+        self.loadCamecaUPbMethod()
+        Pb206 = S.get('samples')['Plesovice@01'].cps('Pb206')
+        self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
+
+    def test_process(self):
+        self.setCamecaStandards()
+        S.process()
+        pars = S.get('pars')
+        self.assertEqual(pars['b'],0.000375)
         
 if __name__ == '__main__':
     unittest.main()
