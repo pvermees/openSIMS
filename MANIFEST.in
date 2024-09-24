@@ -1,1 +1,2 @@
 include openSIMS/Settings/*.csv
+include openSIMS/Settings/*.json
