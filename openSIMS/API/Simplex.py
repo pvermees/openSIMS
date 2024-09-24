@@ -3,7 +3,7 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats, Crunch, Standards
+from . import Cameca, Refmats, Crunch, Standards, Method
 from pathlib import Path
 from scipy.optimize import minimize
 
@@ -14,6 +14,8 @@ class simplex:
         self.i = 0
         self.header = 'import openSIMS as S'
         self.stack = [self.header]
+        self.allrefmats = Refmats.load()
+        self.allmethods = Method.load()
 
     def reset(self):
         self.instrument = None

@@ -17,6 +17,9 @@ class method:
     def get(self,setting):
         return get(self.name,setting)
 
+def load():
+    return None
+    
 def get(m,setting):
     fname = os.path.join('..','Settings','methods.json')
     data = pkgutil.get_data(__name__,fname)

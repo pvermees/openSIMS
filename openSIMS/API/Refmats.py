@@ -12,6 +12,9 @@ def get_table(setting):
         raise ValueError('Invalid setting.')
     return load_settings(fname)
 
+def load():
+    return None
+
 def get_names(setting):
     df = get_table(setting)
     return df.standard.tolist()
