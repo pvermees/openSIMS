@@ -2,7 +2,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import math
-from . import Crunch, Refmats, Method
+import openSIMS as S
+from . import Crunch
 from scipy.optimize import minimize
 
 class Sample:
@@ -22,8 +23,9 @@ class Sample:
         Pb4 = self.cps('Pb204')
         Pb6 = self.cps('Pb206')
         drift = np.exp(b*Pb6['time']/60)
-        a0par = Method.get('U-Pb','y0')
-        a0 = Refmats.get_values('U-Pb',self.group)[a0par]
+        method = S.get('settings')['U-Pb']
+        a0par = method['y0']
+        a0 = method['refmats'][a0par][self.group]
         x = np.log(UO['cps']) - np.log(U['cps'])
         y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
         return x,y

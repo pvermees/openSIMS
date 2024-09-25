@@ -1,39 +1,40 @@
-from .API import Simplex, Method
+from .API import Simplex, Settings
 from .GUI.Main import gui
 
-__S = Simplex.simplex()
+__simplex = Simplex.simplex()
+__settings = Settings.settings()
 
 def set(prop,val):
-    setattr(__S,prop,val)
+    setattr(__simplex,prop,val)
 
 def get(prop):
-    if prop == 'channels':
-        return __S.channels()
-    else:
-        return getattr(__S,prop)
+    return getattr(__simplex,prop)
 
-def method(val,**kwargs):
-    __S.method = Method.method(val,**kwargs)
+def ions2channels(method,**kwargs):
+    __simplex.channels = __settings.ions2channels(method,**kwargs)
 
 def standards(**kwargs):
-    __S.set_groups(**kwargs)
+    __simplex.set_groups(**kwargs)
     
 def reset():
-    __S.reset()
+    __simplex.reset()
 
 def read():
-    __S.read()
+    __simplex.read()
 
 def process():
-    __S.process()
+    __simplex.process()
 
 def plot(i=None,sname=None,show=True,num=None):
     if i is None and sname is None:
-        i = __S.i
-    return __S.plot(i=i,sname=sname,show=show,num=num)
+        i = __simplex.i
+    return __simplex.plot(i=i,sname=sname,show=show,num=num)
 
 def simplex():
-    return __S
+    return __simplex
+
+def settings():
+    return __settings
 
 def TODO():
     pass

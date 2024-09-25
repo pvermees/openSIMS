@@ -1,6 +1,6 @@
 import copy
 import numpy as np
-from . import Refmats, Crunch
+from . import Crunch
 from scipy.optimize import minimize
 
 class standards():
@@ -30,7 +30,15 @@ class standards():
         y = np.array([])
         for standard in self.samples.array:
             xn, yn = standard.calibration_data_UPb(b)
-            offset = Refmats.offset(self.method.name,standard.group)
+            offset = self.offset()
             x = np.append(x,xn)
             y = np.append(y,yn-offset)
         return x, y
+
+    def offset():
+        method = S.get('settings')[self.method]
+        age = method['refmat']['t'][self.group]
+        L = method['lambda']
+        y0t = np.log(np.exp(L*age)-1)
+        y01 = np.log(np.exp(L)-1)
+        return y0t - y01

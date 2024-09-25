@@ -3,7 +3,7 @@ import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats, Crunch, Standards, Method
+from . import Cameca, Crunch, Standards
 from pathlib import Path
 from scipy.optimize import minimize
 
@@ -14,13 +14,12 @@ class simplex:
         self.i = 0
         self.header = 'import openSIMS as S'
         self.stack = [self.header]
-        self.allrefmats = Refmats.load()
-        self.allmethods = Method.load()
 
     def reset(self):
         self.instrument = None
         self.path = None
         self.method = None
+        self.channels = None
         self.samples = None
         self.ignore = set()
         self.pars = None
@@ -64,10 +63,10 @@ class simplex:
             sname = snames[self.i]
         return self.samples[sname].plot(title=sname,show=show,num=num)
 
-    def channels(self):
+    def all_channels(self):
         run = self.samples
         if len(run)>0:
-            return self.samples.iloc[0].channels.index.tolist()
+            return run.iloc[0].channels.index.tolist()
         else:
             return None
 

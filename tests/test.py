@@ -2,7 +2,7 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from openSIMS.API import Cameca, Method, SHRIMP, Sample, Simplex, Refmats, Crunch
+from openSIMS.API import Cameca, Settings, SHRIMP, Sample, Simplex, Crunch
 import openSIMS as S
 
 class Test(unittest.TestCase):
@@ -21,6 +21,12 @@ class Test(unittest.TestCase):
     def setCamecaStandards(self):
         self.loadCamecaUPbMethod()
         S.standards(Plesovice=[0,1,3])
+
+    def test_settings(self):
+        DP = S.settings()['U-Pb'].get_DP('Plesovice')
+        a0 = S.settings()['U-Pb'].get_a0('Plesovice')
+        self.assertEqual(DP,0.05368894845896288)
+        self.assertEqual(a0,18.18037)
         
     def test_newCamecaSHRIMPinstance(self):
         cam = Cameca.Cameca_Sample()
