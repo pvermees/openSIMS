@@ -1,11 +1,9 @@
 import pandas as pd
-import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Crunch, Standards
+from . import Cameca, Standards
 from pathlib import Path
-from scipy.optimize import minimize
 
 class simplex:
     

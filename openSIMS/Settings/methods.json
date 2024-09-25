@@ -1,13 +1,13 @@
 {
     "U-Pb": {
 	"type": "geochron",
-	"ions": ["U","UO","Pb204","Pb206","Pb207"],
+	"ions": ["U","UOx","Pb204","Pb206","Pb207"],
         "y0": "Pb64_0",
         "lambda": 0.000155125
     },
     "Th-Pb": {
 	"type": "geochron",
-	"ions": ["Th","ThO","Pb204","Pb208"],
+	"ions": ["Th","ThOx","Pb204","Pb208"],
         "y0": "Pb84_0",
         "lambda": 0.0000495
     },

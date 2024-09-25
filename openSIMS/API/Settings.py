@@ -39,7 +39,7 @@ class setting(dict):
         csv_string = f.read_text()
         csv_stringio = io.StringIO(csv_string)
         self['refmats'] = pd.read_csv(csv_stringio,index_col=0)
-        
+
 class geochron_setting(setting):
 
     def __init__(self,method,pars):

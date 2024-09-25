@@ -3,8 +3,7 @@ import pandas as pd
 import csv
 import os
 import datetime
-from . import Sample
-from .Toolbox import toolbox
+from . import Sample, Toolbox
 
 class Cameca_Sample(Sample.Sample):
 
@@ -22,8 +21,8 @@ class Cameca_Sample(Sample.Sample):
                 elif 'CAMECA' in row[0]:
                     datestring = row[1]
                     timestring = clean_list(next(rows))[0]
-                    dt = toolbox.get_date(datestring)
-                    tm = toolbox.get_time(timestring)
+                    dt = Toolbox.get_date(datestring)
+                    tm = Toolbox.get_time(timestring)
                     self.date = datetime.datetime.combine(dt,tm)
                 elif 'X POSITION' in row[0]:
                     self.x = float(row[1])
@@ -65,7 +64,7 @@ class Cameca_Sample(Sample.Sample):
                     pass
 
     def cps(self,ion):
-        channel = S.get('method').ions[ion]
+        channel = S.get('channels')[ion]
         detector = self.channels.loc[channel,'detector']
         dwelltime = self.channels.loc[channel,'dwelltime']
         deadtime = self.detector.loc[detector,'deadtime']

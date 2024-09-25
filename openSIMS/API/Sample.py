@@ -3,8 +3,6 @@ import pandas as pd
 import numpy as np
 import math
 import openSIMS as S
-from . import Crunch
-from scipy.optimize import minimize
 
 class Sample:
 
@@ -19,14 +17,12 @@ class Sample:
 
     def calibration_data_UPb(self,b):
         U = self.cps('U')
-        UO = self.cps('UO')
+        UOx = self.cps('UOx')
         Pb4 = self.cps('Pb204')
         Pb6 = self.cps('Pb206')
         drift = np.exp(b*Pb6['time']/60)
-        method = S.get('settings')['U-Pb']
-        a0par = method['y0']
-        a0 = method['refmats'][a0par][self.group]
-        x = np.log(UO['cps']) - np.log(U['cps'])
+        a0 = S.settings('U-Pb').get_a0(self.group)
+        x = np.log(UOx['cps']) - np.log(U['cps'])
         y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
         return x,y
 
