@@ -37,7 +37,7 @@ class simplex:
         self.sort_samples()
 
     def process(self):
-        standards = Standards.standards(self)
+        standards = Standards.Standards(self)
         self.pars = standards.process()
 
     def sort_samples(self):

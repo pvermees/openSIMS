@@ -1,17 +1,18 @@
 import copy
 import numpy as np
+import pandas as pd
 import openSIMS as S
-from . import Toolbox
+from . import Toolbox, Sample
 from scipy.optimize import minimize
 
-class standards():
+class Standards():
 
     def __init__(self,simplex):
         self.method = simplex.method
-        self.samples = copy.copy(simplex.samples)
+        self.standards = pd.Series()
         for sname, sample in simplex.samples.items():
-            if sample.group == 'sample' or sname in simplex.ignore:
-                self.samples.drop(sname,inplace=True)
+            if sample.group != 'sample' and sname not in simplex.ignore:
+                self.standards[sname] = Standard(sample)
 
     def process(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
@@ -29,12 +30,17 @@ class standards():
     def calibration_data(self,b):
         x = np.array([])
         y = np.array([])
-        for standard in self.samples.array:
+        for standard in self.standards.array:
             xn, yn = standard.calibration_data_UPb(b)
-            offset = self.offset()
+            offset = standard.offset()
             x = np.append(x,xn)
             y = np.append(y,yn-offset)
         return x, y
+
+class Standard(Sample.Sample):
+
+    def __init__(self,sample):
+        self.__dict__ = sample.__dict__.copy()
 
     def offset(self):
         method = S.settings(self.method)
@@ -43,3 +49,4 @@ class standards():
         y0t = np.log(DP)
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
+    

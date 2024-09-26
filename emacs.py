@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     import openSIMS as S
 else:
     t.test_process()
