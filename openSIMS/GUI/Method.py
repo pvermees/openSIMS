@@ -2,7 +2,6 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 from . import Main
-from ..API import Method
 
 class MethodWindow(tk.Toplevel):
 
@@ -11,9 +10,9 @@ class MethodWindow(tk.Toplevel):
         self.title('Pair the ions with the channels')
         Main.offset(top,self)
         oldmethod = S.get('method')
-        channels = S.get('channels')
+        channels = S.simplex().all_channels()
         row = 0
-        ions = Method.get(m,'ions')
+        ions = S.settings(m)['ions']
         selections = dict.fromkeys(ions,None)
         for ion in ions:
             label = ttk.Label(self,text=ion)

@@ -3,7 +3,7 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import os.path
 from . import Main
-from ..API import Refmats
+from ..API import Settings
 
 class ListWindow(tk.Toplevel):
 
@@ -17,8 +17,8 @@ class ListWindow(tk.Toplevel):
         self.combo_boxes = []
         Main.offset(top,self)
         if len(samples)>20: self.geometry('400x600')
-        method = S.get('method').name
-        refmats = ['sample'] + Refmats.get_names(method)
+        method = S.get('method')
+        refmats = ['sample'] + list(S.settings(method)['refmats'].index)
         row = 0
         for sname, sample in samples.items():
             label = ttk.Label(self,text=sname)

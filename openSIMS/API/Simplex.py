@@ -1,13 +1,11 @@
 import pandas as pd
-import tkinter as tk
 import numpy as np
 import glob
 import os
-from . import Cameca, Refmats, Crunch, Standards
+from . import Cameca, Standards
 from pathlib import Path
-from scipy.optimize import minimize
 
-class simplex:
+class Simplex:
     
     def __init__(self):
         self.reset()
@@ -19,6 +17,7 @@ class simplex:
         self.instrument = None
         self.path = None
         self.method = None
+        self.channels = None
         self.samples = None
         self.ignore = set()
         self.pars = None
@@ -38,7 +37,7 @@ class simplex:
         self.sort_samples()
 
     def process(self):
-        standards = Standards.standards(self)
+        standards = Standards.Standards(self)
         self.pars = standards.process()
 
     def sort_samples(self):
@@ -52,7 +51,7 @@ class simplex:
             dates = np.append(dates,sample.date)
         return dates
 
-    def plot(self,i=None,sname=None,show=True,num=None):
+    def view(self,i=None,sname=None,show=True,num=None):
         snames = self.samples.index
         if sname in snames:
             self.i = snames.index(sname)
@@ -60,12 +59,12 @@ class simplex:
             if i is not None:
                 self.i = i % len(snames)
             sname = snames[self.i]
-        return self.samples[sname].plot(title=sname,show=show,num=num)
+        return self.samples[sname].view(title=sname,show=show,num=num)
 
-    def channels(self):
+    def all_channels(self):
         run = self.samples
         if len(run)>0:
-            return self.samples.iloc[0].channels.index.tolist()
+            return run.iloc[0].channels.index.tolist()
         else:
             return None
 

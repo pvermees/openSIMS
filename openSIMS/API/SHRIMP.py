@@ -7,4 +7,9 @@ class SHRIMP_Sample(Sample.Sample):
         self.date = None
         self.set = []
         self.sbmbkg = []
-        
+
+    def read(self,fname):
+        pass
+
+    def cps(self,ion):
+        pass

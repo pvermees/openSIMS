@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import math
-from . import Crunch, Refmats, Method
-from scipy.optimize import minimize
+import openSIMS as S
+from abc import ABC, abstractmethod
 
-class Sample:
+class Sample(ABC):
 
     def __init__(self):
         self.date = None
@@ -16,19 +16,15 @@ class Sample:
         self.detector = pd.DataFrame()
         self.group = 'sample'
 
-    def calibration_data_UPb(self,b):
-        U = self.cps('U')
-        UO = self.cps('UO')
-        Pb4 = self.cps('Pb204')
-        Pb6 = self.cps('Pb206')
-        drift = np.exp(b*Pb6['time']/60)
-        a0par = Method.get('U-Pb','y0')
-        a0 = Refmats.get_values('U-Pb',self.group)[a0par]
-        x = np.log(UO['cps']) - np.log(U['cps'])
-        y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
-        return x,y
+    @abstractmethod
+    def read(self,fname):
+        pass
 
-    def plot(self,channels=None,title=None,show=True,num=None):
+    @abstractmethod
+    def cps(self,ion):
+        pass
+
+    def view(self,channels=None,title=None,show=True,num=None):
         if channels is None:
             channels = self.signal.columns
         nr = math.ceil(math.sqrt(len(channels)))
@@ -44,3 +40,22 @@ class Sample:
         if show:
             plt.show()
         return fig, ax
+
+    def offset(self,method):
+        method = S.settings(method)
+        DP = method.get_DP(self.group)
+        L = method['lambda']
+        y0t = np.log(DP)
+        y01 = np.log(np.exp(L)-1)
+        return y0t - y01
+    
+    def calibration_data_UPb(self,b):
+        U = self.cps('U')
+        UOx = self.cps('UOx')
+        Pb4 = self.cps('Pb204')
+        Pb6 = self.cps('Pb206')
+        drift = np.exp(b*Pb6['time']/60)
+        a0 = S.settings('U-Pb').get_a0(self.group)
+        x = np.log(UOx['cps']) - np.log(U['cps'])
+        y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
+        return x, y

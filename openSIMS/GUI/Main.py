@@ -2,7 +2,7 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, Plot
+from . import Doc, List, Log, Method, View
 
 class gui(tk.Tk):
 
@@ -17,7 +17,7 @@ class gui(tk.Tk):
         self.create_method_button()
         self.create_standard_button()
         self.create_process_button()
-        self.create_plot_button()
+        self.create_view_button()
         self.create_export_button()
         self.create_log_button()
         self.create_template_button()
@@ -42,7 +42,8 @@ class gui(tk.Tk):
         button = ttk.Menubutton(self,text='Method',direction='right')
         menu = tk.Menu(button,tearoff=0)
         for method in ['U-Pb','Th-Pb','O','S']:
-            menu.add_command(label=method,command=lambda m=method: self.on_method(m))
+            menu.add_command(label=method,
+                             command=lambda m=method: self.on_method(m))
             button["menu"] = menu
             button.pack(expand=True,fill=tk.BOTH)
 
@@ -54,8 +55,8 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Process',command=self.on_process)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_plot_button(self):
-        button = ttk.Button(self,text='Plot',command=self.on_plot)
+    def create_view_button(self):
+        button = ttk.Button(self,text='View',command=self.on_view)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_export_button(self):
@@ -101,9 +102,9 @@ class gui(tk.Tk):
     def on_export(self):
         self.run("S.TODO()")
 
-    def on_plot(self):
+    def on_view(self):
         if len(S.get('samples'))>0:
-            plot_window = Plot.PlotWindow(self)
+            view_window = View.ViewWindow(self)
 
     def toggle_log_window(self):
         if self.log_window is None:
