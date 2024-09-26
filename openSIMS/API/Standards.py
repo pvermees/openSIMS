@@ -9,10 +9,10 @@ class Standards():
 
     def __init__(self,simplex):
         self.method = simplex.method
-        self.standards = pd.Series()
+        self.standards = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
-            if sample.group != 'sample' and sname not in simplex.ignore:
-                self.standards[sname] = Standard(sample)
+            if sample.group == 'sample' or sname in simplex.ignore:
+                self.standards.drop(sname,inplace=True)
 
     def process(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
@@ -32,32 +32,7 @@ class Standards():
         y = np.array([])
         for standard in self.standards.array:
             xn, yn = standard.calibration_data_UPb(b)
-            offset = standard.offset()
+            offset = standard.offset('U-Pb')
             x = np.append(x,xn)
             y = np.append(y,yn-offset)
         return x, y
-
-class Standard():
-
-    def __init__(self,sample):
-        self.__dict__ = sample.__dict__.copy()
-
-    def offset(self):
-        method = S.settings(self.method)
-        DP = method.get_DP(self.group)
-        L = method['lambda']
-        y0t = np.log(DP)
-        y01 = np.log(np.exp(L)-1)
-        return y0t - y01
-
-    def calibration_data_UPb(self,b):
-        U = self.cps('U')
-        UOx = self.cps('UOx')
-        Pb4 = self.cps('Pb204')
-        Pb6 = self.cps('Pb206')
-        drift = np.exp(b*Pb6['time']/60)
-        a0 = S.settings('U-Pb').get_a0(self.group)
-        x = np.log(UOx['cps']) - np.log(U['cps'])
-        y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
-        return x,y
-    

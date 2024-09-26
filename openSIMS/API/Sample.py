@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import math
 import openSIMS as S
+from abc import ABC, abstractmethod
 
-class Sample():
+class Sample(ABC):
 
     def __init__(self):
         self.date = None
@@ -14,6 +15,14 @@ class Sample():
         self.channels = pd.DataFrame()
         self.detector = pd.DataFrame()
         self.group = 'sample'
+
+    @abstractmethod
+    def read(self,fname):
+        pass
+
+    @abstractmethod
+    def cps(self,ion):
+        pass
 
     def plot(self,channels=None,title=None,show=True,num=None):
         if channels is None:
@@ -31,3 +40,22 @@ class Sample():
         if show:
             plt.show()
         return fig, ax
+
+    def offset(self,method):
+        method = S.settings(method)
+        DP = method.get_DP(self.group)
+        L = method['lambda']
+        y0t = np.log(DP)
+        y01 = np.log(np.exp(L)-1)
+        return y0t - y01
+    
+    def calibration_data_UPb(self,b):
+        U = self.cps('U')
+        UOx = self.cps('UOx')
+        Pb4 = self.cps('Pb204')
+        Pb6 = self.cps('Pb206')
+        drift = np.exp(b*Pb6['time']/60)
+        a0 = S.settings('U-Pb').get_a0(self.group)
+        x = np.log(UOx['cps']) - np.log(U['cps'])
+        y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
+        return x, y

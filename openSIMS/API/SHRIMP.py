@@ -8,5 +8,8 @@ class SHRIMP_Sample(Sample.Sample):
         self.set = []
         self.sbmbkg = []
 
-    def cps(self):
+    def read(self,fname):
+        pass
+
+    def cps(self,ion):
         pass
