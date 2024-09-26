@@ -51,7 +51,7 @@ class Simplex:
             dates = np.append(dates,sample.date)
         return dates
 
-    def plot(self,i=None,sname=None,show=True,num=None):
+    def view(self,i=None,sname=None,show=True,num=None):
         snames = self.samples.index
         if sname in snames:
             self.i = snames.index(sname)
@@ -59,7 +59,7 @@ class Simplex:
             if i is not None:
                 self.i = i % len(snames)
             sname = snames[self.i]
-        return self.samples[sname].plot(title=sname,show=show,num=num)
+        return self.samples[sname].view(title=sname,show=show,num=num)
 
     def all_channels(self):
         run = self.samples

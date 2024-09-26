@@ -24,7 +24,7 @@ class Sample(ABC):
     def cps(self,ion):
         pass
 
-    def plot(self,channels=None,title=None,show=True,num=None):
+    def view(self,channels=None,title=None,show=True,num=None):
         if channels is None:
             channels = self.signal.columns
         nr = math.ceil(math.sqrt(len(channels)))

@@ -5,7 +5,7 @@ import openSIMS as S
 from . import Toolbox, Sample
 from scipy.optimize import minimize
 
-class Standards():
+class Standards:
 
     def __init__(self,simplex):
         self.method = simplex.method

@@ -26,10 +26,10 @@ def read():
 def process():
     __simplex.process()
 
-def plot(i=None,sname=None,show=True,num=None):
+def view(i=None,sname=None,show=True,num=None):
     if i is None and sname is None:
         i = __simplex.i
-    return __simplex.plot(i=i,sname=sname,show=show,num=num)
+    return __simplex.view(i=i,sname=sname,show=show,num=num)
 
 def simplex():
     return __simplex
