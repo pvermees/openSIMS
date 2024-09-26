@@ -1,8 +1,8 @@
 from .API import Simplex, Settings
 from .GUI.Main import gui
 
-__simplex = Simplex.simplex()
-__settings = Settings.settings()
+__simplex = Simplex.Simplex()
+__settings = Settings.Settings()
 
 def set(prop,val):
     setattr(__simplex,prop,val)

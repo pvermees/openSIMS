@@ -5,7 +5,7 @@ import os
 from . import Cameca, Standards
 from pathlib import Path
 
-class simplex:
+class Simplex:
     
     def __init__(self):
         self.reset()

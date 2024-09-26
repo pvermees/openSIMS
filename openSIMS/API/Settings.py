@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 from importlib.resources import files
 
-class settings(dict):
+class Settings(dict):
     
     def __init__(self):
         super().__init__()

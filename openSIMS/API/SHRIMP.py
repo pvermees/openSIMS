@@ -7,4 +7,6 @@ class SHRIMP_Sample(Sample.Sample):
         self.date = None
         self.set = []
         self.sbmbkg = []
-        
+
+    def cps(self):
+        pass

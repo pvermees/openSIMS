@@ -37,7 +37,7 @@ class Standards():
             y = np.append(y,yn-offset)
         return x, y
 
-class Standard(Sample.Sample):
+class Standard():
 
     def __init__(self,sample):
         self.__dict__ = sample.__dict__.copy()
@@ -49,4 +49,15 @@ class Standard(Sample.Sample):
         y0t = np.log(DP)
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
+
+    def calibration_data_UPb(self,b):
+        U = self.cps('U')
+        UOx = self.cps('UOx')
+        Pb4 = self.cps('Pb204')
+        Pb6 = self.cps('Pb206')
+        drift = np.exp(b*Pb6['time']/60)
+        a0 = S.settings('U-Pb').get_a0(self.group)
+        x = np.log(UOx['cps']) - np.log(U['cps'])
+        y = np.log(drift*Pb6['cps']-a0*Pb4['cps']) - np.log(U['cps'])
+        return x,y
     
