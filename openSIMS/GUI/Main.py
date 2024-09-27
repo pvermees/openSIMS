@@ -2,17 +2,18 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, View
+from . import Doc, List, Log, Method, View, Calibration
 
 class gui(tk.Tk):
 
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
-        self.figs = [111]
+        self.figs = [111,112]
         self.log_window = None
         self.list_window = None
         self.view_window = None
+        self.calibration_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
@@ -99,6 +100,10 @@ class gui(tk.Tk):
 
     def on_calibrate(self):
         self.run("S.calibrate()")
+        if self.calibration_window is None:
+            self.calibration_window = Calibration.CalibrationWindow(self)
+        else:
+            self.calibration_window.refresh()
 
     def on_export(self):
         self.run("S.TODO()")

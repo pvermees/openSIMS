@@ -5,6 +5,7 @@ import openSIMS as S
 from . import Toolbox, Sample
 from openSIMS.Methods import Functions
 from scipy.optimize import minimize
+from abc import ABC, abstractmethod
 
 def getStandards(simplex):
 
@@ -16,7 +17,7 @@ def getStandards(simplex):
     else:
         raise ValueError('Unrecognised data type')
 
-class Standards:
+class Standards(ABC):
 
     def __init__(self,simplex):
         self.method = simplex.method
@@ -24,6 +25,18 @@ class Standards:
         for sname, sample in simplex.samples.items():
             if sample.group == 'sample' or sname in simplex.ignore:
                 self.standards.drop(sname,inplace=True)
+
+    @abstractmethod
+    def calibrate(self):
+        pass
+
+    @abstractmethod
+    def misfit(self,b):
+        pass
+    
+    @abstractmethod
+    def pooled_calibration_data(self,b):
+        pass
 
 class GeochronStandards(Standards):
 
@@ -81,5 +94,5 @@ class StableStandards(Standards):
     def misfit(self,b):
         pass
     
-    def calibration_data(self,b):
+    def pooled_calibration_data(self,b):
         pass

@@ -1,4 +1,4 @@
-from .API import Simplex, Settings
+from .API import Simplex, Settings, Calibration
 from .GUI.Main import gui
 
 __simplex = Simplex.Simplex()
@@ -30,6 +30,9 @@ def view(i=None,sname=None,show=True,num=None):
     if i is None and sname is None:
         i = __simplex.i
     return __simplex.view(i=i,sname=sname,show=show,num=num)
+
+def plot(show=True,num=None):
+    return Calibration.plot(__simplex,show=show,num=num)
 
 def simplex():
     return __simplex
