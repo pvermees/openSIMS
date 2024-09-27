@@ -23,8 +23,8 @@ def reset():
 def read():
     __simplex.read()
 
-def process():
-    __simplex.process()
+def calibrate():
+    __simplex.calibrate()
 
 def view(i=None,sname=None,show=True,num=None):
     if i is None and sname is None:

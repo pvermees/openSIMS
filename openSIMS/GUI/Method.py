@@ -9,23 +9,23 @@ class MethodWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Pair the ions with the channels')
         Main.offset(top,self)
-        oldmethod = S.get('method')
-        channels = S.simplex().all_channels()
-        row = 0
+        refresh = (m != S.get('method'))
+        oldselections = None if refresh else S.get('channels')
         ions = S.settings(m)['ions']
-        selections = dict.fromkeys(ions,None)
+        channels = S.simplex().all_channels()
+        newselections = dict.fromkeys(ions,None)
+        row = 0
         for ion in ions:
             label = ttk.Label(self,text=ion)
             label.grid(row=row,column=0,padx=1,pady=1)
-            selections[ion] = tk.StringVar()
-            combo = ttk.Combobox(self,values=channels,textvariable=selections[ion])
-            guess = oldmethod is None or ion not in oldmethod.ions.keys()
-            default = self.guess(ion,channels) if guess else oldmethod.ions[ion]
+            newselections[ion] = tk.StringVar()
+            combo = ttk.Combobox(self,values=channels,textvariable=newselections[ion])
+            default = self.guess(ion,channels) if refresh else oldselections[ion]
             combo.set(default)
             combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1
         button = ttk.Button(self,text='OK',
-                            command=lambda t=top,m=m,s=selections: self.on_click(t,m,s))
+                            command=lambda t=top,m=m,s=newselections: self.on_click(t,m,s))
         button.grid(row=row,columnspan=2)
 
     def guess(self,ion,channels):

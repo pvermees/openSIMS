@@ -36,10 +36,10 @@ class Simplex:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()
 
-    def process(self):
-        standards = Standards.Standards(self)
-        self.pars = standards.process()
-
+    def calibrate(self):
+        standards = Standards.getStandards(self)
+        self.pars = standards.calibrate()        
+        
     def sort_samples(self):
         order = np.argsort(self.get_dates())
         new_index = self.samples.index[order.tolist()]

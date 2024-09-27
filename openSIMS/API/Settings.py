@@ -8,7 +8,7 @@ class Settings(dict):
     
     def __init__(self):
         super().__init__()
-        method_file = files('openSIMS.Settings').joinpath('methods.json')
+        method_file = files('openSIMS.Methods').joinpath('methods.json')
         json_string = method_file.read_text()
         methods = json.loads(json_string)
         for method, pars in methods.items():
@@ -35,7 +35,7 @@ class setting(dict):
     
     def __init__(self,method,pars):
         super().__init__(pars)
-        f = files('openSIMS.Settings.Refmats').joinpath(method + '.csv')
+        f = files('openSIMS.Methods.Refmats').joinpath(method + '.csv')
         csv_string = f.read_text()
         csv_stringio = io.StringIO(csv_string)
         self['refmats'] = pd.read_csv(csv_stringio,index_col=0)

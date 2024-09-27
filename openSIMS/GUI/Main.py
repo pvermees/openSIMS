@@ -12,12 +12,13 @@ class gui(tk.Tk):
         self.figs = [111]
         self.log_window = None
         self.list_window = None
+        self.view_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
-        self.create_standard_button()
-        self.create_process_button()
         self.create_view_button()
+        self.create_standard_button()
+        self.create_calibrate_button()
         self.create_export_button()
         self.create_log_button()
         self.create_template_button()
@@ -47,16 +48,16 @@ class gui(tk.Tk):
             button["menu"] = menu
             button.pack(expand=True,fill=tk.BOTH)
 
+    def create_view_button(self):
+        button = ttk.Button(self,text='View',command=self.on_view)
+        button.pack(expand=True,fill=tk.BOTH)
+
     def create_standard_button(self):
         button = ttk.Button(self,text='Standards',command=self.on_standard)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_process_button(self):
-        button = ttk.Button(self,text='Process',command=self.on_process)
-        button.pack(expand=True,fill=tk.BOTH)
-
-    def create_view_button(self):
-        button = ttk.Button(self,text='View',command=self.on_view)
+    def create_calibrate_button(self):
+        button = ttk.Button(self,text='Calibrate',command=self.on_calibrate)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_export_button(self):
@@ -96,15 +97,18 @@ class gui(tk.Tk):
             self.list_window.destroy()
             self.list_window = None
 
-    def on_process(self):
-        self.run("S.TODO()")
+    def on_calibrate(self):
+        self.run("S.calibrate()")
 
     def on_export(self):
         self.run("S.TODO()")
 
     def on_view(self):
-        if len(S.get('samples'))>0:
-            view_window = View.ViewWindow(self)
+        if self.view_window is None and len(S.get('samples'))>0:
+            self.view_window = View.ViewWindow(self)
+        else:
+            self.view_window.destroy()
+            self.view_window = None
 
     def toggle_log_window(self):
         if self.log_window is None:

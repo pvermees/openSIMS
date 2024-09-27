@@ -1,2 +1,2 @@
-include openSIMS/Settings/*.csv
-include openSIMS/Settings/*.json
+include openSIMS/Methods/Refmats/*.csv
+include openSIMS/Methods/methods.json
