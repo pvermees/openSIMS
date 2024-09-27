@@ -70,6 +70,7 @@ class Test(unittest.TestCase):
         S.calibrate()
         pars = S.get('pars')
         self.assertEqual(pars['b'],0.000375)
+
         
 if __name__ == '__main__':
     unittest.main()

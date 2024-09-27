@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     import openSIMS as S
     S.set('instrument','Cameca')
     S.set('path','/home/pvermees/git/openSIMS/data/Cameca_UPb')
@@ -13,4 +13,6 @@ if True:
     S.standards(Plesovice=[0,1,3])
     S.gui()
 else:
-    t.test_calibrate()
+    t.setCamecaStandards()
+    S.calibrate()
+    S.plot()

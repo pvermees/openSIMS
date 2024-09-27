@@ -38,7 +38,7 @@ class Simplex:
 
     def calibrate(self):
         standards = Standards.getStandards(self)
-        self.pars = standards.calibrate()        
+        self.pars = standards.calibrate()
         
     def sort_samples(self):
         order = np.argsort(self.get_dates())
