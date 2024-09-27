@@ -2,8 +2,8 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from openSIMS.API import Cameca, Sample, Settings, SHRIMP, Simplex, Toolbox
 import openSIMS as S
+from openSIMS.API import Cameca, Sample, Settings, SHRIMP, Simplex, Toolbox
 
 class Test(unittest.TestCase):
 
@@ -14,7 +14,7 @@ class Test(unittest.TestCase):
 
     def loadCamecaUPbMethod(self):
         self.loadCamecaData()
-        S.method('UPb',
+        S.method('U-Pb',
                  U='238U',UOx='238U 16O2',
                  Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
 
@@ -55,8 +55,8 @@ class Test(unittest.TestCase):
         self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
 
     def test_settings(self):
-        DP = S.settings('UPb').get_DP('Plesovice')
-        a0 = S.settings('UPb').get_a0('Plesovice')
+        DP = S.settings('U-Pb').get_DP('Plesovice')
+        a0 = S.settings('U-Pb').get_a0('Plesovice')
         self.assertEqual(DP,0.05368894845896288)
         self.assertEqual(a0,18.18037)
 

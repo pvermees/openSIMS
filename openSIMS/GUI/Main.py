@@ -42,7 +42,7 @@ class gui(tk.Tk):
     def create_method_button(self):
         button = ttk.Menubutton(self,text='Method',direction='right')
         menu = tk.Menu(button,tearoff=0)
-        for method in ['UPb','ThPb','O','S']:
+        for method in ['U-Pb','Th-Pb','O','S']:
             menu.add_command(label=method,
                              command=lambda m=method: self.on_method(m))
             button["menu"] = menu
@@ -98,7 +98,7 @@ class gui(tk.Tk):
             self.list_window = None
 
     def on_calibrate(self):
-        self.run("S.TODO()")
+        self.run("S.calibrate()")
 
     def on_export(self):
         self.run("S.TODO()")
