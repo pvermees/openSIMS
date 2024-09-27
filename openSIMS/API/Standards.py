@@ -5,6 +5,16 @@ import openSIMS as S
 from . import Toolbox, Sample
 from scipy.optimize import minimize
 
+def getStandards(simplex):
+
+    datatype = S.settings(simplex.method)['type']
+    if datatype == 'geochron':
+        return GeochronStandards(simplex)
+    elif datatype == 'stable':
+        return StableStandards(simplex)
+    else:
+        raise ValueError('Unrecognised data type')
+
 class Standards:
 
     def __init__(self,simplex):
@@ -14,7 +24,12 @@ class Standards:
             if sample.group == 'sample' or sname in simplex.ignore:
                 self.standards.drop(sname,inplace=True)
 
-    def process(self):
+class GeochronStandards(Standards):
+
+    def __init__(self,simplex):
+        super().__init__(simplex)
+    
+    def calibrate(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
         b = res.x[0]
         x, y = self.calibration_data(b)
@@ -36,3 +51,17 @@ class Standards:
             x = np.append(x,xn)
             y = np.append(y,yn-offset)
         return x, y
+
+class StableStandards(Standards):
+
+    def __init__(self,simplex):
+        super().__init__(simplex)
+
+    def calibrate(self):
+        pass
+    
+    def misfit(self,b):
+        pass
+    
+    def calibration_data(self,b):
+        pass

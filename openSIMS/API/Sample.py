@@ -35,7 +35,7 @@ class Sample(ABC):
         for r in range(nr):
             for c in range(nc):
                 channel = channels[r*nc+c]
-                ax[r,c].plot(self.time[channel],self.signal[channel])
+                ax[r,c].scatter(self.time[channel],self.signal[channel])
                 ax[r,c].set_title(channel)
         if show:
             plt.show()

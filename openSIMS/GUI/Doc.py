@@ -19,10 +19,10 @@ def Help(item):
         "  - SHRIMP: select an .op or .pd file (TODO)\n" + \
         "2. Method: Select an application and pair the relevant\n" + \
         "   ions with the corresponding mass spectrometer channels.\n" + \
-        "3. Standards: Mark which analyses correspond to" + \
+        "3. View: View the time resolved SIMS data\n" + \
+        "4. Standards: Mark which analyses correspond to" + \
         "   primary reference materials.\n" + \
-        "4. Process: TODO\n" + \
-        "5. Plot: Plot the time resolved SIMS data\n" + \
+        "5. Calibrate: Fit the standards in logratio space\n" + \
         "6. Export: TODO\n" + \
         "7. Log: View, save or run the session log of openSIMS commands\n" + \
         "8. Template: TODO\n" + \
