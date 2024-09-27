@@ -4,13 +4,13 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     import openSIMS as S
     S.set('instrument','Cameca')
     S.set('path','/home/pvermees/git/openSIMS/data/Cameca_UPb')
     S.read()
-    S.method('U-Pb',U='238U',UOx='238U 16O2',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+    S.method('UPb',U='238U',UOx='238U 16O2',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
     S.standards(Plesovice=[0,1,3])
     S.gui()
 else:
-    t.test_process()
+    t.test_calibrate()

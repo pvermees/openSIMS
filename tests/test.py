@@ -14,10 +14,16 @@ class Test(unittest.TestCase):
 
     def loadCamecaUPbMethod(self):
         self.loadCamecaData()
-        S.method('U-Pb',
+        S.method('UPb',
                  U='238U',UOx='238U 16O2',
                  Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
 
+    def loadOxygen(self):
+        S.set('instrument','Cameca')
+        S.set('path','data/Cameca_O')
+        S.read()
+        S.method('O',O16='16O',O17='17O',O18='18O')
+        
     def setCamecaStandards(self):
         self.loadCamecaUPbMethod()
         S.standards(Plesovice=[0,1,3])
@@ -37,6 +43,8 @@ class Test(unittest.TestCase):
     def test_createButDontShowView(self):
         self.loadCamecaData()
         S.view(show=False)
+        self.loadOxygen()
+        S.view(show=False)
 
     def test_methodPairing(self):
         self.loadCamecaUPbMethod()
@@ -47,8 +55,8 @@ class Test(unittest.TestCase):
         self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
 
     def test_settings(self):
-        DP = S.settings('U-Pb').get_DP('Plesovice')
-        a0 = S.settings('U-Pb').get_a0('Plesovice')
+        DP = S.settings('UPb').get_DP('Plesovice')
+        a0 = S.settings('UPb').get_a0('Plesovice')
         self.assertEqual(DP,0.05368894845896288)
         self.assertEqual(a0,18.18037)
 
@@ -57,9 +65,9 @@ class Test(unittest.TestCase):
         Pb206 = S.get('samples')['Plesovice@01'].cps('Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
 
-    def test_process(self):
+    def test_calibrate(self):
         self.setCamecaStandards()
-        S.process()
+        S.calibrate()
         pars = S.get('pars')
         self.assertEqual(pars['b'],0.000375)
         
