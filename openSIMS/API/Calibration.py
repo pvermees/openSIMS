@@ -25,8 +25,8 @@ def plot(simplex,show=True,num=None):
         ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
     xmin = ax.get_xlim()[0]
     for group, val in lines.items():
-        intercept = p['A'] + val['offset']
-        ax.axline((xmin,intercept),slope=p['B'],color=val['colour'])
+        ymin = p['A'] + val['offset'] + p['B'] * xmin
+        ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
     if show:
         plt.show()
     return fig, ax

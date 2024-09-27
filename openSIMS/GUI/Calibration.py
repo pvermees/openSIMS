@@ -12,17 +12,22 @@ class CalibrationWindow(tk.Toplevel):
     def __init__(self,top):
         super().__init__()
         self.title('Calibration')
-        Main.offset(top,self)
-        fig, axs = S.plot(show=False,num=top.figs[1])
+        self.top = top
+        fig, axs = S.plot(show=False,num=self.top.figs[1])
+        self.canvas = FigureCanvasTkAgg(fig,master=self)
+        self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
+        self.canvas.draw()
+        self.toolbar = NavigationToolbar2Tk(self.canvas,self)
+        self.toolbar.update()
+        Main.offset(self.top,self)
+        self.refresh()
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
   
-        canvas = FigureCanvasTkAgg(fig,master=self)
-        canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        canvas.draw()
-        toolbar = NavigationToolbar2Tk(canvas,self)
-        toolbar.update()
-  
-    def refresh(self,top,canvas,di):
-        S.set('i',i)
-        canvas.figure.clf()
-        canvas.figure, axs = S.view(show=False,num=top.figs[1])
-        canvas.draw()
+    def refresh(self):
+        self.canvas.figure.clf()
+        self.canvas.figure, axs = S.plot(show=False,num=self.top.figs[1])
+        self.canvas.draw()
+
+    def on_closing(self):
+        self.top.calibration_window = None
+        self.destroy()

@@ -2,7 +2,7 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, View
+from . import Doc, List, Log, Method, View, Calibration
 
 class gui(tk.Tk):
 
@@ -13,6 +13,7 @@ class gui(tk.Tk):
         self.log_window = None
         self.list_window = None
         self.view_window = None
+        self.calibration_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
