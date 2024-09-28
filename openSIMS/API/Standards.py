@@ -46,7 +46,7 @@ class GeochronStandards(Standards):
     def calibrate(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
         b = res.x[0]
-        x, y, A, B = self.fit(b)
+        A, B = self.fit(b)
         return {'A':A, 'B':B, 'b':b}
     
     def misfit(self,b):
@@ -57,7 +57,7 @@ class GeochronStandards(Standards):
     def fit(self,b):
         x, y = self.pooled_calibration_data(b)
         A, B = Toolbox.linearfit(x,y)
-        return x, y, A, B
+        return A, B
 
     def pooled_calibration_data(self,b):
         x = np.array([])
@@ -89,10 +89,18 @@ class StableStandards(Standards):
         super().__init__(simplex)
 
     def calibrate(self):
-        pass
-    
+        ratios = self.pooled_calibration_data()
+            
     def misfit(self,b):
         pass
     
-    def pooled_calibration_data(self,b):
-        pass
+    def pooled_calibration_data(self):
+        settings = S.settings(self.method)
+        num = settings['deltaref']['num']
+        den = settings['deltaref']['den']
+        ratios = np.array([])
+        for standard in self.standards.array:
+            pass
+
+    def offset(self,standard):
+        method = S.settings(self.method)

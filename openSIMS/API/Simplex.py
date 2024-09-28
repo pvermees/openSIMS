@@ -79,7 +79,15 @@ class Simplex:
             sample.group = 'sample'
         for name, indices in kwargs.items():
             for i in indices:
-                self.samples.iloc[i].group = name
+                self.get_sample(i).group = name
 
+    def get_sample(self,identifier):
+        if type(identifier) is int:
+            return self.samples.iloc[identifier]
+        elif type(identifier) is str:
+            return self.samples[identifier]
+        else:
+            raise ValueError('Invalid sample identifier')
+                
     def TODO(self):
         pass

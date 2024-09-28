@@ -65,12 +65,16 @@ class Test(unittest.TestCase):
         Pb206 = S.get('samples')['Plesovice@01'].cps('Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
 
-    def test_calibrate(self):
+    def test_calibrate_UPb(self):
         self.setCamecaStandards()
         S.calibrate()
         pars = S.get('pars')
         self.assertEqual(pars['b'],0.000375)
 
+    def test_calibrate_O(self):
+        self.loadOxygen()
+        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        S.calibrate()
         
 if __name__ == '__main__':
     unittest.main()
