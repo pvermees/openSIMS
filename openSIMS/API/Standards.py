@@ -3,7 +3,6 @@ import numpy as np
 import pandas as pd
 import openSIMS as S
 from . import Toolbox, Sample
-from openSIMS.Methods import Functions
 from scipy.optimize import minimize
 from abc import ABC, abstractmethod
 
@@ -46,7 +45,7 @@ class GeochronStandards(Standards):
     def calibrate(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
         b = res.x[0]
-        A, B = self.fit(b)
+        x, y, A, B = self.fit(b)
         return {'A':A, 'B':B, 'b':b}
     
     def misfit(self,b):
@@ -57,28 +56,36 @@ class GeochronStandards(Standards):
     def fit(self,b):
         x, y = self.pooled_calibration_data(b)
         A, B = Toolbox.linearfit(x,y)
-        return A, B
+        return x, y, A, B
 
     def pooled_calibration_data(self,b):
         x = np.array([])
         y = np.array([])
+        settings = S.settings(self.method)
         for standard in self.standards.array:
-            xn, yn = self.calibration_data(standard,b)
-            dy = self.offset(standard)
+            xn, yn = self.calibration_data(settings,standard,b)
+            dy = self.offset(settings,standard)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
-    def calibration_data(self,standard,b):
-        settings = S.settings(self.method)
-        function_name = settings['calibration_data']
-        fun = getattr(Functions,function_name)
-        return fun(standard,b)
+    @staticmethod
+    def calibration_data(settings,standard,b):
+        ions = settings['ions']
+        P = standard.cps(ions[0])
+        POx = standard.cps(ions[1])
+        D = standard.cps(ions[2])
+        d = standard.cps(ions[3])
+        drift = np.exp(b*D['time']/60)
+        y0 = settings.get_y0(standard.group)
+        x = np.log(POx['cps']) - np.log(P['cps'])
+        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
+        return x, y
 
-    def offset(self,standard):
-        method = S.settings(self.method)
-        DP = method.get_DP(standard.group)
-        L = method['lambda']
+    @staticmethod
+    def offset(settings,standard):
+        DP = settings.get_DP(standard.group)
+        L = settings['lambda']
         y0t = np.log(DP)
         y01 = np.log(np.exp(L)-1)
         return y0t - y01

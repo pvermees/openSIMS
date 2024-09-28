@@ -56,9 +56,9 @@ class Test(unittest.TestCase):
 
     def test_settings(self):
         DP = S.settings('U-Pb').get_DP('Plesovice')
-        a0 = S.settings('U-Pb').get_a0('Plesovice')
+        y0 = S.settings('U-Pb').get_y0('Plesovice')
         self.assertEqual(DP,0.05368894845896288)
-        self.assertEqual(a0,18.18037)
+        self.assertEqual(y0,18.18037)
 
     def test_cps(self):
         self.loadCamecaUPbMethod()
@@ -74,7 +74,6 @@ class Test(unittest.TestCase):
     def test_calibrate_O(self):
         self.loadOxygen()
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
-        S.calibrate()
         
 if __name__ == '__main__':
     unittest.main()

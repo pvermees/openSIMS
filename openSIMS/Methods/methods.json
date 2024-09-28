@@ -1,17 +1,15 @@
 {
     "U-Pb": {
 	"type": "geochron",
-	"ions": ["U","UOx","Pb204","Pb206","Pb207"],
-        "y0": "Pb64_0",
-        "lambda": 0.000155125,
-	"calibration_data": "calibration_data_UPb"
+	"ions": ["U","UOx","Pb206","Pb204","Pb207"],
+	"y0": "Pb64_0",
+        "lambda": 0.000155125
     },
     "Th-Pb": {
 	"type": "geochron",
-	"ions": ["Th","ThOx","Pb204","Pb208"],
-        "y0": "Pb84_0",
-        "lambda": 0.0000495,
-	"calibration_data": "calibration_data_ThPb"
+	"ions": ["Th","ThOx","Pb208","Pb204"],
+	"y0": "Pb84_0",
+        "lambda": 0.0000495
     },
     "O": {
 	"type": "stable",

@@ -50,7 +50,7 @@ class geochron_setting(setting):
         t = self['refmats']['t'][refmat]
         return np.exp(L*t) - 1
 
-    def get_a0(self,refmat):
+    def get_y0(self,refmat):
         y0 = self['y0']
         return self['refmats'][y0][refmat]
         
