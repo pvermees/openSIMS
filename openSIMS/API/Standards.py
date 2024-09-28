@@ -20,6 +20,7 @@ class Standards(ABC):
 
     def __init__(self,simplex):
         self.method = simplex.method
+        self.channels = simplex.channels
         self.standards = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
             if sample.group == 'sample' or sname in simplex.ignore:
@@ -63,14 +64,14 @@ class GeochronStandards(Standards):
         y = np.array([])
         settings = S.settings(self.method)
         for standard in self.standards.array:
-            xn, yn = self.calibration_data(settings,standard,b)
+            xn, yn = self.raw_calibration_data(settings,standard,b)
             dy = self.offset(settings,standard)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
     @staticmethod
-    def calibration_data(settings,standard,b):
+    def raw_calibration_data(settings,standard,b):
         ions = settings['ions']
         P = standard.cps(ions[0])
         POx = standard.cps(ions[1])
@@ -98,16 +99,36 @@ class StableStandards(Standards):
     def calibrate(self):
         ratios = self.pooled_calibration_data()
             
-    def misfit(self,b):
+    def misfit(self,b=0):
         pass
     
-    def pooled_calibration_data(self):
+    def pooled_calibration_data(self,b=0):
         settings = S.settings(self.method)
         num = settings['deltaref']['num']
         den = settings['deltaref']['den']
-        ratios = np.array([])
+        ratios = [f"{n}/{d}" for n, d in zip(num, den)]
+        df_list = []
         for standard in self.standards.array:
-            pass
+            raw_cps = self.raw_calibration_data(settings,standard,b=b)
+            logratios = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
+            offset = self.offset(settings,standard,ratios,b=b)
+            logratios.apply(lambda raw: raw - offset.values, axis=1)
+            df_list.append(logratios)
+        out = pd.concat(df_list)
+        out.set_axis(ratios,axis=1)
+        return out
 
-    def offset(self,standard):
-        method = S.settings(self.method)
+    @staticmethod
+    def raw_calibration_data(settings,standard,b=0):
+        ions = settings['ions']
+        out = pd.DataFrame()
+        for ion in ions:
+            out[ion] = standard.cps(ion)['cps']
+        return out
+
+    @staticmethod
+    def offset(settings,standard,ratios,b=0):
+        ratios = settings['refmats'][ratios].loc[standard.group]
+        ratios_deltaref = settings['deltaref']['ratio']
+        return np.log(ratios) - np.log(ratios_deltaref)
+        

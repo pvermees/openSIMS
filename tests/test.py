@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from openSIMS.API import Cameca, Sample, Settings, SHRIMP, Simplex, Toolbox
+from openSIMS.API import *
 
 class Test(unittest.TestCase):
 
@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
         self.assertIsInstance(cam,Sample.Sample)
-        self.assertIsInstance(cam,Sample.Sample)
+        self.assertIsInstance(shr,Sample.Sample)
 
     def test_openCamecaASCfile(self):
         samp = Cameca.Cameca_Sample()
@@ -74,6 +74,9 @@ class Test(unittest.TestCase):
     def test_calibrate_O(self):
         self.loadOxygen()
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        simplex = S.simplex()
+        standards = Standards.getStandards(simplex)
+        caldat = standards.pooled_calibration_data()
         
 if __name__ == '__main__':
     unittest.main()
