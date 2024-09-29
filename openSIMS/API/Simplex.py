@@ -51,7 +51,7 @@ class Simplex:
             dates = np.append(dates,sample.date)
         return dates
 
-    def view(self,i=None,sname=None,show=True,num=None):
+    def view(self,i=None,sname=None):
         snames = self.samples.index
         if sname in snames:
             self.i = snames.index(sname)
@@ -59,7 +59,11 @@ class Simplex:
             if i is not None:
                 self.i = i % len(snames)
             sname = snames[self.i]
-        return self.samples[sname].view(title=sname,show=show,num=num)
+        return self.samples[sname].view(title=sname)
+
+    def plot(self):
+        standards = Standards.getStandards(self)
+        return standards.plot()
 
     def all_channels(self):
         run = self.samples
@@ -79,7 +83,15 @@ class Simplex:
             sample.group = 'sample'
         for name, indices in kwargs.items():
             for i in indices:
-                self.samples.iloc[i].group = name
+                self.get_sample(i).group = name
 
+    def get_sample(self,identifier):
+        if type(identifier) is int:
+            return self.samples.iloc[identifier]
+        elif type(identifier) is str:
+            return self.samples[identifier]
+        else:
+            raise ValueError('Invalid sample identifier')
+                
     def TODO(self):
         pass

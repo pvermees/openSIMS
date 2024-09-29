@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from openSIMS.API import Cameca, Sample, Settings, SHRIMP, Simplex, Toolbox
+from openSIMS.API import Cameca, SHRIMP, Standards, Sample
 
 class Test(unittest.TestCase):
 
@@ -32,19 +32,19 @@ class Test(unittest.TestCase):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
         self.assertIsInstance(cam,Sample.Sample)
-        self.assertIsInstance(cam,Sample.Sample)
+        self.assertIsInstance(shr,Sample.Sample)
 
     def test_openCamecaASCfile(self):
         samp = Cameca.Cameca_Sample()
         samp.read("data/Cameca_UPb/Plesovice@01.asc")
         self.assertEqual(samp.signal.size,84)
-        samp.view(show=False)
+        samp.view()
 
-    def test_createButDontShowView(self):
+    def test_view(self):
         self.loadCamecaData()
-        S.view(show=False)
+        S.view()
         self.loadOxygen()
-        S.view(show=False)
+        S.view()
 
     def test_methodPairing(self):
         self.loadCamecaUPbMethod()
@@ -56,21 +56,25 @@ class Test(unittest.TestCase):
 
     def test_settings(self):
         DP = S.settings('U-Pb').get_DP('Plesovice')
-        a0 = S.settings('U-Pb').get_a0('Plesovice')
+        y0 = S.settings('U-Pb').get_y0('Plesovice')
         self.assertEqual(DP,0.05368894845896288)
-        self.assertEqual(a0,18.18037)
+        self.assertEqual(y0,18.18037)
 
     def test_cps(self):
         self.loadCamecaUPbMethod()
         Pb206 = S.get('samples')['Plesovice@01'].cps('Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
 
-    def test_calibrate(self):
+    def test_calibrate_UPb(self):
         self.setCamecaStandards()
         S.calibrate()
         pars = S.get('pars')
         self.assertEqual(pars['b'],0.000375)
 
-        
+    def test_calibrate_O(self):
+        self.loadOxygen()
+        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        S.calibrate()
+
 if __name__ == '__main__':
     unittest.main()

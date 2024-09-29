@@ -13,6 +13,5 @@ if True:
     S.standards(Plesovice=[0,1,3])
     S.gui()
 else:
-    t.setCamecaStandards()
-    S.calibrate()
+    t.test_calibrate_O()
     S.plot()
