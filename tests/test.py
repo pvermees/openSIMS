@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from openSIMS.API import *
+from openSIMS.API import Cameca, SHRIMP, Standards, Sample
 
 class Test(unittest.TestCase):
 

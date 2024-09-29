@@ -61,6 +61,10 @@ class Simplex:
             sname = snames[self.i]
         return self.samples[sname].view(title=sname,show=show,num=num)
 
+    def plot(self,show=True,num=None):
+        standards = Standards.getStandards(self)
+        return standards.plot(show=show,num=num)
+
     def all_channels(self):
         run = self.samples
         if len(run)>0:

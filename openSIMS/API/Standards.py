@@ -2,7 +2,8 @@ import copy
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from . import Toolbox, Sample
+import matplotlib.pyplot as plt
+from . import Toolbox, Sample, Ellipse
 from scipy.optimize import minimize
 from abc import ABC, abstractmethod
 
@@ -19,6 +20,7 @@ def getStandards(simplex):
 class Standards(ABC):
 
     def __init__(self,simplex):
+        self.pars = simplex.pars
         self.method = simplex.method
         self.channels = simplex.channels
         self.standards = copy.copy(simplex.samples)
@@ -38,6 +40,10 @@ class Standards(ABC):
     def pooled_calibration_data(self,b):
         pass
 
+    @abstractmethod
+    def plot(self):
+        pass
+
 class GeochronStandards(Standards):
 
     def __init__(self,simplex):
@@ -48,7 +54,7 @@ class GeochronStandards(Standards):
         b = res.x[0]
         x, y, A, B = self.fit(b)
         return {'A':A, 'B':B, 'b':b}
-    
+   
     def misfit(self,b):
         x, y, A, B = self.fit(b)
         SS = sum((A+B*x-y)**2)
@@ -64,14 +70,14 @@ class GeochronStandards(Standards):
         y = np.array([])
         settings = S.settings(self.method)
         for standard in self.standards.array:
-            xn, yn = self.raw_calibration_data(settings,standard,b)
-            dy = self.offset(settings,standard)
+            xn, yn = self.raw_calibration_data(standard,b)
+            dy = self.offset(standard)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
-    @staticmethod
-    def raw_calibration_data(settings,standard,b):
+    def raw_calibration_data(self,standard,b):
+        settings = S.settings(self.method)
         ions = settings['ions']
         P = standard.cps(ions[0])
         POx = standard.cps(ions[1])
@@ -83,21 +89,50 @@ class GeochronStandards(Standards):
         y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
         return x, y
 
-    @staticmethod
-    def offset(settings,standard):
+    def offset(self,standard):
+        settings = S.settings(self.method)
         DP = settings.get_DP(standard.group)
         L = settings['lambda']
         y0t = np.log(DP)
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
-    
+
+    def plot(self,show=True,num=None):
+        p = self.pars
+        fig, ax = plt.subplots()
+        lines = dict()
+        np.random.seed(0)
+        for sname, standard in self.standards.items():
+            group = standard.group
+            if group in lines.keys():
+                colour = lines[group]['colour']
+            else:
+                lines[group] = dict()
+                lines[group]['colour'] = np.random.rand(3,)
+                lines[group]['offset'] = self.offset(standard)
+            x, y = self.raw_calibration_data(standard,p['b'])
+            Ellipse.confidence_ellipse(x,y,ax,
+                                       alpha=0.25,
+                                       facecolor=lines[group]['colour'],
+                                       edgecolor='black',
+                                       zorder=0)
+            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+        xmin = ax.get_xlim()[0]
+        for group, val in lines.items():
+            ymin = p['A'] + val['offset'] + p['B'] * xmin
+            ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
+        if show:
+            plt.show()
+        return fig, ax
+
 class StableStandards(Standards):
 
     def __init__(self,simplex):
         super().__init__(simplex)
 
     def calibrate(self):
-        ratios = self.pooled_calibration_data()
+        logratios = self.pooled_calibration_data()
+        return logratios.mean
             
     def misfit(self,b=0):
         pass
@@ -132,3 +167,5 @@ class StableStandards(Standards):
         ratios_deltaref = settings['deltaref']['ratio']
         return np.log(ratios) - np.log(ratios_deltaref)
         
+    def plot(self,show=True,num=None):
+        pass
