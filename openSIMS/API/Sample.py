@@ -23,7 +23,7 @@ class Sample(ABC):
     def cps(self,ion):
         pass
 
-    def view(self,channels=None,title=None,show=True):
+    def view(self,channels=None,title=None):
         if channels is None:
             channels = self.signal.columns
         num_panels = len(channels)
@@ -39,6 +39,4 @@ class Sample(ABC):
             fig.delaxes(ax.flatten()[empty_axis])
         plt.subplots_adjust(left=0.1,top=0.9,right=0.9,bottom=0.1,
                             hspace=0.5,wspace=0.5)
-        if show:
-            plt.show()
         return fig, ax

@@ -42,7 +42,7 @@ class Standards(ABC):
         pass
 
     @abstractmethod
-    def plot(self,show=True):
+    def plot(self):
         pass
 
 class GeochronStandards(Standards):
@@ -98,7 +98,7 @@ class GeochronStandards(Standards):
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
 
-    def plot(self,show=True):
+    def plot(self):
         p = self.pars
         fig, ax = plt.subplots()
         lines = dict()
@@ -120,8 +120,6 @@ class GeochronStandards(Standards):
         for group, val in lines.items():
             ymin = p['A'] + val['offset'] + p['B'] * xmin
             ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
-        if show:
-            plt.show()
         return fig, ax
 
 class StableStandards(Standards):
@@ -176,7 +174,7 @@ class StableStandards(Standards):
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(delta+1)
         
-    def plot(self,show=True):
+    def plot(self):
         A = self.pars['A']
         b = self.pars['b']
         num_panels = len(A)
@@ -218,6 +216,4 @@ class StableStandards(Standards):
         for empty_axis in range(len(ratio_names),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         fig.tight_layout()
-        if show:
-            plt.show()
         return fig, ax

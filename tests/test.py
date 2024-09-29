@@ -38,13 +38,13 @@ class Test(unittest.TestCase):
         samp = Cameca.Cameca_Sample()
         samp.read("data/Cameca_UPb/Plesovice@01.asc")
         self.assertEqual(samp.signal.size,84)
-        samp.view(show=False)
+        samp.view()
 
-    def test_createButDontShowView(self):
+    def test_view(self):
         self.loadCamecaData()
-        S.view(show=False)
+        S.view()
         self.loadOxygen()
-        S.view(show=False)
+        S.view()
 
     def test_methodPairing(self):
         self.loadCamecaUPbMethod()

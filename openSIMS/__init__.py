@@ -26,13 +26,13 @@ def read():
 def calibrate():
     __simplex.calibrate()
 
-def view(i=None,sname=None,show=True):
+def view(i=None,sname=None):
     if i is None and sname is None:
         i = __simplex.i
-    return __simplex.view(i=i,sname=sname,show=show)
+    return __simplex.view(i=i,sname=sname)
 
-def plot(show=True):
-    return __simplex.plot(show=show)
+def plot():
+    return __simplex.plot()
 
 def simplex():
     return __simplex

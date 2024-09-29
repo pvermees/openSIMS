@@ -14,4 +14,4 @@ if True:
     S.gui()
 else:
     t.test_calibrate_O()
-    S.plot(show=True)
+    S.plot()
