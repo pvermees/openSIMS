@@ -32,15 +32,11 @@ class Sample(ABC):
         fig, ax = plt.subplots(nr,nc,num=num)
         if title is not None:
             plt.suptitle(title)
-        for r in range(nr):
-            for c in range(nc):
-                i = r*nc+c
-                if i+1 > num_panels:
-                    ax[r,c].axis('off')
-                else:
-                    channel = channels[i]
-                    ax[r,c].scatter(self.time[channel],self.signal[channel])
-                    ax[r,c].set_title(channel)
+        for i, channel in enumerate(channels):
+            ax.ravel()[i].scatter(self.time[channel],self.signal[channel])
+            ax.ravel()[i].set_title(channel)
+        for empty_axis in range(len(channels),nr*nc):
+            fig.delaxes(ax.flatten()[empty_axis])
         if show:
             plt.show()
         return fig, ax

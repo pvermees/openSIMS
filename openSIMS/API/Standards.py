@@ -198,8 +198,17 @@ class StableStandards(Standards):
                 lines[group]['offset'] = self.offset(standard,b=b)
             raw_logratios = self.raw_logratios(standard,b=b)
             logratio_means = raw_logratios.mean(axis=0)
+            logratio_std = raw_logratios.std(axis=0)
             for i, ratio_name in enumerate(ratio_names):
-                ax.ravel()[i].scatter(i+1,logratio_means[i],s=3,c=colour)
+                y_mean = logratio_means.iloc[i]
+                y_min = y_mean - logratio_std.iloc[i]
+                y_max = y_mean + logratio_std.iloc[i]
+                ax.ravel()[i].scatter(sname,y_mean,
+                                      s=5,color='black',zorder=1)
+                ax.ravel()[i].plot([sname,sname],[y_min,y_max],
+                                   '-',color=colour,zorder=0)
+        for empty_axis in range(len(ratio_names),nr*nc):
+            fig.delaxes(ax.flatten()[empty_axis])
         if show:
             plt.show()
         return fig, ax
