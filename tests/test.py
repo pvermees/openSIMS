@@ -74,9 +74,7 @@ class Test(unittest.TestCase):
     def test_calibrate_O(self):
         self.loadOxygen()
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
-        simplex = S.simplex()
-        standards = Standards.getStandards(simplex)
-        caldat = standards.pooled_calibration_data()
-        
+        S.calibrate()
+
 if __name__ == '__main__':
     unittest.main()

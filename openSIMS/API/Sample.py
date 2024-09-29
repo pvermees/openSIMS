@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 import pandas as pd
-import numpy as np
 import math
 import openSIMS as S
 from abc import ABC, abstractmethod
@@ -27,17 +26,17 @@ class Sample(ABC):
     def view(self,channels=None,title=None,show=True,num=None):
         if channels is None:
             channels = self.signal.columns
-        np = len(channels)
-        nr = math.ceil(math.sqrt(np))
-        nc = math.ceil(np/nr)
+        num_panels = len(channels)
+        nr = math.ceil(math.sqrt(num_panels))
+        nc = math.ceil(num_panels/nr)
         fig, ax = plt.subplots(nr,nc,num=num)
         if title is not None:
             plt.suptitle(title)
         for r in range(nr):
             for c in range(nc):
                 i = r*nc+c
-                if i==np:
-                    break
+                if i+1 > num_panels:
+                    ax[r,c].axis('off')
                 else:
                     channel = channels[i]
                     ax[r,c].scatter(self.time[channel],self.signal[channel])

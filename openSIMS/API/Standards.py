@@ -1,4 +1,5 @@
 import copy
+import math
 import numpy as np
 import pandas as pd
 import openSIMS as S
@@ -41,7 +42,7 @@ class Standards(ABC):
         pass
 
     @abstractmethod
-    def plot(self):
+    def plot(self,show=True,num=None):
         pass
 
 class GeochronStandards(Standards):
@@ -107,15 +108,13 @@ class GeochronStandards(Standards):
             if group in lines.keys():
                 colour = lines[group]['colour']
             else:
+                colour = np.random.rand(3,)
                 lines[group] = dict()
-                lines[group]['colour'] = np.random.rand(3,)
+                lines[group]['colour'] = colour
                 lines[group]['offset'] = self.offset(standard)
             x, y = self.raw_calibration_data(standard,p['b'])
-            Ellipse.confidence_ellipse(x,y,ax,
-                                       alpha=0.25,
-                                       facecolor=lines[group]['colour'],
-                                       edgecolor='black',
-                                       zorder=0)
+            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,facecolor=colour,
+                                       edgecolor='black',zorder=0)
             ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
         xmin = ax.get_xlim()[0]
         for group, val in lines.items():
@@ -132,40 +131,75 @@ class StableStandards(Standards):
 
     def calibrate(self):
         logratios = self.pooled_calibration_data()
-        return logratios.mean
+        return {'A': logratios.mean(axis=0), 'b': 0.0}
             
     def misfit(self,b=0):
         pass
     
-    def pooled_calibration_data(self,b=0):
+    def pooled_calibration_data(self,b=0.0):
+        df_list = []
+        for standard in self.standards.array:
+            logratios = self.raw_logratios(standard,b=b)
+            offset = self.offset(standard,b=b)
+            logratios.apply(lambda raw: raw - offset.values, axis=1)
+            df_list.append(logratios)
+        return pd.concat(df_list)
+
+    def get_num_den(self):
         settings = S.settings(self.method)
         num = settings['deltaref']['num']
         den = settings['deltaref']['den']
-        ratios = [f"{n}/{d}" for n, d in zip(num, den)]
-        df_list = []
-        for standard in self.standards.array:
-            raw_cps = self.raw_calibration_data(settings,standard,b=b)
-            logratios = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
-            offset = self.offset(settings,standard,ratios,b=b)
-            logratios.apply(lambda raw: raw - offset.values, axis=1)
-            df_list.append(logratios)
-        out = pd.concat(df_list)
-        out.set_axis(ratios,axis=1)
-        return out
+        return num, den
 
-    @staticmethod
-    def raw_calibration_data(settings,standard,b=0):
+    def get_ratios(self):
+        num, den = self.get_num_den()
+        ratios = [f"{n}/{d}" for n, d in zip(num, den)]
+        return num, den, ratios
+
+    def raw_logratios(self,standard,b=0.0):
+        num, den, ratios = self.get_ratios()
+        raw_cps = self.raw_calibration_data(standard,b=b)
+        out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
+        return out.set_axis(ratios,axis=1)
+
+    def raw_calibration_data(self,standard,b=0.0):
+        settings = S.settings(self.method)
         ions = settings['ions']
         out = pd.DataFrame()
         for ion in ions:
             out[ion] = standard.cps(ion)['cps']
         return out
 
-    @staticmethod
-    def offset(settings,standard,ratios,b=0):
+    def offset(self,standard,b=0.0):
+        num, den, ratios = self.get_ratios()
+        settings = S.settings(self.method)
         ratios = settings['refmats'][ratios].loc[standard.group]
         ratios_deltaref = settings['deltaref']['ratio']
         return np.log(ratios) - np.log(ratios_deltaref)
         
     def plot(self,show=True,num=None):
-        pass
+        A = self.pars['A']
+        b = self.pars['b']
+        num_panels = len(A)
+        ratio_names = A.index.to_list()
+        nr = math.ceil(math.sqrt(num_panels))
+        nc = math.ceil(num_panels/nr)
+        fig, ax = plt.subplots(nrows=nr,ncols=nc)
+        lines = dict()
+        np.random.seed(0)
+        for sname, standard in self.standards.items():
+            group = standard.group
+            if group in lines.keys():
+                colour = lines[group]['colour']
+            else:
+                colour = np.random.rand(3,)
+                lines[group] = dict()
+                lines[group]['colour'] = colour
+                lines[group]['offset'] = self.offset(standard,b=b)
+            raw_logratios = self.raw_logratios(standard,b=b)
+            logratio_means = raw_logratios.mean(axis=0)
+            for i, ratio_name in enumerate(ratio_names):
+                ax.ravel()[i].scatter(i+1,logratio_means[i],s=3,c=colour)
+        if show:
+            plt.show()
+        return fig, ax
