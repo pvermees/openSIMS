@@ -141,8 +141,8 @@ class StableStandards(Standards):
         for standard in self.standards.array:
             logratios = self.raw_logratios(standard,b=b)
             offset = self.offset(standard,b=b)
-            logratios.apply(lambda raw: raw - offset.values, axis=1)
-            df_list.append(logratios)
+            df = logratios.apply(lambda raw: raw - offset.values, axis=1)
+            df_list.append(df)
         return pd.concat(df_list)
 
     def get_num_den(self):
@@ -173,9 +173,8 @@ class StableStandards(Standards):
     def offset(self,standard,b=0.0):
         num, den, ratios = self.get_ratios()
         settings = S.settings(self.method)
-        ratios = settings['refmats'][ratios].loc[standard.group]
-        ratios_deltaref = settings['deltaref']['ratio']
-        return np.log(ratios) - np.log(ratios_deltaref)
+        delta = settings['refmats'][ratios].loc[standard.group]
+        return np.log(delta+1)
         
     def plot(self,show=True,num=None):
         A = self.pars['A']
@@ -204,9 +203,14 @@ class StableStandards(Standards):
                 y_min = y_mean - logratio_std.iloc[i]
                 y_max = y_mean + logratio_std.iloc[i]
                 ax.ravel()[i].scatter(sname,y_mean,
-                                      s=5,color='black',zorder=1)
+                                      s=5,color='black',zorder=2)
                 ax.ravel()[i].plot([sname,sname],[y_min,y_max],
-                                   '-',color=colour,zorder=0)
+                                   '-',color=colour,zorder=1)
+        for group, val in lines.items():
+            y = A + val['offset']
+            for i, ratio_name in enumerate(ratio_names):
+                ax.ravel()[i].axline((0.0,y[ratio_name]),slope=0.0,
+                                     color=val['colour'],zorder=0)
         for empty_axis in range(len(ratio_names),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         if show:
