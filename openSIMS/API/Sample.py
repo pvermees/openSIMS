@@ -23,13 +23,13 @@ class Sample(ABC):
     def cps(self,ion):
         pass
 
-    def view(self,channels=None,title=None,show=True,num=None):
+    def view(self,channels=None,title=None,show=True):
         if channels is None:
             channels = self.signal.columns
         num_panels = len(channels)
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        fig, ax = plt.subplots(nr,nc,num=num)
+        fig, ax = plt.subplots(nr,nc)
         if title is not None:
             plt.suptitle(title)
         for i, channel in enumerate(channels):
@@ -37,6 +37,8 @@ class Sample(ABC):
             ax.ravel()[i].set_title(channel)
         for empty_axis in range(len(channels),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
+        plt.subplots_adjust(left=0.1,top=0.9,right=0.9,bottom=0.1,
+                            hspace=0.5,wspace=0.5)
         if show:
             plt.show()
         return fig, ax

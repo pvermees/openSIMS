@@ -42,7 +42,7 @@ class Standards(ABC):
         pass
 
     @abstractmethod
-    def plot(self,show=True,num=None):
+    def plot(self,show=True):
         pass
 
 class GeochronStandards(Standards):
@@ -98,7 +98,7 @@ class GeochronStandards(Standards):
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
 
-    def plot(self,show=True,num=None):
+    def plot(self,show=True):
         p = self.pars
         fig, ax = plt.subplots()
         lines = dict()
@@ -176,7 +176,7 @@ class StableStandards(Standards):
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(delta+1)
         
-    def plot(self,show=True,num=None):
+    def plot(self,show=True):
         A = self.pars['A']
         b = self.pars['b']
         num_panels = len(A)
@@ -196,16 +196,20 @@ class StableStandards(Standards):
                 lines[group]['colour'] = colour
                 lines[group]['offset'] = self.offset(standard,b=b)
             raw_logratios = self.raw_logratios(standard,b=b)
+            nsweeps = raw_logratios.shape[0]
             logratio_means = raw_logratios.mean(axis=0)
-            logratio_std = raw_logratios.std(axis=0)
+            logratio_stderr = raw_logratios.std(axis=0)/math.sqrt(nsweeps)
             for i, ratio_name in enumerate(ratio_names):
                 y_mean = logratio_means.iloc[i]
-                y_min = y_mean - logratio_std.iloc[i]
-                y_max = y_mean + logratio_std.iloc[i]
+                y_min = y_mean - logratio_stderr.iloc[i]
+                y_max = y_mean + logratio_stderr.iloc[i]
                 ax.ravel()[i].scatter(sname,y_mean,
                                       s=5,color='black',zorder=2)
                 ax.ravel()[i].plot([sname,sname],[y_min,y_max],
                                    '-',color=colour,zorder=1)
+        for i, ratio_name in enumerate(ratio_names):
+            title = 'ln(' + ratio_name + ')'
+            ax.ravel()[i].set_title(title)
         for group, val in lines.items():
             y = A + val['offset']
             for i, ratio_name in enumerate(ratio_names):
@@ -213,6 +217,7 @@ class StableStandards(Standards):
                                      color=val['colour'],zorder=0)
         for empty_axis in range(len(ratio_names),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
+        fig.tight_layout()
         if show:
             plt.show()
         return fig, ax

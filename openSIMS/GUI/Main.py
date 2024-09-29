@@ -9,7 +9,6 @@ class gui(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
-        self.figs = [111,112]
         self.log_window = None
         self.list_window = None
         self.view_window = None
