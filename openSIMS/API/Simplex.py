@@ -16,7 +16,7 @@ class Simplex:
     def reset(self):
         self.instrument = None
         self.path = None
-        self.method = None
+        self.methods = None
         self.channels = None
         self.samples = None
         self.ignore = set()

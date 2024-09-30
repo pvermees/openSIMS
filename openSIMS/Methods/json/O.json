@@ -1,0 +1,10 @@
+{
+    "type": "stable",
+    "ions": ["O16","O17","O18"],
+    "deltaref": {
+	"name": "VSMOW",
+	"num": ["O18","O17"],
+	"den": ["O16","O16"],
+	"ratios": [2.0052e-3,0.3799e-3]
+    }
+}

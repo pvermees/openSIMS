@@ -15,3 +15,4 @@ if True:
 else:
     t.test_calibrate_O()
     S.plot()
+    print(S.method)

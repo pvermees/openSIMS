@@ -1,0 +1,6 @@
+{
+    "type": "geochron",
+    "ions": ["U","UOx","Pb206","Pb204","Pb207"],
+    "y0": "Pb64_0",
+    "lambda": 0.000155125
+}
