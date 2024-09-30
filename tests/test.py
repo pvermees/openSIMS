@@ -42,9 +42,9 @@ class Test(unittest.TestCase):
 
     def test_view(self):
         self.loadCamecaData()
-        S.view()
+        S.view(show=False)
         self.loadOxygen()
-        S.view()
+        S.view(show=False)
 
     def test_methodPairing(self):
         self.loadCamecaUPbMethod()

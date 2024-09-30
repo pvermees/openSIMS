@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 from .API import Simplex, Settings
 from .GUI.Main import gui
 
@@ -26,13 +27,17 @@ def read():
 def calibrate():
     __simplex.calibrate()
 
-def view(i=None,sname=None):
+def view(i=None,sname=None,show=True):
     if i is None and sname is None:
         i = __simplex.i
-    return __simplex.view(i=i,sname=sname)
+    fig, ax = __simplex.view(i=i,sname=sname)
+    if show: plt.show()
+    return fig, ax
 
-def plot():
-    return __simplex.plot()
+def plot(show=True):
+    fig, ax = __simplex.plot()
+    if show: plt.show()
+    return fig, ax
 
 def simplex():
     return __simplex

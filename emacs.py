@@ -13,6 +13,5 @@ if True:
     S.standards(Plesovice=[0,1,3])
     S.gui()
 else:
-    t.test_calibrate_O()
+    t.test_calibrate_UPb()
     S.plot()
-    print(S.method)

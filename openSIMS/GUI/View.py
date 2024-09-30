@@ -13,7 +13,7 @@ class ViewWindow(tk.Toplevel):
         super().__init__()
         self.title('View')
         Main.offset(top,self)
-        fig, axs = S.view()
+        fig, axs = S.view(show=False)
   
         canvas = FigureCanvasTkAgg(fig,master=self)
         canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
@@ -41,5 +41,5 @@ class ViewWindow(tk.Toplevel):
         i = (S.get('i') + di) % ns
         S.set('i',i)
         canvas.figure.clf()
-        canvas.figure, axs = S.view()
+        canvas.figure, axs = S.view(show=False)
         canvas.draw()
