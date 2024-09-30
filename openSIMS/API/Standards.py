@@ -34,14 +34,6 @@ class Standards(ABC):
         pass
 
     @abstractmethod
-    def misfit(self,b):
-        pass
-    
-    @abstractmethod
-    def pooled_calibration_data(self,b):
-        pass
-
-    @abstractmethod
     def plot(self):
         pass
 
@@ -56,28 +48,28 @@ class GeochronStandards(Standards):
         x, y, A, B = self.fit(b)
         return {'A':A, 'B':B, 'b':b}
    
-    def misfit(self,b):
+    def misfit(self,b=0.0):
         x, y, A, B = self.fit(b)
         SS = sum((A+B*x-y)**2)
         return SS
 
-    def fit(self,b):
-        x, y = self.pooled_calibration_data(b)
+    def fit(self,b=0.0):
+        x, y = self.pooled_calibration_data(b=b)
         A, B = Toolbox.linearfit(x,y)
         return x, y, A, B
 
-    def pooled_calibration_data(self,b):
+    def pooled_calibration_data(self,b=0.0):
         x = np.array([])
         y = np.array([])
         settings = S.settings(self.method)
         for standard in self.standards.array:
-            xn, yn = self.raw_calibration_data(standard,b)
+            xn, yn = self.raw_calibration_data(standard,b=b)
             dy = self.offset(standard)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
-    def raw_calibration_data(self,standard,b):
+    def raw_calibration_data(self,standard,b=0.0):
         settings = S.settings(self.method)
         ions = settings['ions']
         P = standard.cps(ions[0])
@@ -129,16 +121,13 @@ class StableStandards(Standards):
 
     def calibrate(self):
         logratios = self.pooled_calibration_data()
-        return {'A': logratios.mean(axis=0), 'b': 0.0}
+        return logratios.mean(axis=0)
             
-    def misfit(self,b=0):
-        pass
-    
-    def pooled_calibration_data(self,b=0.0):
+    def pooled_calibration_data(self):
         df_list = []
         for standard in self.standards.array:
-            logratios = self.raw_logratios(standard,b=b)
-            offset = self.offset(standard,b=b)
+            logratios = self.raw_logratios(standard)
+            offset = self.offset(standard)
             df = logratios.apply(lambda raw: raw - offset.values, axis=1)
             df_list.append(df)
         return pd.concat(df_list)
@@ -154,13 +143,13 @@ class StableStandards(Standards):
         ratios = [f"{n}/{d}" for n, d in zip(num, den)]
         return num, den, ratios
 
-    def raw_logratios(self,standard,b=0.0):
+    def raw_logratios(self,standard):
         num, den, ratios = self.get_ratios()
-        raw_cps = self.raw_calibration_data(standard,b=b)
+        raw_cps = self.raw_calibration_data(standard)
         out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
         return out.set_axis(ratios,axis=1)
 
-    def raw_calibration_data(self,standard,b=0.0):
+    def raw_calibration_data(self,standard):
         settings = S.settings(self.method)
         ions = settings['ions']
         out = pd.DataFrame()
@@ -168,17 +157,15 @@ class StableStandards(Standards):
             out[ion] = standard.cps(ion)['cps']
         return out
 
-    def offset(self,standard,b=0.0):
+    def offset(self,standard):
         num, den, ratios = self.get_ratios()
         settings = S.settings(self.method)
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(delta+1)
         
     def plot(self):
-        A = self.pars['A']
-        b = self.pars['b']
-        num_panels = len(A)
-        ratio_names = A.index.to_list()
+        num_panels = len(self.pars)
+        ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
         fig, ax = plt.subplots(nrows=nr,ncols=nc)
@@ -192,8 +179,8 @@ class StableStandards(Standards):
                 colour = np.random.rand(3,)
                 lines[group] = dict()
                 lines[group]['colour'] = colour
-                lines[group]['offset'] = self.offset(standard,b=b)
-            raw_logratios = self.raw_logratios(standard,b=b)
+                lines[group]['offset'] = self.offset(standard)
+            raw_logratios = self.raw_logratios(standard)
             nsweeps = raw_logratios.shape[0]
             logratio_means = raw_logratios.mean(axis=0)
             logratio_stderr = raw_logratios.std(axis=0)/math.sqrt(nsweeps)
@@ -209,7 +196,7 @@ class StableStandards(Standards):
             title = 'ln(' + ratio_name + ')'
             ax.ravel()[i].set_title(title)
         for group, val in lines.items():
-            y = A + val['offset']
+            y = self.pars + val['offset']
             for i, ratio_name in enumerate(ratio_names):
                 ax.ravel()[i].axline((0.0,y[ratio_name]),slope=0.0,
                                      color=val['colour'],zorder=0)

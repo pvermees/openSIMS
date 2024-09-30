@@ -13,7 +13,7 @@ class CalibrationWindow(tk.Toplevel):
         super().__init__()
         self.title('Calibration')
         self.top = top
-        fig, axs = S.plot()
+        fig, axs = S.plot(show=False)
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
@@ -25,7 +25,7 @@ class CalibrationWindow(tk.Toplevel):
   
     def refresh(self):
         self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot()
+        self.canvas.figure, axs = S.plot(show=False)
         self.canvas.draw()
 
     def on_closing(self):
