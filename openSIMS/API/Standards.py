@@ -8,22 +8,21 @@ from . import Toolbox, Sample, Ellipse
 from scipy.optimize import minimize
 from abc import ABC, abstractmethod
 
-def getStandards(simplex):
+def getStandards(simplex,method):
 
-    datatype = S.settings(simplex.method)['type']
+    datatype = S.settings(method)['type']
     if datatype == 'geochron':
-        return GeochronStandards(simplex)
+        return GeochronStandards(simplex,method)
     elif datatype == 'stable':
-        return StableStandards(simplex)
+        return StableStandards(simplex,method)
     else:
         raise ValueError('Unrecognised data type')
 
 class Standards(ABC):
 
-    def __init__(self,simplex):
+    def __init__(self,simplex,method):
         self.pars = simplex.pars
-        self.method = simplex.method
-        self.channels = simplex.channels
+        self.method = method
         self.standards = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
             if sample.group == 'sample' or sname in simplex.ignore:
@@ -39,8 +38,8 @@ class Standards(ABC):
 
 class GeochronStandards(Standards):
 
-    def __init__(self,simplex):
-        super().__init__(simplex)
+    def __init__(self,simplex,method):
+        super().__init__(simplex,method)
     
     def calibrate(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
@@ -72,10 +71,10 @@ class GeochronStandards(Standards):
     def raw_calibration_data(self,standard,b=0.0):
         settings = S.settings(self.method)
         ions = settings['ions']
-        P = standard.cps(ions[0])
-        POx = standard.cps(ions[1])
-        D = standard.cps(ions[2])
-        d = standard.cps(ions[3])
+        P = standard.cps(self.method,ions[0])
+        POx = standard.cps(self.method,ions[1])
+        D = standard.cps(self.method,ions[2])
+        d = standard.cps(self.method,ions[3])
         drift = np.exp(b*D['time']/60)
         y0 = settings.get_y0(standard.group)
         x = np.log(POx['cps']) - np.log(P['cps'])
@@ -116,8 +115,8 @@ class GeochronStandards(Standards):
 
 class StableStandards(Standards):
 
-    def __init__(self,simplex):
-        super().__init__(simplex)
+    def __init__(self,simplex,method):
+        super().__init__(simplex,method)
 
     def calibrate(self):
         logratios = self.pooled_calibration_data()
@@ -154,7 +153,7 @@ class StableStandards(Standards):
         ions = settings['ions']
         out = pd.DataFrame()
         for ion in ions:
-            out[ion] = standard.cps(ion)['cps']
+            out[ion] = standard.cps(self.method,ion)['cps']
         return out
 
     def offset(self,standard):

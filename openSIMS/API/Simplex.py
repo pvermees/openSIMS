@@ -16,11 +16,10 @@ class Simplex:
     def reset(self):
         self.instrument = None
         self.path = None
-        self.methods = None
-        self.channels = None
+        self.methods = dict()
         self.samples = None
         self.ignore = set()
-        self.pars = None
+        self.pars = dict()
 
     def read(self):
         self.samples = pd.Series()
@@ -35,10 +34,21 @@ class Simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()
+        self.check_method()
+
+    def check_method(self):
+        all_channels = self.all_channels()
+        for method, channels in self.methods.items():
+            method_channels = channels.values()
+            if not set(method_channels).issubset(all_channels):
+                self.methods = dict()
+                self.pars = dict()
+                return
 
     def calibrate(self):
-        standards = Standards.getStandards(self)
-        self.pars = standards.calibrate()
+        for method, channels in self.methods.items():
+            standards = Standards.getStandards(self,method)
+            self.pars[method] = standards.calibrate()
         
     def sort_samples(self):
         order = np.argsort(self.get_dates())

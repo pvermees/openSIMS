@@ -63,8 +63,8 @@ class Cameca_Sample(Sample.Sample):
                 else:
                     pass
 
-    def cps(self,ion):
-        channel = S.get('channels')[ion]
+    def cps(self,method,ion):
+        channel = S.get('methods')[method][ion]
         detector = self.channels.loc[channel,'detector']
         dwelltime = self.channels.loc[channel,'dwelltime']
         deadtime = self.detector.loc[detector,'deadtime']

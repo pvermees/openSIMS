@@ -12,5 +12,5 @@ class SHRIMP_Sample(Sample.Sample):
     def read(self,fname):
         pass
 
-    def cps(self,ion):
+    def cps(self,method,ion):
         pass
