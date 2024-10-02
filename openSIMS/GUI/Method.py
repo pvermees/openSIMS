@@ -10,11 +10,9 @@ class MethodWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Choose methods')
         Main.offset(top,self)
-        self.vars = dict()
-        methods = self.sorted_methods()
-        for method in methods:
-            self.vars[method] = tk.IntVar()
-            check = tk.Checkbutton(self,text=method,variable=self.vars[method],
+        self.variables = self.create_vars()
+        for method, variable in self.variables.items():
+            check = tk.Checkbutton(self,text=method,variable=variable,
                                    command = lambda t=top,m=method:
                                    self.set_channels(t,m))
             check.pack(anchor='w')
@@ -28,8 +26,16 @@ class MethodWindow(tk.Toplevel):
         order = np.argsort(types)
         return methods[order]
 
+    def create_vars(self):
+        all_methods = self.sorted_methods()
+        variables = dict()
+        for method in all_methods:
+            checked = method in S.get('methods').keys()
+            variables[method] = tk.IntVar(value=checked)
+        return variables
+
     def set_channels(self,top,method):
-        if self.vars[method].get():
+        if self.variables[method].get():
             win = ChannelWindow(top,method)
         else:
             cmd = "S.remove_method('{m}')".format(m=method)
