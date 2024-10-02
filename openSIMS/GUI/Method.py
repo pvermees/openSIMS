@@ -1,6 +1,7 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
+import numpy as np
 from . import Main
 
 class MethodWindow(tk.Toplevel):
@@ -9,14 +10,30 @@ class MethodWindow(tk.Toplevel):
         super().__init__(top)
         self.title('Choose methods')
         Main.offset(top,self)
-        for method in S.settings():
-            check = tk.Checkbutton(self,text=method,
+        self.vars = dict()
+        methods = self.sorted_methods()
+        for method in methods:
+            self.vars[method] = tk.IntVar()
+            check = tk.Checkbutton(self,text=method,variable=self.vars[method],
                                    command = lambda t=top,m=method:
                                    self.set_channels(t,m))
-            check.pack()
+            check.pack(anchor='w')
+
+    def sorted_methods(self):
+        methods = np.array([])
+        types = np.array([])
+        for method, settings in S.settings().items():
+            types = np.append(types,settings['type'])
+            methods = np.append(methods,method)
+        order = np.argsort(types)
+        return methods[order]
 
     def set_channels(self,top,method):
-        win = ChannelWindow(top,method)
+        if self.vars[method].get():
+            win = ChannelWindow(top,method)
+        else:
+            cmd = "S.remove_method('{m}')".format(m=method)
+            top.run(cmd)
     
 class ChannelWindow(tk.Toplevel):
 
