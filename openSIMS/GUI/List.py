@@ -17,8 +17,7 @@ class ListWindow(tk.Toplevel):
         self.combo_boxes = []
         Main.offset(top,self)
         if len(samples)>20: self.geometry('400x600')
-        method = S.get('method')
-        refmats = ['sample'] + list(S.settings(method)['refmats'].index)
+        refmats = ['sample'] + self.shared_refmats()
         row = 0
         for sname, sample in samples.items():
             label = ttk.Label(self,text=sname)
@@ -84,6 +83,14 @@ class ListWindow(tk.Toplevel):
             if group != 'sample':
                 out.add(group)
         return out
+
+    def shared_refmats(self):
+        methods = S.get('methods')
+        method_list = list(methods.keys())
+        refmats = set(S.settings(method_list[0])['refmats'].index)
+        for method in method_list:
+            refmats = refmats & set(S.settings(method)['refmats'].index)
+        return list(refmats)
 
     def on_click(self,top):
         groups = dict()
