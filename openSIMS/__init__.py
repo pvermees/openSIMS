@@ -44,8 +44,11 @@ def plot(show=True):
 def simplex():
     return __simplex
 
-def settings(method):
-    return __settings[method]
+def settings(method=None):
+    if method is None:
+        return __settings
+    else:
+        return __settings[method]
 
 def TODO():
     pass

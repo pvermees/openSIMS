@@ -5,12 +5,28 @@ from . import Main
 
 class MethodWindow(tk.Toplevel):
 
+    def __init__(self,top):
+        super().__init__(top)
+        self.title('Choose methods')
+        Main.offset(top,self)
+        for method in S.settings():
+            check = tk.Checkbutton(self,text=method,
+                                   command = lambda t=top,m=method:
+                                   self.set_channels(t,m))
+            check.pack()
+
+    def set_channels(self,top,method):
+        win = ChannelWindow(top,method)
+    
+class ChannelWindow(tk.Toplevel):
+
     def __init__(self,top,m):
         super().__init__(top)
         self.title('Pair the ions with the channels')
         Main.offset(top,self)
-        refresh = (m != S.get('method'))
-        oldselections = None if refresh else S.get('channels')
+        methods = S.get('methods')
+        refresh = (m not in methods.keys())
+        oldselections = None if refresh else methods[m]
         ions = S.settings(m)['ions']
         channels = S.simplex().all_channels()
         newselections = dict.fromkeys(ions,None)
