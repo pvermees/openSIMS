@@ -8,8 +8,9 @@ from . import Toolbox, Sample, Ellipse
 from scipy.optimize import minimize
 from abc import ABC, abstractmethod
 
-def getStandards(simplex,method):
-
+def getStandards(simplex,method=None):
+    if method is None:
+        method = list(simplex.methods.keys())[0]
     datatype = S.settings(method)['type']
     if datatype == 'geochron':
         return GeochronStandards(simplex,method)
@@ -61,14 +62,15 @@ class GeochronStandards(Standards):
         x = np.array([])
         y = np.array([])
         settings = S.settings(self.method)
-        for standard in self.standards.array:
-            xn, yn = self.raw_calibration_data(standard,b=b)
-            dy = self.offset(standard)
+        for name in self.standards.keys():
+            xn, yn = self.raw_calibration_data(name,b=b)
+            dy = self.offset(name)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
-    def raw_calibration_data(self,standard,b=0.0):
+    def raw_calibration_data(self,name,b=0.0):
+        standard = self.standards.loc[name]
         settings = S.settings(self.method)
         ions = settings['ions']
         P = standard.cps(self.method,ions[0])
@@ -81,7 +83,8 @@ class GeochronStandards(Standards):
         y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
         return x, y
 
-    def offset(self,standard):
+    def offset(self,name):
+        standard = self.standards.loc[name]
         settings = S.settings(self.method)
         DP = settings.get_DP(standard.group)
         L = settings['lambda']
@@ -95,7 +98,7 @@ class GeochronStandards(Standards):
             fig, ax = plt.subplots()
         lines = dict()
         np.random.seed(0)
-        for sname, standard in self.standards.items():
+        for name, standard in self.standards.items():
             group = standard.group
             if group in lines.keys():
                 colour = lines[group]['colour']
@@ -103,8 +106,8 @@ class GeochronStandards(Standards):
                 colour = np.random.rand(3,)
                 lines[group] = dict()
                 lines[group]['colour'] = colour
-                lines[group]['offset'] = self.offset(standard)
-            x, y = self.raw_calibration_data(standard,p['b'])
+                lines[group]['offset'] = self.offset(name)
+            x, y = self.raw_calibration_data(name,p['b'])
             Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,facecolor=colour,
                                        edgecolor='black',zorder=0)
             ax.scatter(np.mean(x),np.mean(y),s=3,c='black')

@@ -24,6 +24,16 @@ class Test(unittest.TestCase):
         S.read()
         S.add_method('O',O16='16O',O17='17O',O18='18O')
         
+    def loadMonaziteData(self):
+        S.set('instrument','Cameca')
+        S.set('path','data/Cameca_UThPb')
+        S.read()
+        S.add_method('Th-Pb',
+                     Th='232Th',ThOx='232Th 16O2',
+                     Pb204='204Pb',Pb208='208Pb')
+        S.standards(_44069=['44069@1','44069@2','44069@3','44069@4','44069@5',
+                            '44069@6','44069@7','44069@8','44069@9'])
+
     def setCamecaStandards(self):
         self.loadCamecaUPbMethod()
         S.standards(Plesovice=[0,1,3])
@@ -65,6 +75,15 @@ class Test(unittest.TestCase):
         Pb206 = S.get('samples')['Plesovice@01'].cps('U-Pb','Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
 
+    def test_misfit(self,b=0.0):
+        self.loadMonaziteData()
+        standards = Standards.getStandards(S.simplex())
+        np.random.seed(0)
+        for name, standard in standards.standards.items():
+            x,y = standards.raw_calibration_data(name,b=0.0)
+            plt.scatter(x,y,color=np.random.rand(3,))
+        #plot.show()
+
     def test_calibrate_UPb(self):
         self.setCamecaStandards()
         S.calibrate()
@@ -74,22 +93,15 @@ class Test(unittest.TestCase):
     def test_calibrate_O(self):
         self.loadOxygen()
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
-        S.calibrate()        
+        S.calibrate()
 
     def test_multiple_methods(self):
-        S.set('instrument','Cameca')
-        S.set('path','data/Cameca_UThPb')
-        S.read()
+        self.loadMonaziteData()
         S.add_method('U-Pb',
                      U='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
-        S.add_method('Th-Pb',
-                     Th='232Th',ThOx='232Th 16O2',
-                     Pb204='204Pb',Pb208='206Pb')
-        S.standards(_44069=['44069@1','44069@2','44069@3','44069@4','44069@5',
-                            '44069@6','44069@7','44069@8','44069@9'])
         S.calibrate()
-        S.plot()
+        S.plot(show=False)
         
 if __name__ == '__main__':
     unittest.main()

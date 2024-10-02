@@ -80,7 +80,10 @@ class Simplex:
         fig, ax = plt.subplots(nr,nc)
         for i, (method,channels) in enumerate(self.methods.items()):
             standards = Standards.getStandards(self,method)
-            standards.plot(ax=ax.ravel()[i],fig=fig)
+            if nr*nc > 1:
+                standards.plot(ax=ax.ravel()[i],fig=fig)
+            else:
+                standards.plot(ax=ax,fig=fig)
         for empty_axis in range(num_methods,nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         return fig,ax
