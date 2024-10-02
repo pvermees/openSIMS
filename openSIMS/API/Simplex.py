@@ -1,7 +1,9 @@
+import os
+import glob
+import math
 import pandas as pd
 import numpy as np
-import glob
-import os
+import matplotlib.pyplot as plt
 from . import Cameca, Standards
 from pathlib import Path
 
@@ -72,8 +74,16 @@ class Simplex:
         return self.samples[sname].view(title=sname)
 
     def plot(self):
-        standards = Standards.getStandards(self)
-        return standards.plot()
+        num_methods = len(self.methods)
+        nr = math.ceil(math.sqrt(num_methods))
+        nc = math.ceil(num_methods/nr)
+        fig, ax = plt.subplots(nr,nc)
+        for i, (method,channels) in enumerate(self.methods.items()):
+            standards = Standards.getStandards(self,method)
+            standards.plot(ax=ax.ravel()[i],fig=fig)
+        for empty_axis in range(num_methods,nr*nc):
+            fig.delaxes(ax.flatten()[empty_axis])
+        return fig,ax
 
     def all_channels(self):
         run = self.samples
@@ -102,6 +112,12 @@ class Simplex:
             return self.samples[identifier]
         else:
             raise ValueError('Invalid sample identifier')
+
+    def get_pars(self,method):
+        if method in self.pars.keys():
+            return self.pars[method]
+        else:
+            return dict()
                 
     def TODO(self):
         pass

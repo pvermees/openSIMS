@@ -21,7 +21,7 @@ def getStandards(simplex,method):
 class Standards(ABC):
 
     def __init__(self,simplex,method):
-        self.pars = simplex.pars
+        self.pars = simplex.get_pars(method)
         self.method = method
         self.standards = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
@@ -89,9 +89,10 @@ class GeochronStandards(Standards):
         y01 = np.log(np.exp(L)-1)
         return y0t - y01
 
-    def plot(self):
+    def plot(self,fig=None,ax=None):
         p = self.pars
-        fig, ax = plt.subplots()
+        if fig is None or ax is None:
+            fig, ax = plt.subplots()
         lines = dict()
         np.random.seed(0)
         for sname, standard in self.standards.items():

@@ -89,6 +89,7 @@ class Test(unittest.TestCase):
         S.standards(_44069=['44069@1','44069@2','44069@3','44069@4','44069@5',
                             '44069@6','44069@7','44069@8','44069@9'])
         S.calibrate()
+        S.plot()
         
 if __name__ == '__main__':
     unittest.main()
