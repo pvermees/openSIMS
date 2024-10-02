@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         S.add_method('U-Pb',
                      U='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
-
+        
     def loadOxygen(self):
         S.set('instrument','Cameca')
         S.set('path','data/Cameca_O')
@@ -76,5 +76,19 @@ class Test(unittest.TestCase):
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
         S.calibrate()        
 
+    def test_multiple_methods(self):
+        S.set('instrument','Cameca')
+        S.set('path','data/Cameca_UThPb')
+        S.read()
+        S.add_method('U-Pb',
+                     U='238U',UOx='238U 16O2',
+                     Pb204='204Pb',Pb206='206Pb')
+        S.add_method('Th-Pb',
+                     Th='232Th',ThOx='232Th 16O2',
+                     Pb204='204Pb',Pb208='206Pb')
+        S.standards(_44069=['44069@1','44069@2','44069@3','44069@4','44069@5',
+                            '44069@6','44069@7','44069@8','44069@9'])
+        S.calibrate()
+        
 if __name__ == '__main__':
     unittest.main()
