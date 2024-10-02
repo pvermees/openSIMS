@@ -1,7 +1,9 @@
+import os
+import glob
+import math
 import pandas as pd
 import numpy as np
-import glob
-import os
+import matplotlib.pyplot as plt
 from . import Cameca, Standards
 from pathlib import Path
 
@@ -16,11 +18,10 @@ class Simplex:
     def reset(self):
         self.instrument = None
         self.path = None
-        self.methods = None
-        self.channels = None
+        self.methods = dict()
         self.samples = None
         self.ignore = set()
-        self.pars = None
+        self.pars = dict()
 
     def read(self):
         self.samples = pd.Series()
@@ -35,10 +36,21 @@ class Simplex:
         else:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()
+        self.check_method()
+
+    def check_method(self):
+        all_channels = self.all_channels()
+        for method, channels in self.methods.items():
+            method_channels = channels.values()
+            if not set(method_channels).issubset(all_channels):
+                self.methods = dict()
+                self.pars = dict()
+                return
 
     def calibrate(self):
-        standards = Standards.getStandards(self)
-        self.pars = standards.calibrate()
+        for method, channels in self.methods.items():
+            standards = Standards.getStandards(self,method)
+            self.pars[method] = standards.calibrate()
         
     def sort_samples(self):
         order = np.argsort(self.get_dates())
@@ -62,8 +74,20 @@ class Simplex:
         return self.samples[sname].view(title=sname)
 
     def plot(self):
-        standards = Standards.getStandards(self)
-        return standards.plot()
+        num_methods = len(self.methods)
+        nr = math.ceil(math.sqrt(num_methods))
+        nc = math.ceil(num_methods/nr)
+        fig, ax = plt.subplots(nr,nc)
+        for i, (method,channels) in enumerate(self.methods.items()):
+            standards = Standards.getStandards(self,method)
+            if nr*nc > 1:
+                standards.plot(ax=ax.ravel()[i],fig=fig)
+            else:
+                standards.plot(ax=ax,fig=fig)
+        for empty_axis in range(num_methods,nr*nc):
+            fig.delaxes(ax.flatten()[empty_axis])
+        fig.tight_layout()
+        return fig, ax
 
     def all_channels(self):
         run = self.samples
@@ -92,6 +116,12 @@ class Simplex:
             return self.samples[identifier]
         else:
             raise ValueError('Invalid sample identifier')
+
+    def get_pars(self,method):
+        if method in self.pars.keys():
+            return self.pars[method]
+        else:
+            return dict()
                 
     def TODO(self):
         pass

@@ -11,10 +11,12 @@ def set(prop,val):
 def get(prop):
     return getattr(__simplex,prop)
 
-def method(method,**kwargs):
-    __simplex.method = method
-    __simplex.channels = __settings.ions2channels(method,**kwargs)
+def add_method(method,**kwargs):
+    __simplex.methods[method] = __settings.ions2channels(method,**kwargs)
 
+def remove_method(method):
+    del __simplex.methods[method]
+    
 def standards(**kwargs):
     __simplex.set_groups(**kwargs)
     
@@ -42,8 +44,11 @@ def plot(show=True):
 def simplex():
     return __simplex
 
-def settings(method):
-    return __settings[method]
+def settings(method=None):
+    if method is None:
+        return __settings
+    else:
+        return __settings[method]
 
 def TODO():
     pass

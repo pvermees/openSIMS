@@ -9,6 +9,7 @@ class gui(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
+        self.method_window = None
         self.log_window = None
         self.list_window = None
         self.view_window = None
@@ -40,13 +41,8 @@ class gui(tk.Tk):
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_method_button(self):
-        button = ttk.Menubutton(self,text='Method',direction='right')
-        menu = tk.Menu(button,tearoff=0)
-        for method in ['U-Pb','Th-Pb','O','S']:
-            menu.add_command(label=method,
-                             command=lambda m=method: self.on_method(m))
-            button["menu"] = menu
-            button.pack(expand=True,fill=tk.BOTH)
+        button = ttk.Button(self,text='Method',command=self.on_method)
+        button.pack(expand=True,fill=tk.BOTH)
 
     def create_view_button(self):
         button = ttk.Button(self,text='View',command=self.on_view)
@@ -86,9 +82,12 @@ class gui(tk.Tk):
         self.run("S.set('path','{p}')".format(p=path))
         self.run("S.read()")
 
-    def on_method(self,m):
-        method = Method.MethodWindow(self,m)
-        method.grab_set()
+    def on_method(self):
+        if self.method_window is None:
+            self.method_window = Method.MethodWindow(self)
+        else:
+            self.method_window.destroy()
+            self.method_window = None
 
     def on_standard(self):
         if self.list_window is None:

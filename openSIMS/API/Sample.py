@@ -20,7 +20,7 @@ class Sample(ABC):
         pass
 
     @abstractmethod
-    def cps(self,ion):
+    def cps(self,method,ion):
         pass
 
     def view(self,channels=None,title=None):
