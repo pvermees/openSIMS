@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     S.gui()
 else:
-    t.test_misfit(b=0.0)
+    t.test_multiple_methods()

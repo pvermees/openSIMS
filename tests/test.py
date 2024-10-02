@@ -82,7 +82,6 @@ class Test(unittest.TestCase):
         for name, standard in standards.standards.items():
             x,y = standards.raw_calibration_data(name,b=0.0)
             plt.scatter(x,y,color=np.random.rand(3,))
-        #plot.show()
 
     def test_calibrate_UPb(self):
         self.setCamecaStandards()
@@ -102,6 +101,6 @@ class Test(unittest.TestCase):
                      Pb204='204Pb',Pb206='206Pb')
         S.calibrate()
         S.plot(show=False)
-        
+
 if __name__ == '__main__':
     unittest.main()

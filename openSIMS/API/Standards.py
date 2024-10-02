@@ -112,11 +112,21 @@ class GeochronStandards(Standards):
                                        edgecolor='black',zorder=0)
             ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
         xmin = ax.get_xlim()[0]
+        xlabel, ylabel = self.get_labels()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
         for group, val in lines.items():
             ymin = p['A'] + val['offset'] + p['B'] * xmin
             ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
         return fig, ax
 
+    def get_labels(self):
+        P, POx, D, d  = S.settings(self.method)['ions']
+        channels = S.get('methods')[self.method]
+        xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
+        ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
+        return xlabel, ylabel
+        
 class StableStandards(Standards):
 
     def __init__(self,simplex,method):

@@ -86,7 +86,8 @@ class Simplex:
                 standards.plot(ax=ax,fig=fig)
         for empty_axis in range(num_methods,nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
-        return fig,ax
+        fig.tight_layout()
+        return fig, ax
 
     def all_channels(self):
         run = self.samples
