@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from . import Cameca, Standards
+from . import Cameca, Standards, Process
 from pathlib import Path
 
 class Simplex:
@@ -73,17 +73,20 @@ class Simplex:
             sname = snames[self.i]
         return self.samples[sname].view(title=sname)
 
-    def plot(self):
+    def plot(self,calibration=True):
         num_methods = len(self.methods)
         nr = math.ceil(math.sqrt(num_methods))
         nc = math.ceil(num_methods/nr)
         fig, ax = plt.subplots(nr,nc)
         for i, (method,channels) in enumerate(self.methods.items()):
-            standards = Standards.getStandards(self,method)
-            if nr*nc > 1:
-                standards.plot(ax=ax.ravel()[i],fig=fig)
+            if calibration:
+                toplot = Standards.getStandards(self,method)
             else:
-                standards.plot(ax=ax,fig=fig)
+                toplot = Process.getSamples(self,method)
+            if nr*nc > 1:
+                toplot.plot(ax=ax.ravel()[i],fig=fig)
+            else:
+                toplot.plot(ax=ax,fig=fig)
         for empty_axis in range(num_methods,nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         fig.tight_layout()

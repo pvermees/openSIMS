@@ -7,13 +7,13 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 
-class CalibrationWindow(tk.Toplevel):
+class SamplesWindow(tk.Toplevel):
     
     def __init__(self,top):
         super().__init__()
-        self.title('Calibration')
+        self.title('Samples')
         self.top = top
-        fig, axs = S.plot(show=False,calibration=True)
+        fig, axs = S.plot(show=False,calibration=False)
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
@@ -29,5 +29,5 @@ class CalibrationWindow(tk.Toplevel):
         self.canvas.draw()
 
     def on_closing(self):
-        self.top.calibration_window = None
+        self.top.samples_window = None
         self.destroy()

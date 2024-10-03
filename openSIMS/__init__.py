@@ -36,10 +36,13 @@ def view(i=None,sname=None,show=True):
     if show: plt.show()
     return fig, ax
 
-def plot(show=True):
-    fig, ax = __simplex.plot()
+def plot(show=True,calibration=True):
+    fig, ax = __simplex.plot(calibration=calibration)
     if show: plt.show()
     return fig, ax
+
+def process():
+    pass
 
 def simplex():
     return __simplex
