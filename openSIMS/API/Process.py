@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import openSIMS as S
 import matplotlib.pyplot as plt
-from . import Toolbox, Sample, Ellipse
+from . import Toolbox, Sample, Ellipse, Geochron, Stable
 from scipy.optimize import minimize
 from abc import ABC, abstractmethod
 
@@ -37,7 +37,7 @@ class Samples(ABC):
     def plot(self,fig=None,ax=None):
         pass
 
-class GeochronSamples(Samples):
+class GeochronSamples(Samples,Geochron.Geochron):
 
     def __init__(self,simplex,method):
         super().__init__(simplex,method)
@@ -49,7 +49,7 @@ class GeochronSamples(Samples):
     def plot(self,fig=None,ax=None):
         return fig, ax
 
-class StableSamples(Samples):
+class StableSamples(Samples,Stable.Stable):
 
     def __init__(self,simplex,method):
         super().__init__(simplex,method)
