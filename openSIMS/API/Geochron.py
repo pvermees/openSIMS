@@ -121,4 +121,16 @@ class Processor:
         return x, y, DP, dD
 
     def plot(self,fig=None,ax=None):
-        pass
+        if fig is None or ax is None:
+            fig, ax = plt.subplots()
+        for name, sample in self.samples.items():
+            x, y, DP, dD = self.get_xyDPdD(name)
+            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,
+                                       edgecolor='black',zorder=0)
+            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+        xmin = ax.get_xlim()[0]
+        xlabel, ylabel = self.get_labels()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        return fig, ax
+            

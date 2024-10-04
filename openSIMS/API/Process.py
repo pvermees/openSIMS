@@ -4,13 +4,10 @@ from . import Geochron, Stable
 
 class Samples:
 
-    def __init__(self,simplex,method,omit_standards=True):
+    def __init__(self,simplex,method):
         self.pars = simplex.get_pars(method)
         self.method = method
         self.samples = copy.copy(simplex.samples)
-        for sname, sample in simplex.samples.items():
-            if sample.group != 'sample' and omit_standards:
-                self.samples.drop(sname,inplace=True)
 
 class GeochronSamples(Samples,Geochron.Geochron,Geochron.Processor):
     pass

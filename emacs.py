@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     S.set('instrument','Cameca')
     S.set('path','/home/pvermees/git/openSIMS/data/Cameca_UThPb')
     S.read()
@@ -13,4 +13,5 @@ if True:
     S.calibrate()
     S.gui()
 else:
-    t.test_calibrate_O()
+    t.test_process()
+    plt.show()
