@@ -40,3 +40,6 @@ class Sample(ABC):
         plt.subplots_adjust(left=0.1,top=0.9,right=0.9,bottom=0.1,
                             hspace=0.5,wspace=0.5)
         return fig, ax
+
+def raw_calibration_data(self,b=0.0):
+    pass

@@ -42,7 +42,7 @@ def plot(show=True,calibration=True):
     return fig, ax
 
 def process():
-    pass
+    __simplex.process()
 
 def simplex():
     return __simplex

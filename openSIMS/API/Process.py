@@ -21,12 +21,12 @@ def getSamples(simplex,method=None):
 
 class Samples(ABC):
 
-    def __init__(self,simplex,method):
+    def __init__(self,simplex,method,omit_standards=True):
         self.pars = simplex.get_pars(method)
         self.method = method
         self.samples = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
-            if sample.group != 'sample':
+            if sample.group != 'sample' and omit_standards:
                 self.samples.drop(sname,inplace=True)
 
     @abstractmethod
@@ -43,19 +43,19 @@ class GeochronSamples(Samples):
         super().__init__(simplex,method)
     
     def process(self):
-        pass
-
+        p = self.pars
+        return None
+    
     def plot(self,fig=None,ax=None):
-        ax.scatter([1,2],[3,4])
         return fig, ax
-        
+
 class StableSamples(Samples):
 
     def __init__(self,simplex,method):
         super().__init__(simplex,method)
-
+    
     def process(self):
-        pass
-            
+        p = self.pars
+    
     def plot(self,fig=None,ax=None):
-        pass
+        return fig, ax

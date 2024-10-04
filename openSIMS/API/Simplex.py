@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from . import Cameca, Standards, Process
+from . import Cameca, Calibration, Process
 from pathlib import Path
 
 class Simplex:
@@ -18,10 +18,11 @@ class Simplex:
     def reset(self):
         self.instrument = None
         self.path = None
-        self.methods = dict()
         self.samples = None
         self.ignore = set()
+        self.methods = dict()
         self.pars = dict()
+        self.results = dict()
 
     def read(self):
         self.samples = pd.Series()
@@ -45,13 +46,21 @@ class Simplex:
             if not set(method_channels).issubset(all_channels):
                 self.methods = dict()
                 self.pars = dict()
+                self.results = dict()
                 return
 
     def calibrate(self):
         for method, channels in self.methods.items():
-            standards = Standards.getStandards(self,method)
+            standards = Calibration.getStandards(self,method)
             self.pars[method] = standards.calibrate()
-        
+
+    def process(self):
+        out = dict()
+        for method, channels in self.methods.items():
+            samples = Process.getSamples(self,method)
+            out[method] = samples.process()
+        return out
+
     def sort_samples(self):
         order = np.argsort(self.get_dates())
         new_index = self.samples.index[order.tolist()]
@@ -80,7 +89,7 @@ class Simplex:
         fig, ax = plt.subplots(nr,nc)
         for i, (method,channels) in enumerate(self.methods.items()):
             if calibration:
-                toplot = Standards.getStandards(self,method)
+                toplot = Calibration.getStandards(self,method)
             else:
                 toplot = Process.getSamples(self,method)
             if nr*nc > 1:

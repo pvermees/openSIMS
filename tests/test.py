@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from openSIMS.API import Cameca, SHRIMP, Standards, Sample
+from openSIMS.API import Cameca, SHRIMP, Calibration, Sample
 
 class Test(unittest.TestCase):
 
@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
 
     def test_misfit(self,b=0.0):
         self.loadMonaziteData()
-        standards = Standards.getStandards(S.simplex())
+        standards = Calibration.getStandards(S.simplex())
         np.random.seed(0)
         for name, standard in standards.standards.items():
             x,y = standards.raw_calibration_data(name,b=0.0)
@@ -104,6 +104,7 @@ class Test(unittest.TestCase):
 
     def test_process(self):
         self.setCamecaStandards()
+        S.calibrate()
         S.process()
         S.plot(show=False,calibration=False)
         
