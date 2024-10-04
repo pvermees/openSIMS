@@ -1,20 +1,16 @@
 import copy
-import math
-import numpy as np
-import pandas as pd
 import openSIMS as S
-import matplotlib.pyplot as plt
-from . import Toolbox, Sample, Ellipse, Geochron, Stable
+from . import Geochron, Stable
 
 class Standards:
 
     def __init__(self,simplex,method):
         self.pars = simplex.get_pars(method)
         self.method = method
-        self.standards = copy.copy(simplex.samples)
+        self.samples = copy.copy(simplex.samples)
         for sname, sample in simplex.samples.items():
             if sample.group == 'sample' or sname in simplex.ignore:
-                self.standards.drop(sname,inplace=True)
+                self.samples.drop(sname,inplace=True)
 
 class GeochronStandards(Standards,Geochron.Geochron,Geochron.Calibrator):
     pass

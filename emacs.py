@@ -13,5 +13,4 @@ if True:
     S.calibrate()
     S.gui()
 else:
-    t.test_process()
-
+    t.test_calibrate_O()

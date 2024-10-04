@@ -79,7 +79,7 @@ class Test(unittest.TestCase):
         self.loadMonaziteData()
         standards = Calibration.getStandards(S.simplex())
         np.random.seed(0)
-        for name, standard in standards.standards.items():
+        for name, standard in standards.samples.items():
             x,y = standards.raw_calibration_data(name,b=0.0)
             plt.scatter(x,y,color=np.random.rand(3,))
 

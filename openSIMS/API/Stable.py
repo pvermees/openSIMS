@@ -12,21 +12,6 @@ class Stable:
             out[ion] = standard.cps(self.method,ion)['cps']
         return out
 
-class Calibrator:
-
-    def calibrate(self):
-        logratios = self.pooled_calibration_data()
-        return logratios.mean(axis=0)
-            
-    def pooled_calibration_data(self):
-        df_list = []
-        for standard in self.standards.array:
-            logratios = self.raw_logratios(standard)
-            offset = self.offset(standard)
-            df = logratios.apply(lambda raw: raw - offset.values, axis=1)
-            df_list.append(df)
-        return pd.concat(df_list)
-
     def get_num_den(self):
         settings = S.settings(self.method)
         num = settings['deltaref']['num']
@@ -43,6 +28,21 @@ class Calibrator:
         raw_cps = self.raw_calibration_data(standard)
         out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
         return out.set_axis(ratios,axis=1)
+    
+class Calibrator:
+
+    def calibrate(self):
+        logratios = self.pooled_calibration_data()
+        return logratios.mean(axis=0)
+            
+    def pooled_calibration_data(self):
+        df_list = []
+        for standard in self.samples.array:
+            logratios = self.raw_logratios(standard)
+            offset = self.offset(standard)
+            df = logratios.apply(lambda raw: raw - offset.values, axis=1)
+            df_list.append(df)
+        return pd.concat(df_list)
 
     def offset(self,standard):
         num, den, ratios = self.get_ratios()
@@ -92,3 +92,11 @@ class Calibrator:
             fig.delaxes(ax.flatten()[empty_axis])
         fig.tight_layout()
         return fig, ax
+
+class Processor:
+
+    def process(self):
+        pass
+
+    def plot(self,fig=None,ax=None):
+        pass
