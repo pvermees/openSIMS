@@ -34,7 +34,7 @@ class Standards(ABC):
         pass
 
     @abstractmethod
-    def plot(self):
+    def plot(self,fig=None,ax=None):
         pass
 
 class GeochronStandards(Standards):
@@ -176,12 +176,13 @@ class StableStandards(Standards):
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(delta+1)
         
-    def plot(self):
+    def plot(self,fig=None,ax=None):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        fig, ax = plt.subplots(nrows=nr,ncols=nc)
+        if fig is None or ax is None:
+            fig, ax = plt.subplots(nrows=nr,ncols=nc)
         lines = dict()
         np.random.seed(0)
         for sname, standard in self.standards.items():

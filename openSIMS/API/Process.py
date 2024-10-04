@@ -34,7 +34,7 @@ class Samples(ABC):
         pass
 
     @abstractmethod
-    def plot(self):
+    def plot(self,fig=None,ax=None):
         pass
 
 class GeochronSamples(Samples):
@@ -46,7 +46,8 @@ class GeochronSamples(Samples):
         pass
 
     def plot(self,fig=None,ax=None):
-        pass
+        ax.scatter([1,2],[3,4])
+        return fig, ax
         
 class StableSamples(Samples):
 
@@ -56,5 +57,5 @@ class StableSamples(Samples):
     def process(self):
         pass
             
-    def plot(self):
+    def plot(self,fig=None,ax=None):
         pass

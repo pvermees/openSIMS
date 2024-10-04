@@ -102,5 +102,10 @@ class Test(unittest.TestCase):
         S.calibrate()
         S.plot(show=False)
 
+    def test_process(self):
+        self.setCamecaStandards()
+        S.process()
+        S.plot(show=False,calibration=False)
+        
 if __name__ == '__main__':
     unittest.main()

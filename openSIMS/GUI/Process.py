@@ -1,9 +1,6 @@
 import openSIMS as S
 import tkinter as tk
-import tkinter.ttk as ttk
-import matplotlib.pyplot as plt
 from . import Main
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 
@@ -25,7 +22,7 @@ class SamplesWindow(tk.Toplevel):
   
     def refresh(self):
         self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot(show=False)
+        self.canvas.figure, axs = S.plot(show=False,calibration=False)
         self.canvas.draw()
 
     def on_closing(self):

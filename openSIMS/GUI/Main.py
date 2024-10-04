@@ -2,7 +2,7 @@ import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, View, Calibration, Samples
+from . import Doc, List, Log, Method, View, Calibration, Process
 
 class gui(tk.Tk):
 
@@ -123,7 +123,7 @@ class gui(tk.Tk):
         if self.is_empty(): return
         self.run("S.process()")
         if self.samples_window is None:
-            self.samples_window = Samples.SamplesWindow(self)
+            self.samples_window = Process.SamplesWindow(self)
         else:
             self.samples_window.refresh()
             

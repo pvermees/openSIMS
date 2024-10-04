@@ -13,5 +13,4 @@ if True:
     S.calibrate()
     S.gui()
 else:
-    t.test_multiple_methods()
-    
+    t.test_process()
