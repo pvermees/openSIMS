@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if False:
+if True:
     S.set('instrument','Cameca')
     S.set('path','/home/pvermees/git/openSIMS/data/Cameca_UThPb')
     S.read()

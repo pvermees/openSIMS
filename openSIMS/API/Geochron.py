@@ -16,12 +16,53 @@ class Geochron:
         d = sample.cps(self.method,ions[3])
         return P, POx, D, d
     
+    def offset(self,name):
+        standard = self.samples.loc[name]
+        settings = S.settings(self.method)
+        DP = settings.get_DP(standard.group)
+        L = settings['lambda']
+        y0t = np.log(DP)
+        y01 = np.log(np.exp(L)-1)
+        return y0t - y01
+
     def get_labels(self):
         P, POx, D, d  = S.settings(self.method)['ions']
         channels = S.get('methods')[self.method]
         xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
         ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
         return xlabel, ylabel
+
+    def plot(self,fig=None,ax=None):
+        p = self.pars
+        if fig is None or ax is None:
+            fig, ax = plt.subplots()
+        lines = dict()
+        np.random.seed(1)
+        for name, sample in self.samples.items():
+            group = sample.group
+            if group in lines.keys():
+                colour = lines[group]['colour']
+            else:
+                colour = np.random.rand(3,)
+                lines[group] = dict()
+                lines[group]['colour'] = colour
+                if group != 'sample':
+                    lines[group]['offset'] = self.offset(name)
+            x, y = self.get_xy(name,p['b'])
+            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,facecolor=colour,
+                                       edgecolor='black',zorder=0)
+            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+        xmin = ax.get_xlim()[0]
+        xlabel, ylabel = self.get_labels()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        for group, val in lines.items():
+            if group == 'sample':
+                pass
+            else:
+                ymin = p['A'] + val['offset'] + p['B'] * xmin
+                ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
+        return fig, ax
     
 class Calibrator:
 
@@ -46,13 +87,13 @@ class Calibrator:
         y = np.array([])
         settings = S.settings(self.method)
         for name in self.samples.keys():
-            xn, yn = self.raw_calibration_data(name,b=b)
+            xn, yn = self.get_xy(name,b=b)
             dy = self.offset(name)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
 
-    def raw_calibration_data(self,name,b=0.0):
+    def get_xy(self,name,b=0.0):
         P, POx, D, d = self.get_csv(name)
         standard = self.samples.loc[name]
         settings = S.settings(self.method)
@@ -61,76 +102,30 @@ class Calibrator:
         x = np.log(POx['cps']) - np.log(P['cps'])
         y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
         return x, y
-    
-    def offset(self,name):
-        standard = self.samples.loc[name]
-        settings = S.settings(self.method)
-        DP = settings.get_DP(standard.group)
-        L = settings['lambda']
-        y0t = np.log(DP)
-        y01 = np.log(np.exp(L)-1)
-        return y0t - y01
-
-    def plot(self,fig=None,ax=None):
-        p = self.pars
-        if fig is None or ax is None:
-            fig, ax = plt.subplots()
-        lines = dict()
-        np.random.seed(0)
-        for name, standard in self.samples.items():
-            group = standard.group
-            if group in lines.keys():
-                colour = lines[group]['colour']
-            else:
-                colour = np.random.rand(3,)
-                lines[group] = dict()
-                lines[group]['colour'] = colour
-                lines[group]['offset'] = self.offset(name)
-            x, y = self.raw_calibration_data(name,p['b'])
-            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,facecolor=colour,
-                                       edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
-        xmin = ax.get_xlim()[0]
-        xlabel, ylabel = self.get_labels()
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        for group, val in lines.items():
-            ymin = p['A'] + val['offset'] + p['B'] * xmin
-            ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
-        return fig, ax
 
 class Processor:
     
     def process(self):
         out = dict()
         for name, sample in self.samples.items():
-            x,y,DP,dD = self.get_xyDPdD(name)
+            x, y = self.get_xy(name,b=self.pars['b'])
+            DP, dD = self.get_DPdD(name,x,y)
             out[name] = pd.DataFrame({'DP':DP,'dD':dD})
         return out
 
-    def get_xyDPdD(self,name):
-        settings = S.settings(self.method)
+    def get_DPdD(self,name,x,y):
         P, POx, D, d = self.get_csv(name)
-        Drift = np.exp(self.pars['b']*D['time']/60)
-        drift = np.exp(self.pars['b']*d['time']/60)
-        x = np.log(POx['cps']) - np.log(P['cps'])
-        y = np.log(Drift*D['cps']) - np.log(P['cps'])
         yref = self.pars['A'] + self.pars['B']*D['time']
         DP = np.exp(y-yref)
+        drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
         dD = drift*d['cps']/D['cps']
-        return x, y, DP, dD
+        return DP, dD
 
-    def plot(self,fig=None,ax=None):
-        if fig is None or ax is None:
-            fig, ax = plt.subplots()
-        for name, sample in self.samples.items():
-            x, y, DP, dD = self.get_xyDPdD(name)
-            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,
-                                       edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
-        xmin = ax.get_xlim()[0]
-        xlabel, ylabel = self.get_labels()
-        ax.set_xlabel(xlabel)
-        ax.set_ylabel(ylabel)
-        return fig, ax
-            
+    def get_xy(self,name,b=0.0):
+        settings = S.settings(self.method)
+        P, POx, D, d = self.get_csv(name)
+        Drift = np.exp(b*D['time']/60)
+        drift = np.exp(b*d['time']/60)
+        x = np.log(POx['cps']) - np.log(P['cps'])
+        y = np.log(Drift*D['cps']) - np.log(P['cps'])
+        return x, y
