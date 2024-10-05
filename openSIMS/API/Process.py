@@ -14,8 +14,8 @@ class GeochronSamples(Samples,Geochron.Geochron,Geochron.Processor):
 
 class StableSamples(Samples,Stable.Stable,Stable.Processor):
     pass
-                
-def getSamples(simplex,method=None):
+
+def get_samples(simplex,method=None):
     if method is None:
         method = list(simplex.methods.keys())[0]
     datatype = S.settings(method)['type']

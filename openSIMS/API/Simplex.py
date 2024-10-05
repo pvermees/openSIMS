@@ -51,12 +51,12 @@ class Simplex:
 
     def calibrate(self):
         for method, channels in self.methods.items():
-            standards = Calibration.getStandards(self,method)
+            standards = Calibration.get_standards(self,method)
             self.pars[method] = standards.calibrate()
 
     def process(self):
         for method, channels in self.methods.items():
-            samples = Process.getSamples(self,method)
+            samples = Process.get_samples(self,method)
             self.results[method] = samples.process()
 
     def sort_samples(self):
@@ -80,24 +80,13 @@ class Simplex:
             sname = snames[self.i]
         return self.samples[sname].view(title=sname)
 
-    def plot(self,calibration=True):
-        num_methods = len(self.methods)
-        nr = math.ceil(math.sqrt(num_methods))
-        nc = math.ceil(num_methods/nr)
-        fig, ax = plt.subplots(nr,nc)
-        for i, (method,channels) in enumerate(self.methods.items()):
-            if calibration:
-                toplot = Calibration.getStandards(self,method)
-            else:
-                toplot = Process.getSamples(self,method)
-            if nr*nc > 1:
-                toplot.plot(ax=ax.ravel()[i],fig=fig)
-            else:
-                toplot.plot(ax=ax,fig=fig)
-        for empty_axis in range(num_methods,nr*nc):
-            fig.delaxes(ax.flatten()[empty_axis])
-        fig.tight_layout()
-        return fig, ax
+    def plot_calibration(self,method=None):
+        toplot = Calibration.get_standards(self,method)
+        return toplot.plot()
+
+    def plot_processed(self,method=None):
+        toplot = Process.get_samples(self,method)
+        return toplot.plot()
 
     def all_channels(self):
         run = self.samples
@@ -132,6 +121,6 @@ class Simplex:
             return self.pars[method]
         else:
             return dict()
-                
+
     def TODO(self):
         pass

@@ -10,7 +10,7 @@ class SamplesWindow(tk.Toplevel):
         super().__init__()
         self.title('Samples')
         self.top = top
-        fig, axs = S.plot(show=False,calibration=False)
+        fig, axs = S.plot_processed()
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
@@ -22,7 +22,7 @@ class SamplesWindow(tk.Toplevel):
   
     def refresh(self):
         self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot(show=False,calibration=False)
+        self.canvas.figure, axs = S.plot_processed()
         self.canvas.draw()
 
     def on_closing(self):

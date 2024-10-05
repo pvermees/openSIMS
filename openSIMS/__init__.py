@@ -29,17 +29,16 @@ def read():
 def calibrate():
     __simplex.calibrate()
 
-def view(i=None,sname=None,show=True):
+def view(i=None,sname=None):
     if i is None and sname is None:
         i = __simplex.i
-    fig, ax = __simplex.view(i=i,sname=sname)
-    if show: plt.show()
-    return fig, ax
+    return __simplex.view(i=i,sname=sname)
 
-def plot(show=True,calibration=True):
-    fig, ax = __simplex.plot(calibration=calibration)
-    if show: plt.show()
-    return fig, ax
+def plot_calibration():
+    return __simplex.plot_calibration()
+
+def plot_processed():
+    return __simplex.plot_processed()
 
 def process():
     __simplex.process()

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import openSIMS as S
 from . import Toolbox, Ellipse
+import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 class Geochron:
@@ -104,7 +105,7 @@ class Calibrator:
         return x, y
 
 class Processor:
-    
+
     def process(self):
         out = dict()
         for name, sample in self.samples.items():
