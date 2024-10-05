@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from openSIMS.API import Cameca, SHRIMP, Standards, Sample
+from openSIMS.API import Cameca, SHRIMP, Calibration, Process, Sample
 
 class Test(unittest.TestCase):
 
@@ -38,6 +38,11 @@ class Test(unittest.TestCase):
         self.loadCamecaUPbMethod()
         S.standards(Plesovice=[0,1,3])
 
+    def calibrate_O(self):
+        self.loadOxygen()
+        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        S.calibrate()
+
     def test_newCamecaSHRIMPinstance(self):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
@@ -52,9 +57,9 @@ class Test(unittest.TestCase):
 
     def test_view(self):
         self.loadCamecaData()
-        S.view(show=False)
+        S.view()
         self.loadOxygen()
-        S.view(show=False)
+        S.view()
 
     def test_methodPairing(self):
         self.loadCamecaUPbMethod()
@@ -77,10 +82,10 @@ class Test(unittest.TestCase):
 
     def test_misfit(self,b=0.0):
         self.loadMonaziteData()
-        standards = Standards.getStandards(S.simplex())
+        standards = Calibration.get_standards(S.simplex())
         np.random.seed(0)
-        for name, standard in standards.standards.items():
-            x,y = standards.raw_calibration_data(name,b=0.0)
+        for name, standard in standards.samples.items():
+            x,y = standards.get_xy(name,b=0.0)
             plt.scatter(x,y,color=np.random.rand(3,))
 
     def test_calibrate_UPb(self):
@@ -90,9 +95,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pars['b'],0.000375)
 
     def test_calibrate_O(self):
-        self.loadOxygen()
-        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
-        S.calibrate()
+        self.calibrate_O()
 
     def test_multiple_methods(self):
         self.loadMonaziteData()
@@ -100,7 +103,17 @@ class Test(unittest.TestCase):
                      U='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
         S.calibrate()
-        S.plot(show=False)
+        S.plot_calibration()
 
+    def test_process_monazite(self):
+        self.setCamecaStandards()
+        S.calibrate()
+        S.process()
+        S.plot_calibration()
+
+    def test_process_O(self):
+        self.calibrate_O()
+        S.process()
+        
 if __name__ == '__main__':
     unittest.main()

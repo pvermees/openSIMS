@@ -1,25 +1,27 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, View, Calibration
+from . import Calibration, Doc, List, Log, Method, Open, Process, View
 
 class gui(tk.Tk):
 
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
+        self.open_window = None
         self.method_window = None
         self.log_window = None
         self.list_window = None
         self.view_window = None
         self.calibration_window = None
+        self.samples_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
         self.create_view_button()
         self.create_standard_button()
         self.create_calibrate_button()
+        self.create_samples_button()
         self.create_export_button()
         self.create_log_button()
         self.create_template_button()
@@ -33,11 +35,7 @@ class gui(tk.Tk):
             self.log_window.log(cmd=cmd)
 
     def create_open_button(self):
-        button = ttk.Menubutton(self,text='Open',direction='right')
-        menu = tk.Menu(button,tearoff=0)
-        for inst in ['Cameca','SHRIMP']:
-            menu.add_command(label=inst,command=lambda i=inst: self.on_open(i))
-        button["menu"] = menu
+        button = ttk.Button(self,text='Open',command=self.on_open)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_method_button(self):
@@ -56,6 +54,10 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Calibrate',command=self.on_calibrate)
         button.pack(expand=True,fill=tk.BOTH)
 
+    def create_samples_button(self):
+        button = ttk.Button(self,text='Samples',command=self.on_samples)
+        button.pack(expand=True,fill=tk.BOTH)
+        
     def create_export_button(self):
         button = ttk.Button(self,text='Export',command=self.on_export)
         button.pack(expand=True,fill=tk.BOTH)
@@ -76,13 +78,22 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Help',command=self.on_help)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def on_open(self,inst):
-        self.run("S.set('instrument','{i}')".format(i=inst))
-        path = fd.askdirectory() if inst=='Cameca' else fd.askopenfile()
-        self.run("S.set('path','{p}')".format(p=path))
-        self.run("S.read()")
+    def on_open(self):
+        if self.open_window is None:
+            self.open_window = Open.OpenWindow(self)
+        else:
+            self.open_window.destroy()
+            self.open_window = None
+
+    def is_empty(self):
+        if S.get('samples') is None:
+            tk.messagebox.showwarning(message='No data')
+            return True
+        else:
+            return False
 
     def on_method(self):
+        if self.is_empty(): return
         if self.method_window is None:
             self.method_window = Method.MethodWindow(self)
         else:
@@ -90,6 +101,7 @@ class gui(tk.Tk):
             self.method_window = None
 
     def on_standard(self):
+        if self.is_empty(): return
         if self.list_window is None:
             self.list_window = List.ListWindow(self)
         else:
@@ -97,16 +109,27 @@ class gui(tk.Tk):
             self.list_window = None
 
     def on_calibrate(self):
+        if self.is_empty(): return
         self.run("S.calibrate()")
         if self.calibration_window is None:
             self.calibration_window = Calibration.CalibrationWindow(self)
         else:
             self.calibration_window.refresh()
 
+    def on_samples(self):
+        if self.is_empty(): return
+        self.run("S.process()")
+        if self.samples_window is None:
+            self.samples_window = Process.SamplesWindow(self)
+        else:
+            self.samples_window.refresh()
+            
     def on_export(self):
+        if self.is_empty(): return
         self.run("S.TODO()")
 
     def on_view(self):
+        if self.is_empty(): return
         if self.view_window is None and len(S.get('samples'))>0:
             self.view_window = View.ViewWindow(self)
         else:

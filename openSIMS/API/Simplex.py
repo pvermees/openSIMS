@@ -4,7 +4,7 @@ import math
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from . import Cameca, Standards
+from . import Cameca, Calibration, Process
 from pathlib import Path
 
 class Simplex:
@@ -18,10 +18,11 @@ class Simplex:
     def reset(self):
         self.instrument = None
         self.path = None
-        self.methods = dict()
         self.samples = None
         self.ignore = set()
+        self.methods = dict()
         self.pars = dict()
+        self.results = dict()
 
     def read(self):
         self.samples = pd.Series()
@@ -45,13 +46,19 @@ class Simplex:
             if not set(method_channels).issubset(all_channels):
                 self.methods = dict()
                 self.pars = dict()
+                self.results = dict()
                 return
 
     def calibrate(self):
         for method, channels in self.methods.items():
-            standards = Standards.getStandards(self,method)
+            standards = Calibration.get_standards(self,method)
             self.pars[method] = standards.calibrate()
-        
+
+    def process(self):
+        for method, channels in self.methods.items():
+            samples = Process.get_samples(self,method)
+            self.results[method] = samples.process()
+
     def sort_samples(self):
         order = np.argsort(self.get_dates())
         new_index = self.samples.index[order.tolist()]
@@ -73,21 +80,13 @@ class Simplex:
             sname = snames[self.i]
         return self.samples[sname].view(title=sname)
 
-    def plot(self):
-        num_methods = len(self.methods)
-        nr = math.ceil(math.sqrt(num_methods))
-        nc = math.ceil(num_methods/nr)
-        fig, ax = plt.subplots(nr,nc)
-        for i, (method,channels) in enumerate(self.methods.items()):
-            standards = Standards.getStandards(self,method)
-            if nr*nc > 1:
-                standards.plot(ax=ax.ravel()[i],fig=fig)
-            else:
-                standards.plot(ax=ax,fig=fig)
-        for empty_axis in range(num_methods,nr*nc):
-            fig.delaxes(ax.flatten()[empty_axis])
-        fig.tight_layout()
-        return fig, ax
+    def plot_calibration(self,method=None):
+        toplot = Calibration.get_standards(self,method)
+        return toplot.plot()
+
+    def plot_processed(self,method=None):
+        toplot = Process.get_samples(self,method)
+        return toplot.plot()
 
     def all_channels(self):
         run = self.samples
@@ -122,6 +121,6 @@ class Simplex:
             return self.pars[method]
         else:
             return dict()
-                
+
     def TODO(self):
         pass

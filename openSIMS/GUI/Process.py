@@ -1,19 +1,16 @@
 import openSIMS as S
 import tkinter as tk
-import tkinter.ttk as ttk
-import matplotlib.pyplot as plt
 from . import Main
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 
-class CalibrationWindow(tk.Toplevel):
+class SamplesWindow(tk.Toplevel):
     
     def __init__(self,top):
         super().__init__()
-        self.title('Calibration')
+        self.title('Samples')
         self.top = top
-        fig, axs = S.plot_calibration()
+        fig, axs = S.plot_processed()
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
@@ -25,9 +22,9 @@ class CalibrationWindow(tk.Toplevel):
   
     def refresh(self):
         self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot_calibration()
+        self.canvas.figure, axs = S.plot_processed()
         self.canvas.draw()
 
     def on_closing(self):
-        self.top.calibration_window = None
+        self.top.samples_window = None
         self.destroy()

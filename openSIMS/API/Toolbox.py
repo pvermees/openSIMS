@@ -24,5 +24,3 @@ def linearfit(x,y):
     slope = res[0][0]
     intercept = res[1][0]
     return intercept, slope
-
-    
