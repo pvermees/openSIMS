@@ -63,6 +63,7 @@ class Geochron:
             else:
                 ymin = p['A'] + val['offset'] + p['B'] * xmin
                 ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
+        fig.tight_layout()
         return fig, ax
     
 class Calibrator:

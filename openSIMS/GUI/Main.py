@@ -1,14 +1,14 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-import tkinter.filedialog as fd
-from . import Doc, List, Log, Method, View, Calibration, Process
+from . import Calibration, Doc, List, Log, Method, Open, Process, View
 
 class gui(tk.Tk):
 
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
+        self.open_window = None
         self.method_window = None
         self.log_window = None
         self.list_window = None
@@ -35,11 +35,7 @@ class gui(tk.Tk):
             self.log_window.log(cmd=cmd)
 
     def create_open_button(self):
-        button = ttk.Menubutton(self,text='Open',direction='right')
-        menu = tk.Menu(button,tearoff=0)
-        for inst in ['Cameca','SHRIMP']:
-            menu.add_command(label=inst,command=lambda i=inst: self.on_open(i))
-        button["menu"] = menu
+        button = ttk.Button(self,text='Open',command=self.on_open)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_method_button(self):
@@ -82,11 +78,12 @@ class gui(tk.Tk):
         button = ttk.Button(self,text='Help',command=self.on_help)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def on_open(self,inst):
-        self.run("S.set('instrument','{i}')".format(i=inst))
-        path = fd.askdirectory() if inst=='Cameca' else fd.askopenfile()
-        self.run("S.set('path','{p}')".format(p=path))
-        self.run("S.read()")
+    def on_open(self):
+        if self.open_window is None:
+            self.open_window = Open.OpenWindow(self)
+        else:
+            self.open_window.destroy()
+            self.open_window = None
 
     def is_empty(self):
         if S.get('samples') is None:
