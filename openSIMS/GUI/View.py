@@ -4,8 +4,7 @@ import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
 from . import Main
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-                                               NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class ViewWindow(tk.Toplevel):
     
@@ -13,13 +12,12 @@ class ViewWindow(tk.Toplevel):
         super().__init__()
         self.title('View')
         Main.offset(top,self)
-        fig, axs = S.view()
-  
+
+        fig = plt.figure(top.figures['view'])
         canvas = FigureCanvasTkAgg(fig,master=self)
+        canvas.figure, axs = S.view()
         canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         canvas.draw()
-        toolbar = NavigationToolbar2Tk(canvas,self)
-        toolbar.update()
   
         previous_button = ttk.Button(self,text='<',
                                      command=lambda c=canvas,t=top:

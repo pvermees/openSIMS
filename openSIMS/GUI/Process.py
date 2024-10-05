@@ -1,8 +1,8 @@
 import openSIMS as S
 import tkinter as tk
+import matplotlib.pyplot as plt
 from . import Main
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
-                                               NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class SamplesWindow(tk.Toplevel):
     
@@ -10,21 +10,16 @@ class SamplesWindow(tk.Toplevel):
         super().__init__()
         self.title('Samples')
         self.top = top
-        fig, axs = S.plot_processed()
-        self.canvas = FigureCanvasTkAgg(fig,master=self)
-        self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        self.canvas.draw()
-        self.toolbar = NavigationToolbar2Tk(self.canvas,self)
-        self.toolbar.update()
         Main.offset(self.top,self)
-        self.refresh()
+
+        fig = plt.figure(top.figures['process'])
+        canvas = FigureCanvasTkAgg(fig,master=self)
+        canvas.figure, axs = S.plot_processed()
+        canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
+        canvas.draw()
+        
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
   
-    def refresh(self):
-        self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot_processed()
-        self.canvas.draw()
-
     def on_closing(self):
         self.top.samples_window = None
         self.destroy()

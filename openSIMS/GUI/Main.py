@@ -8,6 +8,7 @@ class gui(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
+        self.figures = {'view':100,'calibration':101,'process':102}
         self.open_window = None
         self.method_window = None
         self.log_window = None
@@ -110,20 +111,22 @@ class gui(tk.Tk):
 
     def on_calibrate(self):
         if self.is_empty(): return
-        self.run("S.calibrate()")
         if self.calibration_window is None:
+            self.run("S.calibrate()")
             self.calibration_window = Calibration.CalibrationWindow(self)
         else:
-            self.calibration_window.refresh()
+            self.calibration_window.destroy()
+            self.calibration_window = None
 
     def on_samples(self):
         if self.is_empty(): return
-        self.run("S.process()")
         if self.samples_window is None:
+            self.run("S.process()")
             self.samples_window = Process.SamplesWindow(self)
         else:
-            self.samples_window.refresh()
-            
+            self.samples_window.destroy()
+            self.samples_window = None
+
     def on_export(self):
         if self.is_empty(): return
         self.run("S.TODO()")
