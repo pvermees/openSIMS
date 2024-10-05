@@ -85,8 +85,7 @@ class ListWindow(tk.Toplevel):
         return out
 
     def shared_refmats(self):
-        methods = S.get('methods')
-        method_list = list(methods.keys())
+        method_list = S.list_methods()
         refmats = set(S.settings(method_list[0])['refmats'].index)
         for method in method_list:
             refmats = refmats & set(S.settings(method)['refmats'].index)

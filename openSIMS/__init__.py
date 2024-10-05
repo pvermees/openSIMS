@@ -14,6 +14,9 @@ def get(prop):
 def add_method(method,**kwargs):
     __simplex.methods[method] = __settings.ions2channels(method,**kwargs)
 
+def list_methods():
+    return list(__simplex.methods.keys())
+    
 def remove_method(method):
     del __simplex.methods[method]
     
@@ -29,19 +32,19 @@ def read():
 def calibrate():
     __simplex.calibrate()
 
+def process():
+    __simplex.process()
+
 def view(i=None,sname=None):
     if i is None and sname is None:
         i = __simplex.i
     return __simplex.view(i=i,sname=sname)
 
-def plot_calibration():
-    return __simplex.plot_calibration()
+def plot_calibration(method=None):
+    return __simplex.plot_calibration(method=method)
 
-def plot_processed():
-    return __simplex.plot_processed()
-
-def process():
-    __simplex.process()
+def plot_processed(method=None):
+    return __simplex.plot_processed(method=method)
 
 def simplex():
     return __simplex

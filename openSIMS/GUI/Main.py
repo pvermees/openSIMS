@@ -9,6 +9,7 @@ class gui(tk.Tk):
         super().__init__()
         self.title('openSIMS')
         self.figures = {'view':100,'calibration':101,'process':102}
+        self.method = None
         self.open_window = None
         self.method_window = None
         self.log_window = None
@@ -100,6 +101,10 @@ class gui(tk.Tk):
         else:
             self.method_window.destroy()
             self.method_window = None
+
+    def set_method(self):
+        if self.method is None and len(S.get('methods'))>0:
+            self.method = S.list_methods()[0]
 
     def on_standard(self):
         if self.is_empty(): return

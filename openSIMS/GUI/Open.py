@@ -25,13 +25,14 @@ class OpenWindow(tk.Toplevel):
 
     def on_Cameca(self,top):
         path = fd.askdirectory()
-        self.read(top,path)
+        self.read(top,path,'Cameca')
 
     def on_SHRIMP(self,top):
         path = fd.askopenfile()
-        self.read(top,path)
+        self.read(top,path,'SHRIMP')
 
-    def read(self,top,path):
+    def read(self,top,path,instrument):
+        top.run("S.set('instrument','{i}')".format(i=instrument))
         top.run("S.set('path','{p}')".format(p=path))
         top.run("S.read()")
         top.open_window = None

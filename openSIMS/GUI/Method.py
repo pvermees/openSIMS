@@ -30,7 +30,7 @@ class MethodWindow(tk.Toplevel):
         all_methods = self.sorted_methods()
         variables = dict()
         for method in all_methods:
-            checked = method in S.get('methods').keys()
+            checked = method in S.list_methods()
             variables[method] = tk.IntVar(value=checked)
         return variables
 
