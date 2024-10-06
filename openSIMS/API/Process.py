@@ -17,7 +17,7 @@ class StableSamples(Samples,Stable.Stable,Stable.Processor):
 
 def get_samples(simplex,method=None):
     if method is None:
-        method = list(simplex.methods.keys())[0]
+        method = S.list_methods()[0]
     datatype = S.settings(method)['type']
     if datatype == 'geochron':
         return GeochronSamples(simplex,method)

@@ -20,7 +20,7 @@ class StableStandards(Standards,Stable.Stable,Stable.Calibrator):
 
 def get_standards(simplex,method=None):
     if method is None:
-        method = list(simplex.methods.keys())[0]
+        method = S.list_methods()[0]
     datatype = S.settings(method)['type']
     if datatype == 'geochron':
         return GeochronStandards(simplex,method)

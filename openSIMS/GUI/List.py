@@ -7,7 +7,7 @@ from ..API import Settings
 
 class ListWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('Select standards')
         samples = S.get('samples')
@@ -15,7 +15,7 @@ class ListWindow(tk.Toplevel):
         self.combo_labels = []
         self.combo_vars = []
         self.combo_boxes = []
-        Main.offset(top,self)
+        Main.offset(button,self)
         if len(samples)>20: self.geometry('400x600')
         refmats = ['sample'] + self.shared_refmats()
         row = 0
@@ -85,8 +85,7 @@ class ListWindow(tk.Toplevel):
         return out
 
     def shared_refmats(self):
-        methods = S.get('methods')
-        method_list = list(methods.keys())
+        method_list = S.list_methods()
         refmats = set(S.settings(method_list[0])['refmats'].index)
         for method in method_list:
             refmats = refmats & set(S.settings(method)['refmats'].index)

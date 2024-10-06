@@ -7,19 +7,22 @@ from . import Main
 
 class LogWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('log')
-        Main.offset(top,self)
-        self.protocol('WM_DELETE_WINDOW',top.toggle_log_window)
+        Main.offset(button,self)
+        
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
+
         open_button = ttk.Button(self,text='Open',command=self.load)
         open_button.pack(expand=True,side=tk.LEFT)
         save_button = ttk.Button(self,text='Save',command=self.save)
         save_button.pack(expand=True,side=tk.LEFT)
         clear_button = ttk.Button(self,text='Clear',command=self.clear)
         clear_button.pack(expand=True,side=tk.LEFT)
+        
+        self.protocol('WM_DELETE_WINDOW',top.on_log)
 
     def show(self,run=False):
         for cmd in S.get('stack'):

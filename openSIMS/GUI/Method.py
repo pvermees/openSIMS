@@ -6,11 +6,12 @@ from . import Main
 
 class MethodWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('Choose methods')
-        Main.offset(top,self)
+        Main.offset(button,self)
         self.variables = self.create_vars()
+        self.win = None
         for method, variable in self.variables.items():
             check = tk.Checkbutton(self,text=method,variable=variable,
                                    command = lambda t=top,m=method:
@@ -35,18 +36,20 @@ class MethodWindow(tk.Toplevel):
         return variables
 
     def set_channels(self,top,method):
-        if self.variables[method].get():
-            win = ChannelWindow(top,method)
-        else:
+        if self.variables[method].get():   
+            self.win = ChannelWindow(self,top,method)
+        elif method in S.list_methods():
             cmd = "S.remove_method('{m}')".format(m=method)
             top.run(cmd)
+        else:
+            self.win.destroy()
     
 class ChannelWindow(tk.Toplevel):
 
-    def __init__(self,top,m):
+    def __init__(self,parent,top,m):
         super().__init__(top)
         self.title('Pair the ions with the channels')
-        Main.offset(top,self)
+        Main.offset(parent,self)
         methods = S.get('methods')
         refresh = (m not in methods.keys())
         oldselections = None if refresh else methods[m]
@@ -64,7 +67,8 @@ class ChannelWindow(tk.Toplevel):
             combo.grid(row=row,column=1,padx=1,pady=1)
             row += 1
         button = ttk.Button(self,text='OK',
-                            command=lambda t=top,m=m,s=newselections: self.on_click(t,m,s))
+                            command=lambda t=top,m=m,s=newselections:
+                            self.on_click(t,m,s))
         button.grid(row=row,columnspan=2)
 
     def guess(self,ion,channels):
