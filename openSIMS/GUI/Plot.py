@@ -7,12 +7,14 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class PlotWindow(tk.Toplevel):
 
-    def __init__(self,top,button,title,figure_type,action):
+    def __init__(self,top,button,title=None,
+                 figure_type=None,action=None,window_id=None):
         super().__init__()
         self.title(title)
         top.set_method_if_None()
         self.top = top
         self.action = action
+        self.window_id = window_id
         Main.offset(button,self)
 
         fig = plt.figure(top.figures[figure_type])
@@ -35,9 +37,9 @@ class PlotWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        self.top.calibration_window = None
+        self.window_id = None
         self.destroy()
-
+        
     def on_change(self,event):
         self.top.method = self.combo.get()
         self.canvas.figure.clf()
@@ -47,9 +49,18 @@ class PlotWindow(tk.Toplevel):
 class CalibrationWindow(PlotWindow):
 
     def __init__(self,top,button):
-        super().__init__(top,button,'Calibration','calibration',S.plot_calibration)
-
+        super().__init__(top,button,
+                         title='Calibration',
+                         figure_type='calibration',
+                         action=S.plot_calibration,
+                         window_id=top.calibration_window)
+        
 class ProcessWindow(PlotWindow):
 
     def __init__(self,top,button):
-        super().__init__(top,button,'Samples','process',S.plot_processed)
+        super().__init__(top,
+                         button,
+                         title='Samples',
+                         figure_type='process',
+                         action=S.plot_processed,
+                         window_id=top.process_window)

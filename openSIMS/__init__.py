@@ -1,9 +1,12 @@
 import matplotlib.pyplot as plt
 from .API import Simplex, Settings
-from .GUI.Main import gui
+from .GUI import Main
 
 __simplex = Simplex.Simplex()
 __settings = Settings.Settings()
+
+def gui():
+    Main.gui()
 
 def set(prop,val):
     setattr(__simplex,prop,val)
