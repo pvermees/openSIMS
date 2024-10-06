@@ -7,5 +7,4 @@ t = tests.Test()
 if False:
     S.gui()
 else:
-    t.test_process_O()
-    print(S.get('results'))
+    t.test_process_monazite()

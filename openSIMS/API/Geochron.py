@@ -118,7 +118,7 @@ class Processor:
             out[name] = pd.DataFrame({'DP':DP,'dD':dD})
         return out
 
-    def get_logDPdD(self,name,x,y):
+    def get_DPdD(self,name,x,y):
         P, POx, D, d = self.get_csv(name)
         y_1Ma = self.pars['A'] + self.pars['B']*x
         DP_1Ma = S.settings(self.method).get_DP_1Ma()
