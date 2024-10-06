@@ -7,12 +7,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class CalibrationWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__()
         self.title('Calibration')
         top.set_method()
         self.top = top
-        Main.offset(self.top,self)
+        Main.offset(button,self)
 
         fig = plt.figure(top.figures['calibration'])
         self.canvas = FigureCanvasTkAgg(fig,master=self)

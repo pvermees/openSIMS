@@ -6,10 +6,10 @@ from . import Main
 
 class OpenWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('Choose an instrument')
-        Main.offset(top,self)
+        Main.offset(button,self)
         self.create_Cameca_button(top)
         self.create_SHRIMP_button(top)
 

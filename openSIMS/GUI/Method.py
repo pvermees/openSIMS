@@ -6,10 +6,10 @@ from . import Main
 
 class MethodWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('Choose methods')
-        Main.offset(top,self)
+        Main.offset(button,self)
         self.variables = self.create_vars()
         for method, variable in self.variables.items():
             check = tk.Checkbutton(self,text=method,variable=variable,

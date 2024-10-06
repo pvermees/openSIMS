@@ -6,11 +6,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class SamplesWindow(tk.Toplevel):
     
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__()
         self.title('Samples')
         self.top = top
-        Main.offset(self.top,self)
+        Main.offset(button,self)
 
         fig = plt.figure(top.figures['process'])
         canvas = FigureCanvasTkAgg(fig,master=self)

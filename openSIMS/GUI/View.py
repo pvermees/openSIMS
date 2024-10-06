@@ -8,10 +8,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class ViewWindow(tk.Toplevel):
     
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__()
         self.title('View')
-        Main.offset(top,self)
+        Main.offset(button,self)
 
         fig = plt.figure(top.figures['view'])
         canvas = FigureCanvasTkAgg(fig,master=self)
