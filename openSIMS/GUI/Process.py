@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from . import Main
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class SamplesWindow(tk.Toplevel):
+class ProcessWindow(tk.Toplevel):
     
     def __init__(self,top,button):
         super().__init__()

@@ -17,16 +17,20 @@ class CalibrationWindow(tk.Toplevel):
         fig = plt.figure(top.figures['calibration'])
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        self.canvas.figure, axs = S.plot_calibration()
+        self.canvas.figure, axs = S.plot_calibration(self.top.method)
         self.canvas.draw()
 
-        self.var = tk.StringVar()
-        self.combo = ttk.Combobox(self,
-                                  values=S.list_methods(),
-                                  textvariable=self.var)
-        self.var.set(self.top.method)
-        self.combo.pack(pady=2)
-        
+        methods = S.list_methods()
+        if len(methods)>1:
+            label = ttk.Label(self,text='Methods:')
+            label.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
+            self.var = tk.StringVar()
+            self.combo = ttk.Combobox(self,values=methods,
+                                      textvariable=self.var)
+            self.combo.bind("<<ComboboxSelected>>",self.on_change)
+            self.var.set(self.top.method)
+            self.combo.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
+
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
@@ -34,4 +38,7 @@ class CalibrationWindow(tk.Toplevel):
         self.destroy()
 
     def on_change(self,event):
-        pass
+        method = self.combo.get()
+        self.canvas.figure.clf()
+        self.canvas.figure, axs = S.plot_calibration(method)
+        self.canvas.draw()
