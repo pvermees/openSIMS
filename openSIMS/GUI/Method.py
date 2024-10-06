@@ -30,23 +30,23 @@ class MethodWindow(tk.Toplevel):
         all_methods = self.sorted_methods()
         variables = dict()
         for method in all_methods:
-            checked = method in S.list_methods()
+            checked = method in S.get('methods').keys()
             variables[method] = tk.IntVar(value=checked)
         return variables
 
     def set_channels(self,top,method):
         if self.variables[method].get():
-            win = ChannelWindow(top,method)
+            win = ChannelWindow(self,top,method)
         else:
             cmd = "S.remove_method('{m}')".format(m=method)
             top.run(cmd)
     
 class ChannelWindow(tk.Toplevel):
 
-    def __init__(self,top,m):
+    def __init__(self,parent,top,m):
         super().__init__(top)
         self.title('Pair the ions with the channels')
-        Main.offset(top,self)
+        Main.offset(parent,self)
         methods = S.get('methods')
         refresh = (m not in methods.keys())
         oldselections = None if refresh else methods[m]
