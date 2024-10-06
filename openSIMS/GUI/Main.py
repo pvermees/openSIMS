@@ -16,14 +16,14 @@ class gui(tk.Tk):
         self.list_window = None
         self.view_window = None
         self.calibration_window = None
-        self.samples_window = None
+        self.process_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
         self.create_view_button()
         self.create_standard_button()
         self.create_calibrate_button()
-        self.create_samples_button()
+        self.create_process_button()
         self.create_export_button()
         self.create_log_button()
         self.create_template_button()
@@ -61,9 +61,9 @@ class gui(tk.Tk):
         button.bind("<Button-1>", self.on_calibrate)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_samples_button(self):
-        button = ttk.Button(self,text='Samples')
-        button.bind("<Button-1>", self.on_samples)
+    def create_process_button(self):
+        button = ttk.Button(self,text='Process')
+        button.bind("<Button-1>", self.on_process)
         button.pack(expand=True,fill=tk.BOTH)
         
     def create_export_button(self):
@@ -134,14 +134,14 @@ class gui(tk.Tk):
             self.calibration_window.destroy()
             self.calibration_window = None
 
-    def on_samples(self,event):
+    def on_process(self,event):
         if self.is_empty(): return
-        if self.samples_window is None:
+        if self.process_window is None:
             self.run("S.process()")
-            self.samples_window = Process.SamplesWindow(self,event.widget)
+            self.process_window = Process.ProcessWindow(self,event.widget)
         else:
-            self.samples_window.destroy()
-            self.samples_window = None
+            self.process_window.destroy()
+            self.process_window = None
 
     def on_export(self,event):
         if self.is_empty(): return
