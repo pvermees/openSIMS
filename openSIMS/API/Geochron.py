@@ -21,10 +21,8 @@ class Geochron:
         standard = self.samples.loc[name]
         settings = S.settings(self.method)
         DP = settings.get_DP(standard.group)
-        L = settings['lambda']
-        y0t = np.log(DP)
-        y01 = np.log(np.exp(L)-1)
-        return y0t - y01
+        DP_1Ma = settings.get_DP_1Ma()
+        return np.log(DP) - np.log(DP_1Ma)
 
     def get_labels(self):
         P, POx, D, d  = S.settings(self.method)['ions']
@@ -65,6 +63,11 @@ class Geochron:
                 ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
         fig.tight_layout()
         return fig, ax
+
+    def export(self,path):
+        f = open(path,"a")
+        f.write("test")
+        f.close()
     
 class Calibrator:
 
@@ -115,10 +118,11 @@ class Processor:
             out[name] = pd.DataFrame({'DP':DP,'dD':dD})
         return out
 
-    def get_DPdD(self,name,x,y):
+    def get_logDPdD(self,name,x,y):
         P, POx, D, d = self.get_csv(name)
-        yref = self.pars['A'] + self.pars['B']*D['time']
-        DP = np.exp(y-yref)
+        y_1Ma = self.pars['A'] + self.pars['B']*x
+        DP_1Ma = S.settings(self.method).get_DP_1Ma()
+        DP = np.exp(y-y_1Ma) * DP_1Ma
         drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
         dD = drift*d['cps']/D['cps']
         return DP, dD

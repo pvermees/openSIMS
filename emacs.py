@@ -4,7 +4,8 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     S.gui()
 else:
-    t.test_multiple_methods()
+    t.test_process_O()
+    print(S.get('results'))

@@ -43,6 +43,11 @@ class Test(unittest.TestCase):
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
         S.calibrate()
 
+    def process_monazite(self):
+        self.setCamecaStandards()
+        S.calibrate()
+        S.process()
+        
     def test_newCamecaSHRIMPinstance(self):
         cam = Cameca.Cameca_Sample()
         shr = SHRIMP.SHRIMP_Sample()
@@ -106,14 +111,15 @@ class Test(unittest.TestCase):
         S.plot_calibration()
 
     def test_process_monazite(self):
-        self.setCamecaStandards()
-        S.calibrate()
-        S.process()
+        self.process_monazite()
         S.plot_calibration()
 
     def test_process_O(self):
         self.calibrate_O()
         S.process()
+
+    def test_export_monazite(self):
+        self.process_monazite()
         
 if __name__ == '__main__':
     unittest.main()

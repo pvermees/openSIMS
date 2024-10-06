@@ -102,7 +102,8 @@ class Calibrator:
 class Processor:
 
     def process(self):
-        out = dict()
+        out = []
         for name, sample in self.samples.items():
             logratios = self.raw_logratios(name)
-        return out
+            out.append(np.exp(logratios))
+        return pd.concat(out)
