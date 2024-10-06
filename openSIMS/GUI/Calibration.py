@@ -15,14 +15,17 @@ class CalibrationWindow(tk.Toplevel):
         Main.offset(self.top,self)
 
         fig = plt.figure(top.figures['calibration'])
-        canvas = FigureCanvasTkAgg(fig,master=self)
-        canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        canvas.figure, axs = S.plot_calibration()
-        canvas.draw()
+        self.canvas = FigureCanvasTkAgg(fig,master=self)
+        self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
+        self.canvas.figure, axs = S.plot_calibration()
+        self.canvas.draw()
 
-        combo = ttk.Combobox(self,values=S.list_methods())
-        combo.set(self.top.method)
-        combo.pack(pady=2)
+        self.var = tk.StringVar()
+        self.combo = ttk.Combobox(self,
+                                  values=S.list_methods(),
+                                  textvariable=self.var)
+        self.var.set(self.top.method)
+        self.combo.pack(pady=2)
         
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 

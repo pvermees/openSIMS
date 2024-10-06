@@ -65,7 +65,8 @@ class gui(tk.Tk):
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_log_button(self):
-        button = ttk.Button(self,text='Log',command=self.toggle_log_window)
+        button = ttk.Button(self,text='Log')
+        button.bind("<Button-1>", self.toggle_log_window)
         button.pack(expand=True,fill=tk.BOTH)
 
     def create_template_button(self):
@@ -144,9 +145,9 @@ class gui(tk.Tk):
             self.view_window.destroy()
             self.view_window = None
 
-    def toggle_log_window(self):
+    def toggle_log_window(self,event):
         if self.log_window is None:
-            self.log_window = Log.LogWindow(self)
+            self.log_window = Log.LogWindow(self,event.widget)
             self.log_window.show()
         else:
             self.log_window.destroy()
@@ -166,7 +167,7 @@ class gui(tk.Tk):
             self.help_window = None
 
 def offset(parent,child):
-    x_offset = parent.winfo_x()
+    x_offset = parent.winfo_rootx()
     width = parent.winfo_width()
-    y_offset = parent.winfo_y()
+    y_offset = parent.winfo_rooty()
     child.geometry("+{}+{}".format(x_offset+width, y_offset))

@@ -7,10 +7,10 @@ from . import Main
 
 class LogWindow(tk.Toplevel):
 
-    def __init__(self,top):
+    def __init__(self,top,button):
         super().__init__(top)
         self.title('log')
-        Main.offset(top,self)
+        Main.offset(button,self)
         
         self.script = st.ScrolledText(self)
         self.script.pack(side=tk.BOTTOM,expand=True,fill=tk.BOTH)
