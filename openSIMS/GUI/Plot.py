@@ -5,16 +5,17 @@ import matplotlib.pyplot as plt
 from . import Main
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-class CalibrationWindow(tk.Toplevel):
+class PlotWindow(tk.Toplevel):
 
-    def __init__(self,top,button):
+    def __init__(self,top,button,title,figure_type,action):
         super().__init__()
-        self.title('Calibration')
-        top.set_method()
+        self.title(title)
+        top.set_method_if_None()
         self.top = top
+        self.action = action
         Main.offset(button,self)
 
-        fig = plt.figure(top.figures['calibration'])
+        fig = plt.figure(top.figures[figure_type])
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.figure, axs = S.plot_calibration(self.top.method)
@@ -38,7 +39,17 @@ class CalibrationWindow(tk.Toplevel):
         self.destroy()
 
     def on_change(self,event):
-        method = self.combo.get()
+        self.top.method = self.combo.get()
         self.canvas.figure.clf()
-        self.canvas.figure, axs = S.plot_calibration(method)
+        self.canvas.figure, axs = self.action(self.top.method)
         self.canvas.draw()
+
+class CalibrationWindow(PlotWindow):
+
+    def __init__(self,top,button):
+        super().__init__(top,button,'Calibration','calibration',S.plot_calibration)
+
+class ProcessWindow(PlotWindow):
+
+    def __init__(self,top,button):
+        super().__init__(top,button,'Samples','process',S.plot_processed)

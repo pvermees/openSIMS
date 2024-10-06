@@ -1,7 +1,7 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-from . import Calibration, Doc, List, Log, Method, Open, Process, View
+from . import Doc, List, Log, Method, Open, Plot, View
 
 class gui(tk.Tk):
 
@@ -113,7 +113,7 @@ class gui(tk.Tk):
             self.method_window.destroy()
             self.method_window = None
 
-    def set_method(self):
+    def set_method_if_None(self):
         if self.method is None and len(S.get('methods'))>0:
             self.method = S.list_methods()[0]
 
@@ -129,7 +129,7 @@ class gui(tk.Tk):
         if self.is_empty(): return
         if self.calibration_window is None:
             self.run("S.calibrate()")
-            self.calibration_window = Calibration.CalibrationWindow(self,event.widget)
+            self.calibration_window = Plot.CalibrationWindow(self,event.widget)
         else:
             self.calibration_window.destroy()
             self.calibration_window = None
@@ -138,7 +138,7 @@ class gui(tk.Tk):
         if self.is_empty(): return
         if self.process_window is None:
             self.run("S.process()")
-            self.process_window = Process.ProcessWindow(self,event.widget)
+            self.process_window = Plot.ProcessWindow(self,event.widget)
         else:
             self.process_window.destroy()
             self.process_window = None
