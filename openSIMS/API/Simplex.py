@@ -100,7 +100,7 @@ class Simplex:
         for sample in self.samples:
             out.add(sample.group)
         return out
-        
+
     def set_groups(self,**kwargs):
         for key, sample in self.samples.items():
             sample.group = 'sample'
@@ -121,6 +121,9 @@ class Simplex:
             return self.pars[method]
         else:
             return dict()
+
+    def export(self,path):
+        pass
 
     def TODO(self):
         pass
