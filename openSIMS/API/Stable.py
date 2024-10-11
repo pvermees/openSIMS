@@ -102,8 +102,19 @@ class Calibrator:
 class Processor:
 
     def process(self):
-        out = []
+        out = dict()
         for name, sample in self.samples.items():
             logratios = self.raw_logratios(name)
-            out.append(np.exp(logratios))
-        return pd.concat(out)
+            df = np.exp(logratios)
+            out[name] = Result(df)
+
+class ResultMixin:
+
+    def delta(self):
+        pass
+
+    def average(self):
+        pass
+    
+class Result(pd.DataFrame,ResultMixin):
+    pass

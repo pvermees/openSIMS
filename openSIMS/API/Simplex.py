@@ -122,8 +122,17 @@ class Simplex:
         else:
             return dict()
 
-    def export(self,path):
+    def export_timeresolved(self,path):
         pass
 
+    def group_results_by_sample(self):
+        pass
+
+    def export_csv(self,path):
+        pass
+
+    def export_json(self,path):
+        pass
+    
     def TODO(self):
         pass

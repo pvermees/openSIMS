@@ -120,6 +120,7 @@ class Test(unittest.TestCase):
 
     def test_export_monazite(self):
         self.process_monazite()
+        results = S.get('results')
         
 if __name__ == '__main__':
     unittest.main()

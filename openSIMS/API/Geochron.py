@@ -114,18 +114,26 @@ class Processor:
         out = dict()
         for name, sample in self.samples.items():
             x, y = self.get_xy(name,b=self.pars['b'])
-            DP, dD = self.get_DPdD(name,x,y)
-            out[name] = pd.DataFrame({'DP':DP,'dD':dD})
+            t, P, D, d = self.get_tPDd(name,x,y)
+            df = pd.DataFrame({'t':t,'P':P,'D':D,'d':d})
+            out[name] = Result(df)
         return out
 
     def get_DPdD(self,name,x,y):
+        t, P, D, d = self.get_tPDd(name,x,y)
+        return D/P, d/D
+        
+    def get_tPDd(self,name,x,y):
         P, POx, D, d = self.get_csv(name)
         y_1Ma = self.pars['A'] + self.pars['B']*x
         DP_1Ma = S.settings(self.method).get_DP_1Ma()
         DP = np.exp(y-y_1Ma) * DP_1Ma
         drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
-        dD = drift*d['cps']/D['cps']
-        return DP, dD
+        tout = D['time']
+        Dout = D['cps']
+        Pout = Dout/DP
+        dout = drift*d['cps']
+        return tout, Pout, Dout, dout
 
     def get_xy(self,name,b=0.0):
         settings = S.settings(self.method)
@@ -135,3 +143,14 @@ class Processor:
         x = np.log(POx['cps']) - np.log(P['cps'])
         y = np.log(Drift*D['cps']) - np.log(P['cps'])
         return x, y
+
+class ResultMixin:
+
+    def ages(self):
+        pass
+
+    def average(self):
+        pass
+    
+class Result(pd.DataFrame,ResultMixin):
+    pass
