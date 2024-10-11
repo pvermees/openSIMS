@@ -1,4 +1,5 @@
 import numpy as np
+import scipy as sp
 import pandas as pd
 import openSIMS as S
 from . import Toolbox, Ellipse
@@ -119,10 +120,6 @@ class Processor:
             out[name] = Result(df)
         return out
 
-    def get_DPdD(self,name,x,y):
-        t, P, D, d = self.get_tPDd(name,x,y)
-        return D/P, d/D
-        
     def get_tPDd(self,name,x,y):
         P, POx, D, d = self.get_csv(name)
         y_1Ma = self.pars['A'] + self.pars['B']*x
@@ -143,14 +140,34 @@ class Processor:
         x = np.log(POx['cps']) - np.log(P['cps'])
         y = np.log(Drift*D['cps']) - np.log(P['cps'])
         return x, y
-
+    
 class ResultMixin:
 
     def ages(self):
         pass
 
-    def average(self):
-        pass
-    
+    def raw_DPdD(self,name):
+        DP = self['D']/self['P']
+        dD = self['d']/self['D']
+        return DP, dD
+
+    def avg_DPdD(self):
+        mean_P = np.mean(self['P'])
+        mean_D = np.mean(self['D'])
+        mean_d = np.mean(self['d'])
+        stderr_P = sp.stats.sem(self['P'])
+        stderr_D = sp.stats.sem(self['D'])
+        stderr_d = sp.stats.sem(self['d'])
+        DP = mean_D/mean_P
+        dD = mean_d/mean_D
+        J = np.matrix([[-mean_D/mean_P**2,1/mean_P,0],
+                       [0,-mean_d/mean_D**2,1/mean_D]])
+        E = np.diag([stderr_P,stderr_D,stderr_d])**2
+        covmat = J @ E @ np.transpose(J)
+        s_DP = np.sqrt(covmat[0,0])
+        s_dD = np.sqrt(covmat[1,1])
+        rho = covmat[0,1]/np.sqrt(s_DP*s_dD)
+        return [DP,s_DP,dD,s_dD,rho]
+
 class Result(pd.DataFrame,ResultMixin):
     pass
