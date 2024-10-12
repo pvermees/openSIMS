@@ -126,10 +126,11 @@ class Simplex:
         pass
 
     def export_csv(self,path):
-        csv = []
+        averages = []
         for method, results in self.results.items():
-            csv.append(results.avg_DPdD())
-        df = pd.DataFrame(csv)
+            averages.append(results.average())
+        df = pd.concat(averages,axis=1)
+        df.to_csv(path)
 
     def export_json(self,path):
         pass

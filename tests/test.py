@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
     def loadCamecaUPbMethod(self):
         self.loadCamecaData()
         S.add_method('U-Pb',
-                     U='238U',UOx='238U 16O2',
+                     U238='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
         
     def loadOxygen(self):
@@ -28,8 +28,11 @@ class Test(unittest.TestCase):
         S.set('instrument','Cameca')
         S.set('path','data/Cameca_UThPb')
         S.read()
+        S.add_method('U-Pb',
+                     U238='238U',UOx='238U 16O2',
+                     Pb204='204Pb',Pb206='206Pb')
         S.add_method('Th-Pb',
-                     Th='232Th',ThOx='232Th 16O2',
+                     Th232='232Th',ThOx='232Th 16O2',
                      Pb204='204Pb',Pb208='208Pb')
         S.standards(_44069=['44069@1','44069@2','44069@3','44069@4','44069@5',
                             '44069@6','44069@7','44069@8','44069@9'])
@@ -44,7 +47,7 @@ class Test(unittest.TestCase):
         S.calibrate()
 
     def process_monazite(self):
-        self.setCamecaStandards()
+        self.loadMonaziteData()
         S.calibrate()
         S.process()
         
@@ -105,7 +108,7 @@ class Test(unittest.TestCase):
     def test_multiple_methods(self):
         self.loadMonaziteData()
         S.add_method('U-Pb',
-                     U='238U',UOx='238U 16O2',
+                     U238='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
         S.calibrate()
         S.plot_calibration()
@@ -120,7 +123,7 @@ class Test(unittest.TestCase):
 
     def test_export_monazite(self):
         self.process_monazite()
-        results = S.get('results')
+        S.simplex().export_csv('tests/out/monazite.csv')
         
 if __name__ == '__main__':
     unittest.main()

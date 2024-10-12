@@ -58,6 +58,10 @@ class geochron_setting(setting):
 
     def get_y0(self,refmat):
         return self['refmats'].iloc[:,2][refmat]
+
+    def get_labels(self):
+        ions = self['ions']
+        return {'P':ions[0],'D':ions[2],'d':ions[3]}
         
 class stable_setting(setting):
 

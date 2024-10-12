@@ -112,7 +112,7 @@ class Calibrator:
 class Processor:
 
     def process(self):
-        out = Results()
+        out = Results(self.method)
         for name, sample in self.samples.items():
             x, y = self.get_xy(name,b=self.pars['b'])
             df = self.get_tPDd(name,x,y)
@@ -140,21 +140,28 @@ class Processor:
         y = np.log(Drift*D['cps']) - np.log(P['cps'])
         return x, y
 
-class ResultsMixin:
+class Results(dict):
 
-    def avg_DPdD(self):
+    def __init__(self,method):
+        super().__init__()
+        self.labels = S.settings(method).get_labels()
+
+    def average(self):
         lst = []
         for name, result in self.items():
             lst.append(result.avg_PDdD())
         out = pd.DataFrame(lst)
-        out.columns = ['P/D','s[P/D]','d/D','s[d/D]','rho']
+        labels = ['']*5
+        labels[0] = self.labels['P'] + '/' + self.labels['D']
+        labels[1] = 's[' + labels[0] + ']'
+        labels[2] = self.labels['d'] + '/' + self.labels['D']
+        labels[3] = 's[' + labels[2] + ']'
+        labels[4] = 'rho[' + labels[0] + '/' + labels[2] + ']'
+        out.columns = labels
         out.index = list(self.keys())
         return out
 
-class Results(dict,ResultsMixin):
-    pass
-
-class ResultMixin:
+class Result(pd.DataFrame):
 
     def ages(self):
         pass
@@ -181,6 +188,3 @@ class ResultMixin:
         s_dD = np.sqrt(covmat[1,1])
         rho = covmat[0,1]/(s_PD*s_dD)
         return [PD,s_PD,dD,s_dD,rho]
-
-class Result(pd.DataFrame,ResultMixin):
-    pass
