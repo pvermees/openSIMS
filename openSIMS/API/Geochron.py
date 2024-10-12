@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 
 class Geochron:
 
-    def get_csv(self,name):
+    def get_cps(self,name):
         sample = self.samples.loc[name]
         settings = S.settings(self.method)
         ions = settings['ions']
@@ -100,7 +100,7 @@ class Calibrator:
         return x, y
 
     def get_xy(self,name,b=0.0):
-        P, POx, D, d = self.get_csv(name)
+        P, POx, D, d = self.get_cps(name)
         standard = self.samples.loc[name]
         settings = S.settings(self.method)
         y0 = settings.get_y0(standard.group)
@@ -112,16 +112,15 @@ class Calibrator:
 class Processor:
 
     def process(self):
-        out = dict()
+        out = Results()
         for name, sample in self.samples.items():
             x, y = self.get_xy(name,b=self.pars['b'])
-            t, P, D, d = self.get_tPDd(name,x,y)
-            df = pd.DataFrame({'t':t,'P':P,'D':D,'d':d})
+            df = self.get_tPDd(name,x,y)
             out[name] = Result(df)
         return out
 
     def get_tPDd(self,name,x,y):
-        P, POx, D, d = self.get_csv(name)
+        P, POx, D, d = self.get_cps(name)
         y_1Ma = self.pars['A'] + self.pars['B']*x
         DP_1Ma = S.settings(self.method).get_DP_1Ma()
         DP = np.exp(y-y_1Ma) * DP_1Ma
@@ -130,44 +129,58 @@ class Processor:
         Dout = D['cps']
         Pout = Dout/DP
         dout = drift*d['cps']
-        return tout, Pout, Dout, dout
+        return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
 
     def get_xy(self,name,b=0.0):
         settings = S.settings(self.method)
-        P, POx, D, d = self.get_csv(name)
+        P, POx, D, d = self.get_cps(name)
         Drift = np.exp(b*D['time']/60)
         drift = np.exp(b*d['time']/60)
         x = np.log(POx['cps']) - np.log(P['cps'])
         y = np.log(Drift*D['cps']) - np.log(P['cps'])
         return x, y
-    
+
+class ResultsMixin:
+
+    def avg_DPdD(self):
+        lst = []
+        for name, result in self.items():
+            lst.append(result.avg_PDdD())
+        out = pd.DataFrame(lst)
+        out.columns = ['P/D','s[P/D]','d/D','s[d/D]','rho']
+        out.index = list(self.keys())
+        return out
+
+class Results(dict,ResultsMixin):
+    pass
+
 class ResultMixin:
 
     def ages(self):
         pass
 
-    def raw_DPdD(self,name):
-        DP = self['D']/self['P']
+    def raw_PDdD(self):
+        PD = self['P']/self['D']
         dD = self['d']/self['D']
-        return DP, dD
+        return PD, dD
 
-    def avg_DPdD(self):
+    def avg_PDdD(self):
         mean_P = np.mean(self['P'])
         mean_D = np.mean(self['D'])
         mean_d = np.mean(self['d'])
         stderr_P = sp.stats.sem(self['P'])
         stderr_D = sp.stats.sem(self['D'])
         stderr_d = sp.stats.sem(self['d'])
-        DP = mean_D/mean_P
+        PD = mean_P/mean_D
         dD = mean_d/mean_D
-        J = np.matrix([[-mean_D/mean_P**2,1/mean_P,0],
+        J = np.matrix([[1/mean_D,-mean_P/mean_D**2,0],
                        [0,-mean_d/mean_D**2,1/mean_D]])
         E = np.diag([stderr_P,stderr_D,stderr_d])**2
         covmat = J @ E @ np.transpose(J)
-        s_DP = np.sqrt(covmat[0,0])
+        s_PD = np.sqrt(covmat[0,0])
         s_dD = np.sqrt(covmat[1,1])
-        rho = covmat[0,1]/np.sqrt(s_DP*s_dD)
-        return [DP,s_DP,dD,s_dD,rho]
+        rho = covmat[0,1]/(s_PD*s_dD)
+        return [PD,s_PD,dD,s_dD,rho]
 
 class Result(pd.DataFrame,ResultMixin):
     pass

@@ -125,11 +125,11 @@ class Simplex:
     def export_timeresolved(self,path):
         pass
 
-    def group_results_by_sample(self):
-        pass
-
     def export_csv(self,path):
-        pass
+        csv = []
+        for method, results in self.results.items():
+            csv.append(results.avg_DPdD())
+        df = pd.DataFrame(csv)
 
     def export_json(self,path):
         pass
