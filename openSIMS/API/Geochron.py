@@ -89,23 +89,18 @@ class Geochron:
     def pooled_calibration_data(self,b=0.0):
         x = np.array([])
         y = np.array([])
-        settings = S.settings(self.method)
         for name in self.samples.keys():
-            xn, yn = self.get_xy(name,b=b)
+            xn, yn = self.get_xy_calibration(name,b=b)
             dy = self.offset(name)
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
-
-    def get_xy(self,name,b=0.0):
-        P, POx, D, d = self.get_cps(name)
+    
+    def get_xy_calibration(self,name,b=0.0):
         standard = self.samples.loc[name]
         settings = S.settings(self.method)
         y0 = settings.get_y0(standard.group)
-        drift = np.exp(b*D['time']/60)
-        x = np.log(POx['cps']) - np.log(P['cps'])
-        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
-        return x, y
+        return self.get_xy(name,b=b,y0=y0)
 
     def process(self):
         out = Results(self.method)
@@ -115,6 +110,14 @@ class Geochron:
             out[name] = Result(df)
         return out
 
+    def get_xy(self,name,b=0.0,y0=0.0):
+        settings = S.settings(self.method)
+        P, POx, D, d = self.get_cps(name)
+        drift = np.exp(b*D['time']/60)
+        x = np.log(POx['cps']) - np.log(P['cps'])
+        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
+        return x, y
+    
     def get_tPDd(self,name,x,y):
         P, POx, D, d = self.get_cps(name)
         y_1Ma = self.pars['A'] + self.pars['B']*x
@@ -126,15 +129,6 @@ class Geochron:
         Pout = Dout/DP
         dout = drift*d['cps']
         return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
-
-    def get_xy(self,name,b=0.0):
-        settings = S.settings(self.method)
-        P, POx, D, d = self.get_cps(name)
-        Drift = np.exp(b*D['time']/60)
-        drift = np.exp(b*d['time']/60)
-        x = np.log(POx['cps']) - np.log(P['cps'])
-        y = np.log(Drift*D['cps']) - np.log(P['cps'])
-        return x, y
 
 class Results(dict):
 

@@ -68,5 +68,11 @@ class stable_setting(setting):
     def __init__(self,method_name,pars):
         super().__init__(method_name,pars)
 
-    def get_ref(self,refmat):
-        pass
+    def get_num_den(self):
+        num = self['deltaref']['num']
+        den = self['deltaref']['den']
+        return num, den
+
+    def get_labels(self):
+        num, den = self.get_num_den()
+        return [f"{n}/{d}" for n, d in zip(num, den)]

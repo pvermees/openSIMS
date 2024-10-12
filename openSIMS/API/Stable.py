@@ -15,26 +15,21 @@ class Stable:
             out[ion] = sample.cps(self.method,ion)['cps']
         return out
 
-    def get_num_den(self):
-        settings = S.settings(self.method)
-        num = settings['deltaref']['num']
-        den = settings['deltaref']['den']
-        return num, den
-
     def get_ratios(self):
-        num, den = self.get_num_den()
-        ratios = [f"{n}/{d}" for n, d in zip(num, den)]
+        settings = S.settings(self.method)
+        num, den = settings.get_num_den()
+        ratios = settings.get_labels()
         return num, den, ratios
 
     def raw_logratios(self,name):
-        raw_cps = self.get_cps(name)
         num, den, ratios = self.get_ratios()
+        raw_cps = self.get_cps(name)
         out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
         return out.set_axis(ratios,axis=1)
 
     def offset(self,name):
-        standard = self.samples.loc[name]
         num, den, ratios = self.get_ratios()
+        standard = self.samples.loc[name]
         settings = S.settings(self.method)
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(delta+1)
@@ -98,7 +93,7 @@ class Stable:
         return pd.concat(df_list)
 
     def process(self):
-        out = dict()
+        out = Results(self.method)
         for name, sample in self.samples.items():
             logratios = self.raw_logratios(name)
             df = np.exp(logratios)
@@ -111,12 +106,7 @@ class Results(dict):
         self.labels = S.settings(method).get_labels()
 
     def average(self):
-        lst = []
-        for name, result in self.items():
-            lst.append(result.average())
-        out = pd.DataFrame(lst)
-        out.index = list(self.keys())
-        return out
+        pass
 
 class Result(pd.DataFrame):
 
@@ -124,19 +114,4 @@ class Result(pd.DataFrame):
         pass
 
     def average(self):
-        mean_P = np.mean(self['P'])
-        mean_D = np.mean(self['D'])
-        mean_d = np.mean(self['d'])
-        stderr_P = sp.stats.sem(self['P'])
-        stderr_D = sp.stats.sem(self['D'])
-        stderr_d = sp.stats.sem(self['d'])
-        PD = mean_P/mean_D
-        dD = mean_d/mean_D
-        J = np.matrix([[1/mean_D,-mean_P/mean_D**2,0],
-                       [0,-mean_d/mean_D**2,1/mean_D]])
-        E = np.diag([stderr_P,stderr_D,stderr_d])**2
-        covmat = J @ E @ np.transpose(J)
-        s_PD = np.sqrt(covmat[0,0])
-        s_dD = np.sqrt(covmat[1,1])
-        rho = covmat[0,1]/(s_PD*s_dD)
-        return [PD,s_PD,dD,s_dD,rho]
+        pass

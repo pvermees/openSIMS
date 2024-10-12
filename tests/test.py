@@ -100,7 +100,7 @@ class Test(unittest.TestCase):
         self.setCamecaStandards()
         S.calibrate()
         pars = S.get('pars')['U-Pb']
-        self.assertEqual(pars['b'],0.0006875)
+        self.assertEqual(pars['b'],0.000375)
 
     def test_calibrate_O(self):
         self.calibrate_O()
