@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 class Stable:
 
-    def get_csv(self,name):
+    def get_cps(self,name):
         sample = self.samples.loc[name]
         settings = S.settings(self.method)
         ions = settings['ions']
@@ -27,7 +27,7 @@ class Stable:
         return num, den, ratios
 
     def raw_logratios(self,name):
-        raw_cps = self.get_csv(name)
+        raw_cps = self.get_cps(name)
         num, den, ratios = self.get_ratios()
         out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
         return out.set_axis(ratios,axis=1)
@@ -84,8 +84,6 @@ class Stable:
         fig.tight_layout()
         return fig, ax
 
-class Calibrator:
-
     def calibrate(self):
         logratios = self.pooled_calibration_data()
         return logratios.mean(axis=0)
@@ -99,8 +97,6 @@ class Calibrator:
             df_list.append(df)
         return pd.concat(df_list)
 
-class Processor:
-
     def process(self):
         out = dict()
         for name, sample in self.samples.items():
@@ -108,13 +104,39 @@ class Processor:
             df = np.exp(logratios)
             out[name] = Result(df)
 
-class ResultMixin:
+class Results(dict):
+
+    def __init__(self,method):
+        super().__init__()
+        self.labels = S.settings(method).get_labels()
+
+    def average(self):
+        lst = []
+        for name, result in self.items():
+            lst.append(result.average())
+        out = pd.DataFrame(lst)
+        out.index = list(self.keys())
+        return out
+
+class Result(pd.DataFrame):
 
     def delta(self):
         pass
 
     def average(self):
-        pass
-    
-class Result(pd.DataFrame,ResultMixin):
-    pass
+        mean_P = np.mean(self['P'])
+        mean_D = np.mean(self['D'])
+        mean_d = np.mean(self['d'])
+        stderr_P = sp.stats.sem(self['P'])
+        stderr_D = sp.stats.sem(self['D'])
+        stderr_d = sp.stats.sem(self['d'])
+        PD = mean_P/mean_D
+        dD = mean_d/mean_D
+        J = np.matrix([[1/mean_D,-mean_P/mean_D**2,0],
+                       [0,-mean_d/mean_D**2,1/mean_D]])
+        E = np.diag([stderr_P,stderr_D,stderr_d])**2
+        covmat = J @ E @ np.transpose(J)
+        s_PD = np.sqrt(covmat[0,0])
+        s_dD = np.sqrt(covmat[1,1])
+        rho = covmat[0,1]/(s_PD*s_dD)
+        return [PD,s_PD,dD,s_dD,rho]

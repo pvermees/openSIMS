@@ -9,10 +9,10 @@ class Samples:
         self.method = method
         self.samples = copy.copy(simplex.samples)
 
-class GeochronSamples(Samples,Geochron.Geochron,Geochron.Processor):
+class GeochronSamples(Samples,Geochron.Geochron):
     pass
 
-class StableSamples(Samples,Stable.Stable,Stable.Processor):
+class StableSamples(Samples,Stable.Stable):
     pass
 
 def get_samples(simplex,method=None):

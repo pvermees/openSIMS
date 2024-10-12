@@ -70,8 +70,6 @@ class Geochron:
         f.write("test")
         f.close()
     
-class Calibrator:
-
     def calibrate(self):
         res = minimize(self.misfit,0.0,method='nelder-mead')
         b = res.x[0]
@@ -108,8 +106,6 @@ class Calibrator:
         x = np.log(POx['cps']) - np.log(P['cps'])
         y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
         return x, y
-
-class Processor:
 
     def process(self):
         out = Results(self.method)
@@ -180,8 +176,8 @@ class Result(pd.DataFrame):
         stderr_d = sp.stats.sem(self['d'])
         PD = mean_P/mean_D
         dD = mean_d/mean_D
-        J = np.matrix([[1/mean_D,-mean_P/mean_D**2,0],
-                       [0,-mean_d/mean_D**2,1/mean_D]])
+        J = np.array([[1/mean_D,-mean_P/mean_D**2,0],
+                      [0,-mean_d/mean_D**2,1/mean_D]])
         E = np.diag([stderr_P,stderr_D,stderr_d])**2
         covmat = J @ E @ np.transpose(J)
         s_PD = np.sqrt(covmat[0,0])
