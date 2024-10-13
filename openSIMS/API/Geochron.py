@@ -8,6 +8,92 @@ from scipy.optimize import minimize
 
 class Geochron:
 
+    def get_cps(self,name):
+        sample = self.samples.loc[name]
+        settings = S.settings(self.method)
+        ions = settings['ions']
+        P = sample.cps(self.method,ions[0])
+        POx = sample.cps(self.method,ions[1])
+        D = sample.cps(self.method,ions[2])
+        d = sample.cps(self.method,ions[3])
+        return P, POx, D, d
+    
+    def get_labels(self):
+        P, POx, D, d  = S.settings(self.method)['ions']
+        channels = S.get('methods')[self.method]
+        xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
+        ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
+        return xlabel, ylabel
+
+    def get_xy(self,name,b=0.0,y0=0.0):
+        settings = S.settings(self.method)
+        P, POx, D, d = self.get_cps(name)
+        drift = np.exp(b*D['time']/60)
+        x = np.log(POx['cps']) - np.log(P['cps'])
+        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
+        return x, y
+
+    def get_tPDd(self,name,x,y):
+        P, POx, D, d = self.get_cps(name)
+        y_1Ma = self.pars['A'] + self.pars['B']*x
+        DP_1Ma = S.settings(self.method).get_DP_1Ma()
+        DP = np.exp(y-y_1Ma) * DP_1Ma
+        drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
+        tout = D['time']
+        Dout = D['cps']
+        Pout = Dout/DP
+        dout = drift*d['cps']
+        return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
+
+    def process(self):
+        out = Results(self.method)
+        for name, sample in self.samples.items():
+            x, y = self.get_xy(name,b=self.pars['b'])
+            df = self.get_tPDd(name,x,y)
+            out[name] = Result(df)
+        return out
+
+class Calibrator:
+
+    def calibrate(self):
+        res = minimize(self.misfit,0.0,method='nelder-mead')
+        b = res.x[0]
+        x, y, A, B = self.fit(b)
+        return {'A':A, 'B':B, 'b':b}
+   
+    def misfit(self,b=0.0):
+        x, y, A, B = self.fit(b)
+        SS = sum((A+B*x-y)**2)
+        return SS
+
+    def fit(self,b=0.0):
+        x, y = self.pooled_calibration_data(b=b)
+        A, B = Toolbox.linearfit(x,y)
+        return x, y, A, B
+
+    def offset(self,name):
+        standard = self.samples.loc[name]
+        settings = S.settings(self.method)
+        DP = settings.get_DP(standard.group)
+        DP_1Ma = settings.get_DP_1Ma()
+        return np.log(DP) - np.log(DP_1Ma)
+
+    def pooled_calibration_data(self,b=0.0):
+        x = np.array([])
+        y = np.array([])
+        for name in self.samples.keys():
+            xn, yn = self.get_xy_calibration(name,b=b)
+            dy = self.offset(name)
+            x = np.append(x,xn)
+            y = np.append(y,yn-dy)
+        return x, y
+    
+    def get_xy_calibration(self,name,b=0.0):
+        standard = self.samples.loc[name]
+        settings = S.settings(self.method)
+        y0 = settings.get_y0(standard.group)
+        return self.get_xy(name,b=b,y0=y0)
+
     def plot(self,fig=None,ax=None):
         p = self.pars
         if fig is None or ax is None:
@@ -41,95 +127,11 @@ class Geochron:
         fig.tight_layout()
         return fig, ax
 
-    def get_cps(self,name):
-        sample = self.samples.loc[name]
-        settings = S.settings(self.method)
-        ions = settings['ions']
-        P = sample.cps(self.method,ions[0])
-        POx = sample.cps(self.method,ions[1])
-        D = sample.cps(self.method,ions[2])
-        d = sample.cps(self.method,ions[3])
-        return P, POx, D, d
+class Processor:
     
-    def offset(self,name):
-        standard = self.samples.loc[name]
-        settings = S.settings(self.method)
-        DP = settings.get_DP(standard.group)
-        DP_1Ma = settings.get_DP_1Ma()
-        return np.log(DP) - np.log(DP_1Ma)
-
-    def get_labels(self):
-        P, POx, D, d  = S.settings(self.method)['ions']
-        channels = S.get('methods')[self.method]
-        xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
-        ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
-        return xlabel, ylabel
-
-    def export(self,path):
-        f = open(path,"a")
-        f.write("test")
-        f.close()
+    def plot(self,fig=None,ax=None):
+        pass
     
-    def calibrate(self):
-        res = minimize(self.misfit,0.0,method='nelder-mead')
-        b = res.x[0]
-        x, y, A, B = self.fit(b)
-        return {'A':A, 'B':B, 'b':b}
-   
-    def misfit(self,b=0.0):
-        x, y, A, B = self.fit(b)
-        SS = sum((A+B*x-y)**2)
-        return SS
-
-    def fit(self,b=0.0):
-        x, y = self.pooled_calibration_data(b=b)
-        A, B = Toolbox.linearfit(x,y)
-        return x, y, A, B
-
-    def pooled_calibration_data(self,b=0.0):
-        x = np.array([])
-        y = np.array([])
-        for name in self.samples.keys():
-            xn, yn = self.get_xy_calibration(name,b=b)
-            dy = self.offset(name)
-            x = np.append(x,xn)
-            y = np.append(y,yn-dy)
-        return x, y
-    
-    def get_xy_calibration(self,name,b=0.0):
-        standard = self.samples.loc[name]
-        settings = S.settings(self.method)
-        y0 = settings.get_y0(standard.group)
-        return self.get_xy(name,b=b,y0=y0)
-
-    def process(self):
-        out = Results(self.method)
-        for name, sample in self.samples.items():
-            x, y = self.get_xy(name,b=self.pars['b'])
-            df = self.get_tPDd(name,x,y)
-            out[name] = Result(df)
-        return out
-
-    def get_xy(self,name,b=0.0,y0=0.0):
-        settings = S.settings(self.method)
-        P, POx, D, d = self.get_cps(name)
-        drift = np.exp(b*D['time']/60)
-        x = np.log(POx['cps']) - np.log(P['cps'])
-        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
-        return x, y
-    
-    def get_tPDd(self,name,x,y):
-        P, POx, D, d = self.get_cps(name)
-        y_1Ma = self.pars['A'] + self.pars['B']*x
-        DP_1Ma = S.settings(self.method).get_DP_1Ma()
-        DP = np.exp(y-y_1Ma) * DP_1Ma
-        drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
-        tout = D['time']
-        Dout = D['cps']
-        Pout = Dout/DP
-        dout = drift*d['cps']
-        return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
-
 class Results(dict):
 
     def __init__(self,method):

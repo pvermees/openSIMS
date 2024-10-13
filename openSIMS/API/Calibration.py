@@ -12,10 +12,14 @@ class Standards():
             if sample.group == 'sample' or name in simplex.ignore:
                 self.samples.drop(name,inplace=True)
 
-class GeochronStandards(Standards,Geochron.Geochron):
+class GeochronStandards(Standards,
+                        Geochron.Geochron,
+                        Geochron.Calibrator):
     pass
 
-class StableStandards(Standards,Stable.Stable):
+class StableStandards(Standards,
+                      Stable.Stable,
+                      Stable.Calibrator):
     pass
 
 def get_standards(simplex,method=None):

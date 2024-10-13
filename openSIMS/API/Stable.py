@@ -6,6 +6,55 @@ import matplotlib.pyplot as plt
 
 class Stable:
 
+    def get_cps(self,name):
+        sample = self.samples.loc[name]
+        settings = S.settings(self.method)
+        ions = settings['ions']
+        out = pd.DataFrame()
+        for ion in ions:
+            out[ion] = sample.cps(self.method,ion)['cps']
+        return out
+
+    def get_ratios(self):
+        settings = S.settings(self.method)
+        num, den = settings.get_num_den()
+        ratios = settings.get_labels()
+        return num, den, ratios
+
+    def raw_logratios(self,name):
+        num, den, ratios = self.get_ratios()
+        raw_cps = self.get_cps(name)
+        out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
+        return out.set_axis(ratios,axis=1)
+
+    def process(self):
+        out = Results(self.method)
+        for name, sample in self.samples.items():
+            logratios = self.raw_logratios(name)
+            deltap = logratios.apply(lambda lr: lr + self.pars, axis=1)
+            out[name] = Result(deltap)
+        return out
+    
+class Calibrator:
+
+    def calibrate(self):
+        df_list = []
+        for name, standard in self.samples.items():
+            logratios = self.raw_logratios(name)
+            dprime = self.get_deltap_standard(name).values
+            df = logratios.apply(lambda lr: dprime - lr, axis=1)
+            df_list.append(df)
+        pooled = pd.concat(df_list)
+        pars = pooled.mean(axis=0)
+        return pars
+
+    def get_deltap_standard(self,name):
+        num, den, ratios = self.get_ratios()
+        standard = self.samples.loc[name]
+        settings = S.settings(self.method)
+        delta = settings['refmats'][ratios].loc[standard.group]
+        return np.log(1+delta/1000)
+
     def plot(self,fig=None,ax=None):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
@@ -51,53 +100,11 @@ class Stable:
         fig.tight_layout()
         return fig, ax    
 
-    def get_cps(self,name):
-        sample = self.samples.loc[name]
-        settings = S.settings(self.method)
-        ions = settings['ions']
-        out = pd.DataFrame()
-        for ion in ions:
-            out[ion] = sample.cps(self.method,ion)['cps']
-        return out
+class Processor:
 
-    def get_ratios(self):
-        settings = S.settings(self.method)
-        num, den = settings.get_num_den()
-        ratios = settings.get_labels()
-        return num, den, ratios
-
-    def raw_logratios(self,name):
-        num, den, ratios = self.get_ratios()
-        raw_cps = self.get_cps(name)
-        out = np.log(raw_cps[num]) - np.log(raw_cps[den]).values
-        return out.set_axis(ratios,axis=1)
-
-    def get_deltap_standard(self,name):
-        num, den, ratios = self.get_ratios()
-        standard = self.samples.loc[name]
-        settings = S.settings(self.method)
-        delta = settings['refmats'][ratios].loc[standard.group]
-        return np.log(1+delta/1000)
-
-    def calibrate(self):
-        df_list = []
-        for name, standard in self.samples.items():
-            logratios = self.raw_logratios(name)
-            dprime = self.get_deltap_standard(name).values
-            df = logratios.apply(lambda lr: dprime - lr, axis=1)
-            df_list.append(df)
-        pooled = pd.concat(df_list)
-        pars = pooled.mean(axis=0)
-        return pars
-
-    def process(self):
-        out = Results(self.method)
-        for name, sample in self.samples.items():
-            logratios = self.raw_logratios(name)
-            deltap = logratios.apply(lambda lr: lr + self.pars, axis=1)
-            out[name] = Result(deltap)
-        return out
-
+    def plot(self,fig=None,ax=None):
+        pass
+    
 class Results(dict):
 
     def __init__(self,method):
