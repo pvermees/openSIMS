@@ -43,12 +43,17 @@ class Test(unittest.TestCase):
 
     def calibrate_O(self):
         self.loadOxygen()
-        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'],
+                    Qinghu=['Qinghu@1','Qinghu@2','Qinghu@3'])
         S.calibrate()
 
     def process_monazite(self):
         self.loadMonaziteData()
         S.calibrate()
+        S.process()
+        
+    def process_O(self):
+        self.calibrate_O()
         S.process()
         
     def test_newCamecaSHRIMPinstance(self):
@@ -117,13 +122,13 @@ class Test(unittest.TestCase):
         self.process_monazite()
         S.plot_calibration()
 
-    def test_process_O(self):
-        self.calibrate_O()
-        S.process()
-
     def test_export_monazite(self):
         self.process_monazite()
         S.simplex().export_csv('tests/out/monazite.csv')
+
+    def test_export_O(self):
+        self.process_O()
+        S.simplex().export_csv('tests/out/O.csv')
         
 if __name__ == '__main__':
     unittest.main()

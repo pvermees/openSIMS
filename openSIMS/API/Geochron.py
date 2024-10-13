@@ -8,30 +8,6 @@ from scipy.optimize import minimize
 
 class Geochron:
 
-    def get_cps(self,name):
-        sample = self.samples.loc[name]
-        settings = S.settings(self.method)
-        ions = settings['ions']
-        P = sample.cps(self.method,ions[0])
-        POx = sample.cps(self.method,ions[1])
-        D = sample.cps(self.method,ions[2])
-        d = sample.cps(self.method,ions[3])
-        return P, POx, D, d
-    
-    def offset(self,name):
-        standard = self.samples.loc[name]
-        settings = S.settings(self.method)
-        DP = settings.get_DP(standard.group)
-        DP_1Ma = settings.get_DP_1Ma()
-        return np.log(DP) - np.log(DP_1Ma)
-
-    def get_labels(self):
-        P, POx, D, d  = S.settings(self.method)['ions']
-        channels = S.get('methods')[self.method]
-        xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
-        ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
-        return xlabel, ylabel
-
     def plot(self,fig=None,ax=None):
         p = self.pars
         if fig is None or ax is None:
@@ -64,6 +40,30 @@ class Geochron:
                 ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
         fig.tight_layout()
         return fig, ax
+
+    def get_cps(self,name):
+        sample = self.samples.loc[name]
+        settings = S.settings(self.method)
+        ions = settings['ions']
+        P = sample.cps(self.method,ions[0])
+        POx = sample.cps(self.method,ions[1])
+        D = sample.cps(self.method,ions[2])
+        d = sample.cps(self.method,ions[3])
+        return P, POx, D, d
+    
+    def offset(self,name):
+        standard = self.samples.loc[name]
+        settings = S.settings(self.method)
+        DP = settings.get_DP(standard.group)
+        DP_1Ma = settings.get_DP_1Ma()
+        return np.log(DP) - np.log(DP_1Ma)
+
+    def get_labels(self):
+        P, POx, D, d  = S.settings(self.method)['ions']
+        channels = S.get('methods')[self.method]
+        xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
+        ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
+        return xlabel, ylabel
 
     def export(self,path):
         f = open(path,"a")
