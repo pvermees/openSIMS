@@ -4,8 +4,8 @@ import tests
 
 t = tests.Test()
 
-if False:
+if True:
     S.gui()
 else:
-    t.test_calibrate_O()
+    t.test_process_monazite()
     plt.show()

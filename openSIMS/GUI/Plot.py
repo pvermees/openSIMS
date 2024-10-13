@@ -20,7 +20,7 @@ class PlotWindow(tk.Toplevel):
         fig = plt.figure(top.figures[figure_type])
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        self.canvas.figure, axs = S.plot_calibration(self.top.method)
+        self.canvas.figure, axs = action(self.top.method)
         self.canvas.draw()
 
         methods = S.list_methods()

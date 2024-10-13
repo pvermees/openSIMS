@@ -46,12 +46,11 @@ class Geochron:
         return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
 
     def process(self):
-        out = Results(self.method)
+        self.results = Results(self.method)
         for name, sample in self.samples.items():
             x, y = self.get_xy(name,b=self.pars['b'])
             df = self.get_tPDd(name,x,y)
-            out[name] = Result(df)
-        return out
+            self.results[name] = Result(df)
 
 class Calibrator:
 
@@ -59,7 +58,7 @@ class Calibrator:
         res = minimize(self.misfit,0.0,method='nelder-mead')
         b = res.x[0]
         x, y, A, B = self.fit(b)
-        return {'A':A, 'B':B, 'b':b}
+        self.pars = {'A':A, 'B':B, 'b':b}
    
     def misfit(self,b=0.0):
         x, y, A, B = self.fit(b)
@@ -111,8 +110,8 @@ class Calibrator:
                 if group != 'sample':
                     lines[group]['offset'] = self.offset(name)
             x, y = self.get_xy(name,p['b'])
-            Ellipse.confidence_ellipse(x,y,ax,alpha=0.25,facecolor=colour,
-                                       edgecolor='black',zorder=0)
+            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor=colour,
+                               edgecolor='black',zorder=0)
             ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
@@ -130,7 +129,23 @@ class Calibrator:
 class Processor:
     
     def plot(self,fig=None,ax=None):
-        pass
+        p = self.pars
+        if fig is None or ax is None:
+            fig, ax = plt.subplots()
+        lines = dict()
+        np.random.seed(1)
+        results = self.results.average()
+        for sname, sample in self.samples.items():
+            x, y = self.get_xy(sname,p['b'])
+            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor='blue',
+                               edgecolor='black',zorder=0)
+            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+        xmin = ax.get_xlim()[0]
+        xlabel, ylabel = self.get_labels()
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        fig.tight_layout()
+        return fig, ax
     
 class Results(dict):
 

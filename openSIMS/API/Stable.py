@@ -63,7 +63,7 @@ class Calibrator:
         lines = dict()
         self.process()
         deltap = self.results.average()
-        np.random.seed(0)
+        np.random.seed(1)
         for sname, standard in self.samples.items():
             group = standard.group
             if group in lines.keys():
