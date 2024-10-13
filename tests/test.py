@@ -134,8 +134,12 @@ class Test(unittest.TestCase):
 
     def test_process_monazite(self):
         self.process_monazite()
-        S.plot_calibration()
+        S.plot_processed()
 
+    def test_process_O(self):
+        self.process_O()
+        S.plot_processed()
+        
     def test_export_monazite(self):
         self.process_monazite()
         S.simplex().export_csv('tests/out/monazite.csv')

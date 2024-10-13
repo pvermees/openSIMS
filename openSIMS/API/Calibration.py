@@ -5,8 +5,12 @@ from . import Geochron, Stable
 class Standards():
 
     def __init__(self,simplex,method):
-        self.pars = simplex.get_pars(method)
         self.method = method
+        self.pars = simplex.get_pars(method)
+        if method in simplex.results:
+            self.results = simplex.results[method]
+        else:
+            self.results = None
         self.samples = copy.copy(simplex.samples)
         for name, sample in simplex.samples.items():
             if sample.group == 'sample' or name in simplex.ignore:

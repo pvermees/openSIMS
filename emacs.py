@@ -7,5 +7,5 @@ t = tests.Test()
 if False:
     S.gui()
 else:
-    t.test_calibrate_O_2_standards()
+    t.test_calibrate_O()
     plt.show()

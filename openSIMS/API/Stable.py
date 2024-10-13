@@ -28,12 +28,11 @@ class Stable:
         return out.set_axis(ratios,axis=1)
 
     def process(self):
-        out = Results(self.method)
+        self.results = Results(self.method)
         for name, sample in self.samples.items():
             logratios = self.raw_logratios(name)
             deltap = logratios.apply(lambda lr: lr + self.pars, axis=1)
-            out[name] = Result(deltap)
-        return out
+            self.results[name] = Result(deltap)
 
 class Calibrator:
 
@@ -45,8 +44,7 @@ class Calibrator:
             df = logratios.apply(lambda lr: dprime - lr, axis=1)
             df_list.append(df)
         pooled = pd.concat(df_list)
-        pars = pooled.mean(axis=0)
-        return pars
+        self.pars = pooled.mean(axis=0)
 
     def get_deltap_standard(self,name):
         num, den, ratios = self.get_ratios()
@@ -63,8 +61,9 @@ class Calibrator:
         if fig is None or ax is None:
             fig, ax = plt.subplots(nrows=nr,ncols=nc)
         lines = dict()
+        self.process()
+        deltap = self.results.average()
         np.random.seed(0)
-        deltap = self.process().average()
         for sname, standard in self.samples.items():
             group = standard.group
             if group in lines.keys():
@@ -99,7 +98,27 @@ class Calibrator:
 class Processor:
 
     def plot(self,fig=None,ax=None):
-        pass
+        num_panels = len(self.pars)
+        ratio_names = self.pars.index.to_list()
+        nr = math.ceil(math.sqrt(num_panels))
+        nc = math.ceil(num_panels/nr)
+        if fig is None or ax is None:
+            fig, ax = plt.subplots(nrows=nr,ncols=nc)
+        deltap = self.results.average()
+        for sname, standard in self.samples.items():
+            for i, rname in enumerate(ratio_names):
+                y = 1000*deltap.loc[sname,rname]
+                sy = 1000*deltap.loc[sname,'s['+rname+']']
+                ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
+                ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
+                                   '-',color='black',zorder=1)
+        for i, rname in enumerate(ratio_names):
+            title = r"$\delta$'" + "(" + rname + ")"
+            ax.ravel()[i].set_title(title)
+        for empty_axis in range(len(ratio_names),nr*nc):
+            fig.delaxes(ax.flatten()[empty_axis])
+        fig.tight_layout()
+        return fig, ax    
     
 class Results(dict):
 

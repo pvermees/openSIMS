@@ -52,12 +52,14 @@ class Simplex:
     def calibrate(self):
         for method, channels in self.methods.items():
             standards = Calibration.get_standards(self,method)
-            self.pars[method] = standards.calibrate()
+            standards.calibrate()
+            self.pars[method] = standards.pars
 
     def process(self):
         for method, channels in self.methods.items():
             samples = Process.get_samples(self,method)
-            self.results[method] = samples.process()
+            samples.process()
+            self.results[method] = samples.results
 
     def sort_samples(self):
         order = np.argsort(self.get_dates())
