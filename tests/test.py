@@ -43,10 +43,15 @@ class Test(unittest.TestCase):
 
     def calibrate_O(self):
         self.loadOxygen()
+        S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'])
+        S.calibrate()
+
+    def calibrate_O_2_standards(self):
+        self.loadOxygen()
         S.standards(NBS28=['NBS28@1','NBS28@2','NBS28@3','NBS28@4','NBS28@5'],
                     Qinghu=['Qinghu@1','Qinghu@2','Qinghu@3'])
         S.calibrate()
-
+        
     def process_monazite(self):
         self.loadMonaziteData()
         S.calibrate()
@@ -54,6 +59,10 @@ class Test(unittest.TestCase):
         
     def process_O(self):
         self.calibrate_O()
+        S.process()
+
+    def process_O_2_standards(self):
+        self.calibrate_O_2_standards()
         S.process()
         
     def test_newCamecaSHRIMPinstance(self):
@@ -109,6 +118,11 @@ class Test(unittest.TestCase):
 
     def test_calibrate_O(self):
         self.calibrate_O()
+        S.plot_calibration()
+
+    def test_calibrate_O_2_standards(self):
+        self.calibrate_O_2_standards()
+        S.plot_calibration()
 
     def test_multiple_methods(self):
         self.loadMonaziteData()

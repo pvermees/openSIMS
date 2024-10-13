@@ -34,7 +34,7 @@ class Stable:
             deltap = logratios.apply(lambda lr: lr + self.pars, axis=1)
             out[name] = Result(deltap)
         return out
-    
+
 class Calibrator:
 
     def calibrate(self):
@@ -64,7 +64,8 @@ class Calibrator:
             fig, ax = plt.subplots(nrows=nr,ncols=nc)
         lines = dict()
         np.random.seed(0)
-        for name, standard in self.samples.items():
+        deltap = self.process().average()
+        for sname, standard in self.samples.items():
             group = standard.group
             if group in lines.keys():
                 colour = lines[group]['colour']
@@ -73,28 +74,23 @@ class Calibrator:
                 lines[group] = dict()
                 lines[group]['colour'] = colour
                 if group != 'sample':
-                    lines[group]['offset'] = self.get_deltap_standard(name)
-            raw_logratios = self.raw_logratios(name)
-            nsweeps = raw_logratios.shape[0]
-            logratio_means = raw_logratios.mean(axis=0)
-            logratio_stderr = raw_logratios.std(axis=0)/math.sqrt(nsweeps)
-            for i, ratio_name in enumerate(ratio_names):
-                y_mean = logratio_means.iloc[i]
-                y_min = y_mean - logratio_stderr.iloc[i]
-                y_max = y_mean + logratio_stderr.iloc[i]
-                ax.ravel()[i].scatter(name,y_mean,
-                                      s=5,color='black',zorder=2)
-                ax.ravel()[i].plot([name,name],[y_min,y_max],
+                    lines[group]['truth'] = self.get_deltap_standard(sname)
+            for i, rname in enumerate(ratio_names):
+                y = 1000*deltap.loc[sname,rname]
+                sy = 1000*deltap.loc[sname,'s['+rname+']']
+                ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
+                ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
                                    '-',color=colour,zorder=1)
-        for i, ratio_name in enumerate(ratio_names):
-            title = 'ln(' + ratio_name + ')'
+        for i, rname in enumerate(ratio_names):
+            title = r"$\delta$'" + "(" + rname + ")"
             ax.ravel()[i].set_title(title)
         for group, val in lines.items():
             if group != 'sample':
-                y = self.pars + val['offset']
-                for i, ratio_name in enumerate(ratio_names):
-                    ax.ravel()[i].axline((0.0,y[ratio_name]),slope=0.0,
-                                         color=val['colour'],zorder=0)
+                for i, rname in enumerate(ratio_names):
+                    ax.ravel()[i].axline((0.0,1000*val['truth'][rname]),
+                                         slope=0.0,
+                                         color=val['colour'],
+                                         zorder=0)
         for empty_axis in range(len(ratio_names),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         fig.tight_layout()
