@@ -163,3 +163,4 @@ cython_debug/
 
 # Manually added
 *~
+tests/out/*

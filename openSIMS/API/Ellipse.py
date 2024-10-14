@@ -1,25 +1,28 @@
-# code from https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html
-# with minor changes as marked by comments
+# modified from
+# https://matplotlib.org/stable/gallery/statistics/confidence_ellipse.html
 
 import matplotlib.pyplot as plt
 import numpy as np
-
-from matplotlib.patches import Ellipse
 import matplotlib.transforms as transforms
+from matplotlib.patches import Ellipse
 
-def confidence_ellipse(x, y, ax, n_std=1.0, facecolor='none', **kwargs):
-    if x.size != y.size:
-        raise ValueError("x and y must be the same size")
-    cov = np.cov(x, y)
-    pearson = cov[0, 1]/np.sqrt(cov[0, 0] * cov[1, 1])
+def xy2ellipse(x, y,
+               ax, n_std=1.0, facecolor='none', **kwargs):
+    cov = np.cov(x,y) / x.size
+    sx = np.sqrt(cov[0,0])
+    sy = np.sqrt(cov[1,1])
+    pearson = cov[0,1]/(sx*sy)
+    return result2ellipse(np.mean(x),sx,np.mean(y),sy,pearson,ax,
+                          n_std=n_std,facecolor=facecolor,**kwargs)
+
+def result2ellipse(mean_x, sx, mean_y, sy, pearson,
+                   ax, n_std=1.0, facecolor='none', **kwargs):
     ell_radius_x = np.sqrt(1 + pearson)
     ell_radius_y = np.sqrt(1 - pearson)
     ellipse = Ellipse((0, 0), width=ell_radius_x * 2, height=ell_radius_y * 2,
                       facecolor=facecolor, **kwargs)
-    scale_x = np.sqrt(cov[0, 0]) * n_std / np.sqrt(x.size) # modified
-    mean_x = np.mean(x)
-    scale_y = np.sqrt(cov[1, 1]) * n_std / np.sqrt(y.size) # modified
-    mean_y = np.mean(y)
+    scale_x = sx * n_std
+    scale_y = sy * n_std
     transf = transforms.Affine2D() \
         .rotate_deg(45) \
         .scale(scale_x, scale_y) \

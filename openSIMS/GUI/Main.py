@@ -1,7 +1,7 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-from . import Doc, List, Log, Method, Open, Plot, View
+from . import Doc, Export, List, Log, Method, Open, Plot, View
 
 class gui(tk.Tk):
 
@@ -17,6 +17,7 @@ class gui(tk.Tk):
         self.view_window = None
         self.calibration_window = None
         self.process_window = None
+        self.export_window = None
         self.help_window = None
         self.create_open_button()
         self.create_method_button()
@@ -29,6 +30,7 @@ class gui(tk.Tk):
         self.create_template_button()
         self.create_settings_button()
         self.create_help_button()
+        self.exporter = 'default'
 
     def run(self,cmd):
         S.get('stack').append(cmd)
@@ -145,7 +147,11 @@ class gui(tk.Tk):
 
     def on_export(self,event):
         if self.is_empty(): return
-        self.run("S.TODO()")
+        if self.export_window is None:
+            self.export_window = Export.ExportWindow(self,event.widget)
+        else:
+            self.export_window.destroy()
+            self.export_window = None
 
     def on_view(self,event):
         if self.is_empty(): return

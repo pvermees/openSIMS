@@ -5,17 +5,25 @@ from . import Geochron, Stable
 class Standards():
 
     def __init__(self,simplex,method):
-        self.pars = simplex.get_pars(method)
         self.method = method
+        self.pars = simplex.get_pars(method)
+        if method in simplex.results:
+            self.results = simplex.results[method]
+        else:
+            self.results = None
         self.samples = copy.copy(simplex.samples)
         for name, sample in simplex.samples.items():
             if sample.group == 'sample' or name in simplex.ignore:
                 self.samples.drop(name,inplace=True)
 
-class GeochronStandards(Standards,Geochron.Geochron,Geochron.Calibrator):
+class GeochronStandards(Standards,
+                        Geochron.Geochron,
+                        Geochron.Calibrator):
     pass
 
-class StableStandards(Standards,Stable.Stable,Stable.Calibrator):
+class StableStandards(Standards,
+                      Stable.Stable,
+                      Stable.Calibrator):
     pass
 
 def get_standards(simplex,method=None):

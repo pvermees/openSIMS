@@ -1,10 +1,13 @@
 import os
 import glob
 import math
+import pkgutil
+import importlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from . import Cameca, Calibration, Process
+from .. import Methods
 from pathlib import Path
 
 class Simplex:
@@ -49,15 +52,20 @@ class Simplex:
                 self.results = dict()
                 return
 
+    def hasMethods(self,methods):
+        return set(methods).issubset(set(self.methods.keys()))
+
     def calibrate(self):
         for method, channels in self.methods.items():
             standards = Calibration.get_standards(self,method)
-            self.pars[method] = standards.calibrate()
+            standards.calibrate()
+            self.pars[method] = standards.pars
 
     def process(self):
         for method, channels in self.methods.items():
             samples = Process.get_samples(self,method)
-            self.results[method] = samples.process()
+            samples.process()
+            self.results[method] = samples.results
 
     def sort_samples(self):
         order = np.argsort(self.get_dates())
@@ -122,8 +130,24 @@ class Simplex:
         else:
             return dict()
 
-    def export(self,path):
+    def exporters(self):
+        import openSIMS.Methods.Exporters
+        exporters = pkgutil.iter_modules(openSIMS.Methods.Exporters.__path__)
+        return [name for importer, name, ispkg in exporters]
+
+    def export_timeresolved(self,path):
         pass
 
+    def export_csv(self,path,fmt='default'):
+        if len(self.results) > 0:
+            module_name = 'openSIMS.Methods.Exporters.' + fmt
+            module = importlib.import_module(module_name)
+            module.csv(self,path)
+        else:
+            raise ValueError("This dataset hasn't been processed yet")
+
+    def export_json(self,path):
+        pass
+    
     def TODO(self):
         pass

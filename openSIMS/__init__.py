@@ -49,6 +49,9 @@ def plot_calibration(method=None):
 def plot_processed(method=None):
     return __simplex.plot_processed(method=method)
 
+def export_csv(path,fmt='default'):
+    __simplex.export_csv(path,fmt=fmt)
+
 def simplex():
     return __simplex
 

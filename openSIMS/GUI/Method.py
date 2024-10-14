@@ -61,7 +61,8 @@ class ChannelWindow(tk.Toplevel):
             label = ttk.Label(self,text=ion)
             label.grid(row=row,column=0,padx=1,pady=1)
             newselections[ion] = tk.StringVar()
-            combo = ttk.Combobox(self,values=channels,textvariable=newselections[ion])
+            combo = ttk.Combobox(self,values=channels,
+                                 textvariable=newselections[ion])
             default = self.guess(ion,channels) if refresh else oldselections[ion]
             combo.set(default)
             combo.grid(row=row,column=1,padx=1,pady=1)

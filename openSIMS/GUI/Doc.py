@@ -3,12 +3,14 @@ from . import Main
 
 class HelpWindow(tk.Toplevel):
 
-    def __init__(self,top,button,item='top'):
+    def __init__(self,top,button,item='top',text=None):
         super().__init__(top)
         self.title('Help')
         Main.offset(button,self)
         self.init_help()
-        label = tk.Label(self,text=self.help[item],anchor='w',justify='left')
+        if text is None:
+            text = self.help[item]
+        label = tk.Label(self,text=text,anchor='w',justify='left')
         label.bind('<Configure>',
                    lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)

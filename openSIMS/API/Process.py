@@ -5,14 +5,22 @@ from . import Geochron, Stable
 class Samples:
 
     def __init__(self,simplex,method):
-        self.pars = simplex.get_pars(method)
         self.method = method
+        self.pars = simplex.get_pars(method)
+        if method in simplex.results:
+            self.results = simplex.results[method]
+        else:
+            self.results = None
         self.samples = copy.copy(simplex.samples)
 
-class GeochronSamples(Samples,Geochron.Geochron,Geochron.Processor):
+class GeochronSamples(Samples,
+                      Geochron.Geochron,
+                      Geochron.Processor):
     pass
 
-class StableSamples(Samples,Stable.Stable,Stable.Processor):
+class StableSamples(Samples,
+                    Stable.Stable,
+                    Stable.Processor):
     pass
 
 def get_samples(simplex,method=None):
