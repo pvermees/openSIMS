@@ -1,11 +1,13 @@
 import os
 import glob
 import math
+import pkgutil
 import importlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from . import Cameca, Calibration, Process
+from .. import Methods
 from pathlib import Path
 
 class Simplex:
@@ -127,6 +129,11 @@ class Simplex:
             return self.pars[method]
         else:
             return dict()
+
+    def exporters(self):
+        import openSIMS.Methods.Exporters
+        exporters = pkgutil.iter_modules(openSIMS.Methods.Exporters.__path__)
+        return [name for importer, name, ispkg in exporters]
 
     def export_timeresolved(self,path):
         pass

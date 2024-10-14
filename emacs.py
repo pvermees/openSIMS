@@ -4,7 +4,8 @@ import tests
 
 t = tests.Test()
 
-if False:
+if True:
     S.gui()
 else:
     t.test_export_monazite()
+    S.simplex().exporters()
