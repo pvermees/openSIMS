@@ -1,6 +1,7 @@
 import os
 import glob
 import math
+import importlib
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,6 +49,9 @@ class Simplex:
                 self.pars = dict()
                 self.results = dict()
                 return
+
+    def hasMethods(self,methods):
+        return set(methods).issubset(set(self.methods.keys()))
 
     def calibrate(self):
         for method, channels in self.methods.items():
@@ -127,12 +131,10 @@ class Simplex:
     def export_timeresolved(self,path):
         pass
 
-    def export_csv(self,path):
-        averages = []
-        for method, results in self.results.items():
-            averages.append(results.average())
-        df = pd.concat(averages,axis=1)
-        df.to_csv(path)
+    def export_csv(self,path,fmt='default'):
+        module_name = 'openSIMS.Methods.Exporters.' + fmt
+        module = importlib.import_module(module_name)
+        module.csv(self,path)
 
     def export_json(self,path):
         pass

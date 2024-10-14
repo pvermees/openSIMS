@@ -40,18 +40,18 @@ class Calibrator:
         df_list = []
         for name, standard in self.samples.items():
             logratios = self.raw_logratios(name)
-            dprime = self.get_deltap_standard(name).values
+            dprime = self.get_deltap_standard(name,multiplier=1).values
             df = logratios.apply(lambda lr: dprime - lr, axis=1)
             df_list.append(df)
         pooled = pd.concat(df_list)
         self.pars = pooled.mean(axis=0)
 
-    def get_deltap_standard(self,name):
+    def get_deltap_standard(self,name,multiplier=1000):
         num, den, ratios = self.get_ratios()
         standard = self.samples.loc[name]
         settings = S.settings(self.method)
         delta = settings['refmats'][ratios].loc[standard.group]
-        return np.log(1+delta/1000)
+        return np.log(1+delta/1000)*multiplier
 
     def plot(self,fig=None,ax=None):
         num_panels = len(self.pars)
@@ -75,8 +75,8 @@ class Calibrator:
                 if group != 'sample':
                     lines[group]['truth'] = self.get_deltap_standard(sname)
             for i, rname in enumerate(ratio_names):
-                y = 1000*deltap.loc[sname,rname]
-                sy = 1000*deltap.loc[sname,'s['+rname+']']
+                y = deltap.loc[sname,rname]
+                sy = deltap.loc[sname,'s['+rname+']']
                 ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
                 ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
                                    '-',color=colour,zorder=1)
@@ -86,14 +86,14 @@ class Calibrator:
         for group, val in lines.items():
             if group != 'sample':
                 for i, rname in enumerate(ratio_names):
-                    ax.ravel()[i].axline((0.0,1000*val['truth'][rname]),
+                    ax.ravel()[i].axline((0.0,val['truth'][rname]),
                                          slope=0.0,
                                          color=val['colour'],
                                          zorder=0)
         for empty_axis in range(len(ratio_names),nr*nc):
             fig.delaxes(ax.flatten()[empty_axis])
         fig.tight_layout()
-        return fig, ax    
+        return fig, ax
 
 class Processor:
 
@@ -107,8 +107,8 @@ class Processor:
         deltap = self.results.average()
         for sname, standard in self.samples.items():
             for i, rname in enumerate(ratio_names):
-                y = 1000*deltap.loc[sname,rname]
-                sy = 1000*deltap.loc[sname,'s['+rname+']']
+                y = deltap.loc[sname,rname]
+                sy = deltap.loc[sname,'s['+rname+']']
                 ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
                 ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
                                    '-',color='black',zorder=1)
@@ -126,10 +126,10 @@ class Results(dict):
         super().__init__()
         self.ratios = S.settings(method).get_labels()
 
-    def average(self):
+    def average(self,multiplier=1000):
         lst = []
         for name, result in self.items():
-            lst.append(result.average())
+            lst.append(result.average(multiplier=multiplier))
         out = pd.DataFrame(lst)
         nc = out.shape[1]
         nratios = len(self.ratios)
@@ -149,7 +149,7 @@ class Result(pd.DataFrame):
     def delta(self):
         pass
 
-    def average(self):
+    def average(self,multiplier=1):
         avg = np.mean(self,axis=0)
         nr = self.shape[0]
         nc = self.shape[1]
@@ -157,7 +157,7 @@ class Result(pd.DataFrame):
         cormat = self.corr()
         out = []
         for i, val in enumerate(avg):
-            out.append(avg.iloc[i])
-            out.append(np.sqrt(covmat.iloc[i,i]))
+            out.append(avg.iloc[i]*multiplier)
+            out.append(np.sqrt(covmat.iloc[i,i])*multiplier)
         rho = cormat.iloc[np.triu_indices(nc,k=1)].values.flatten()
         return np.hstack((out,rho))

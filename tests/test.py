@@ -142,7 +142,7 @@ class Test(unittest.TestCase):
         
     def test_export_monazite(self):
         self.process_monazite()
-        S.simplex().export_csv('tests/out/monazite.csv')
+        S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb-2')
 
     def test_export_O(self):
         self.process_O()
