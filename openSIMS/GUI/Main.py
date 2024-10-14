@@ -30,6 +30,7 @@ class gui(tk.Tk):
         self.create_template_button()
         self.create_settings_button()
         self.create_help_button()
+        self.exporter = 'default'
 
     def run(self,cmd):
         S.get('stack').append(cmd)

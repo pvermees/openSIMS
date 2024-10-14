@@ -139,9 +139,12 @@ class Simplex:
         pass
 
     def export_csv(self,path,fmt='default'):
-        module_name = 'openSIMS.Methods.Exporters.' + fmt
-        module = importlib.import_module(module_name)
-        module.csv(self,path)
+        if len(self.results) > 0:
+            module_name = 'openSIMS.Methods.Exporters.' + fmt
+            module = importlib.import_module(module_name)
+            module.csv(self,path)
+        else:
+            raise ValueError("This dataset hasn't been processed yet")
 
     def export_json(self,path):
         pass

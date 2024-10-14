@@ -7,3 +7,7 @@ def csv(simplex,path):
 
 def json(simplex,path):
     pass
+
+def help():
+    return "Contains the following columns:\n" + \
+        "X=232Th/208Pb, s[X], Y=204Pb/208Pb, s[Y], rho[X,Y]."
