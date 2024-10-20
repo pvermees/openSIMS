@@ -86,7 +86,7 @@ class Calibrator:
             x = np.append(x,xn)
             y = np.append(y,yn-dy)
         return x, y
-    
+
     def get_xy_calibration(self,name,b=0.0):
         standard = self.samples.loc[name]
         settings = S.settings(self.method)

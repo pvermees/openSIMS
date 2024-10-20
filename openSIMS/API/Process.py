@@ -1,6 +1,6 @@
 import copy
 import openSIMS as S
-from . import Geochron, Stable
+from . import Geochron, Stable, PbPb
 
 class Samples:
 
@@ -13,14 +13,13 @@ class Samples:
             self.results = None
         self.samples = copy.copy(simplex.samples)
 
-class GeochronSamples(Samples,
-                      Geochron.Geochron,
-                      Geochron.Processor):
+class GeochronSamples(Samples,Geochron.Geochron,Geochron.Processor):
     pass
 
-class StableSamples(Samples,
-                    Stable.Stable,
-                    Stable.Processor):
+class StableSamples(Samples,Stable.Stable,Stable.Processor):
+    pass
+
+class PbPbSamples(Samples,PbPb.PbPb,PbPb.Processor):
     pass
 
 def get_samples(simplex,method=None):
@@ -31,5 +30,7 @@ def get_samples(simplex,method=None):
         return GeochronSamples(simplex,method)
     elif datatype == 'stable':
         return StableSamples(simplex,method)
+    elif datatype == 'geochron_PbPb':
+        return PbPbSamples(simplex,method)
     else:
         raise ValueError('Unrecognised data type')
