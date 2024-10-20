@@ -153,6 +153,8 @@ class Test(unittest.TestCase):
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         S.standards(Plesovice=[0,1,3])
         S.calibrate()
+        S.plot_calibration()
+        plt.show()
 
 if __name__ == '__main__':
     unittest.main()
