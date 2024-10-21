@@ -148,12 +148,13 @@ class Test(unittest.TestCase):
         self.process_O()
         S.simplex().export_csv('tests/out/O.csv')
 
-    def test_calibrate_PbPb(self):
+    def test_process_PbPb(self):
         self.loadCamecaData()
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         S.standards(Plesovice=[0,1,3])
         S.calibrate()
-        S.plot_calibration()
+        S.process()
+        S.plot_processed()
         plt.show()
 
 if __name__ == '__main__':

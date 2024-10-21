@@ -23,24 +23,28 @@ class PbPb:
         xlabel = channels[Pb4] + '/' + channels[Pb6]
         ylabel = channels[Pb7] + '/' + channels[Pb6]
         return xlabel, ylabel
-
-    def process(self):
-        self.results = Results(self.method)
-        for name, sample in self.samples.items():
-            pass
+        
+    def get_tPb764(self,name):
+        cps7, cps6, cps4 = self.get_cps(name)
+        a = self.pars['a']
+        b = self.pars['b']
+        tt7 = cps7['time']/60
+        Pb4 = cps4['cps']/np.exp(3*a+b*tt7)
+        Pb6 = cps6['cps']/np.exp(a+b*tt7)
+        return pd.DataFrame({'t':tt7,'Pb7':cps7['cps'],'Pb6':Pb6,'Pb4':Pb4})
 
     def get_xy(self,name):
-        Pb7, Pb6, Pb4 = self.get_cps(name)
-        p = self.pars
-        a = p['a']
-        b = p['b']
-        tt7 = Pb7['time']/60
-        drift_corrected_Pb4 = Pb4['cps']/np.exp(3*a+b*tt7)
-        drift_corrected_Pb6 = Pb6['cps']/np.exp(a+b*tt7)
-        x = drift_corrected_Pb4/drift_corrected_Pb6
-        y = Pb7['cps']/drift_corrected_Pb6
+        df = self.get_tPb764(name)
+        x = df['Pb4']/df['Pb6']
+        y = df['Pb7']/df['Pb6']
         return x, y
-        
+
+    def process(self):
+        self.results = Results()
+        for name, sample in self.samples.items():
+            df = self.get_tPb764(name)
+            self.results[name] = Result(df)
+
 class Calibrator:
 
     def calibrate(self):
@@ -128,7 +132,10 @@ class Processor:
         np.random.seed(1)
         results = self.results.average()
         for sname, sample in self.samples.items():
-            pass
+            x, y = self.get_xy(sname)
+            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor='blue',
+                               edgecolor='black',zorder=0)
+            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
@@ -137,13 +144,43 @@ class Processor:
     
 class Results(dict):
 
-    def __init__(self,method):
+    def __init__(self):
         super().__init__()
 
     def average(self):
-        pass
+        lst = []
+        for name, result in self.items():
+            lst.append(result.avg_Pb764())
+        out = pd.DataFrame(lst)
+        labels = ['']*5
+        labels[0] = 'Pb204/Pb206'
+        labels[1] = 's[Pb204/Pb206]'
+        labels[2] = 'Pb207/Pb206'
+        labels[3] = 's[Pb207/Pb206]'
+        labels[4] = 'rho[Pb204/Pb206,Pb207/Pb206]'
+        out.columns = labels
+        out.index = list(self.keys())
+        return out
 
 class Result(pd.DataFrame):
 
     def ages(self):
         pass
+
+    def avg_Pb764(self):
+        mu7 = np.mean(self['Pb7'])
+        mu6 = np.mean(self['Pb6'])
+        mu4 = np.mean(self['Pb4'])
+        se7 = sp.stats.sem(self['Pb7'])
+        se6 = sp.stats.sem(self['Pb6'])
+        se4 = sp.stats.sem(self['Pb4'])
+        Pb46 = mu4/mu6
+        Pb76 = mu7/mu6
+        J = np.array([[0,-mu4/mu6**2,1/mu6],
+                      [1/mu6,-mu7/mu6**2,0]])
+        E = np.diag([se7,se6,se4])**2
+        covmat = J @ E @ np.transpose(J)
+        se46 = np.sqrt(covmat[0,0])
+        se76 = np.sqrt(covmat[1,1])
+        rho = covmat[0,1]/(se46*se76)
+        return [Pb46,se46,Pb76,se76,rho]

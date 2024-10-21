@@ -7,4 +7,4 @@ t = tests.Test()
 if True:
     S.gui()
 else:
-    t.test_calibrate_PbPb()
+    t.test_process_PbPb()
