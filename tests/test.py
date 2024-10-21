@@ -142,20 +142,30 @@ class Test(unittest.TestCase):
         
     def test_export_monazite(self):
         self.process_monazite()
-        S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb-2')
+        S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb-9')
 
     def test_export_O(self):
         self.process_O()
         S.simplex().export_csv('tests/out/O.csv')
 
-    def test_process_PbPb(self):
+    def test_export_PbPb(self):
         self.loadCamecaData()
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         S.standards(Plesovice=[0,1,3])
         S.calibrate()
         S.process()
-        S.plot_processed()
-        plt.show()
+        S.simplex().export_csv('tests/out/PbPb.csv',fmt='Pb-Pb-2')
+
+    def test_export_UPbPb(self):
+        self.loadCamecaData()
+        S.add_method('U-Pb',
+                     U238='238U',UOx='238U 16O2',
+                     Pb204='204Pb',Pb206='206Pb')
+        S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        S.standards(Plesovice=[0,1,3])
+        S.calibrate()
+        S.process()
+        S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
 
 if __name__ == '__main__':
     unittest.main()

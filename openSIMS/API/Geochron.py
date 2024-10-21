@@ -163,7 +163,7 @@ class Results(dict):
         labels[1] = 's[' + labels[0] + ']'
         labels[2] = self.labels['d'] + '/' + self.labels['D']
         labels[3] = 's[' + labels[2] + ']'
-        labels[4] = 'rho[' + labels[0] + '/' + labels[2] + ']'
+        labels[4] = 'rho[' + labels[0] + ',' + labels[2] + ']'
         out.columns = labels
         out.index = list(self.keys())
         return out

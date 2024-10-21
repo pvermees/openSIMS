@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     S.gui()
 else:
-    t.test_process_PbPb()
+    t.test_export_UPbPb()
