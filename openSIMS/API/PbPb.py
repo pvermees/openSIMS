@@ -23,7 +23,7 @@ class PbPb:
         xlabel = channels[Pb4] + '/' + channels[Pb6]
         ylabel = channels[Pb7] + '/' + channels[Pb6]
         return xlabel, ylabel
-        
+
     def get_tPb764(self,name):
         cps7, cps6, cps4 = self.get_cps(name)
         a = self.pars['a']
@@ -182,5 +182,5 @@ class Result(pd.DataFrame):
         covmat = J @ E @ np.transpose(J)
         se46 = np.sqrt(covmat[0,0])
         se76 = np.sqrt(covmat[1,1])
-        rho = covmat[0,1]/(se46*se76)
+        rho = 0.0 if se46==0 or se76==0 else covmat[0,1]/(se46*se76)
         return [Pb46,se46,Pb76,se76,rho]

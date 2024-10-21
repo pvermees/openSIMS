@@ -6,12 +6,11 @@ import numpy as np
 import matplotlib.transforms as transforms
 from matplotlib.patches import Ellipse
 
-def xy2ellipse(x, y,
-               ax, n_std=1.0, facecolor='none', **kwargs):
+def xy2ellipse(x, y, ax, n_std=1.0, facecolor='none', **kwargs):
     cov = np.cov(x,y) / x.size
     sx = np.sqrt(cov[0,0])
     sy = np.sqrt(cov[1,1])
-    pearson = cov[0,1]/(sx*sy)
+    pearson = 0.0 if sx==0.0 or sy==0.0 else cov[0,1]/(sx*sy)
     return result2ellipse(np.mean(x),sx,np.mean(y),sy,pearson,ax,
                           n_std=n_std,facecolor=facecolor,**kwargs)
 

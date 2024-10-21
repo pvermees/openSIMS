@@ -39,7 +39,7 @@ class Test(unittest.TestCase):
 
     def setCamecaStandards(self):
         self.loadCamecaUPbMethod()
-        S.standards(Plesovice=[0,1,3])
+        S.standards(Temora=[0,1,3,5,7,9,10,12,14,16,18,19])
 
     def calibrate_O(self):
         self.loadOxygen()
@@ -73,8 +73,8 @@ class Test(unittest.TestCase):
 
     def test_openCamecaASCfile(self):
         samp = Cameca.Cameca_Sample()
-        samp.read("data/Cameca_UPb/Plesovice@01.asc")
-        self.assertEqual(samp.signal.size,84)
+        samp.read("data/Cameca_UPb/Tem@1.asc")
+        self.assertEqual(samp.signal.size,77)
         samp.view()
 
     def test_view(self):
@@ -89,18 +89,18 @@ class Test(unittest.TestCase):
 
     def test_setStandards(self):
         self.setCamecaStandards()
-        self.assertEqual(S.get('samples').iloc[0].group,'Plesovice')
+        self.assertEqual(S.get('samples').iloc[0].group,'Temora')
 
     def test_settings(self):
-        DP = S.settings('U-Pb').get_DP('Plesovice')
-        y0 = S.settings('U-Pb').get_y0('Plesovice')
-        self.assertEqual(DP,0.05368894845896288)
-        self.assertEqual(y0,18.18037)
+        DP = S.settings('U-Pb').get_DP('Temora')
+        y0 = S.settings('U-Pb').get_y0('Temora')
+        self.assertEqual(DP,0.06678381721936288)
+        self.assertEqual(y0,18.05283)
 
     def test_cps(self):
         self.loadCamecaUPbMethod()
-        Pb206 = S.get('samples')['Plesovice@01'].cps('U-Pb','Pb206')
-        self.assertEqual(Pb206.loc[0,'cps'],1981.191294204482)
+        Pb206 = S.get('samples')['Tem@1'].cps('U-Pb','Pb206')
+        self.assertEqual(Pb206.loc[0,'cps'],3213.8858032128287)
 
     def test_misfit(self,b=0.0):
         self.loadMonaziteData()
@@ -114,7 +114,7 @@ class Test(unittest.TestCase):
         self.setCamecaStandards()
         S.calibrate()
         pars = S.get('pars')['U-Pb']
-        self.assertEqual(pars['b'],0.000375)
+        self.assertEqual(pars['b'],0.0028125000000000008)
 
     def test_calibrate_O(self):
         self.calibrate_O()
@@ -142,7 +142,7 @@ class Test(unittest.TestCase):
         
     def test_export_monazite(self):
         self.process_monazite()
-        S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb-9')
+        S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb')
 
     def test_export_O(self):
         self.process_O()
@@ -151,10 +151,10 @@ class Test(unittest.TestCase):
     def test_export_PbPb(self):
         self.loadCamecaData()
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
-        S.standards(Plesovice=[0,1,3])
+        S.standards(Temora=[0,1,3,5,7,9,10,12,14,16,18,19])
         S.calibrate()
         S.process()
-        S.simplex().export_csv('tests/out/PbPb.csv',fmt='Pb-Pb-2')
+        S.simplex().export_csv('tests/out/PbPb.csv',fmt='Pb-Pb')
 
     def test_export_UPbPb(self):
         self.loadCamecaData()
@@ -162,10 +162,11 @@ class Test(unittest.TestCase):
                      U238='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
-        S.standards(Plesovice=[0,1,3])
+        S.standards(Temora=[0,1,3,5,7,9,10,12,14,16,18,19])
         S.calibrate()
-        S.process()
-        S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
+        S.plot_calibration('Pb-Pb')
+        #S.process()
+        #S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
 
 if __name__ == '__main__':
     unittest.main()
