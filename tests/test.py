@@ -87,6 +87,13 @@ class Test(unittest.TestCase):
         self.loadCamecaUPbMethod()
         self.assertEqual(S.get('methods')['U-Pb']['UOx'],'238U 16O2')
 
+    def test_dwelltime(self):
+        self.loadCamecaUPbMethod()
+        samp = S.simplex().samples['Tem@1']
+        dwell = samp.total_time('U-Pb',
+                                ['238U 16O2','238U','207Pb','206Pb','204Pb'])
+        self.assertEqual(dwell['204Pb'],34.72)
+
     def test_setStandards(self):
         self.setCamecaStandards()
         self.assertEqual(S.get('samples').iloc[0].group,'Temora')
@@ -164,9 +171,9 @@ class Test(unittest.TestCase):
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
         S.standards(Temora=[0,1,3,5,7,9,10,12,14,16,18,19])
         S.calibrate()
-        S.plot_calibration('Pb-Pb')
-        #S.process()
-        #S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
-
+        S.process()
+        S.plot_calibration('U-Pb')
+        S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
+        
 if __name__ == '__main__':
     unittest.main()

@@ -33,11 +33,19 @@ class PbPb:
         Pb6 = cps6['cps']/np.exp(a+b*tt7)
         return pd.DataFrame({'t':tt7,'Pb7':cps7['cps'],'Pb6':Pb6,'Pb4':Pb4})
 
-    def get_xy(self,name):
-        df = self.get_tPb764(name)
-        x = df['Pb4']/df['Pb6']
-        y = df['Pb7']/df['Pb6']
-        return x, y
+    def get_ellipse(self,name):
+        cps7, cps6, cps4 = self.get_cps(name)
+        a = cps4['cps']
+        b = cps7['cps']
+        c = cps6['cps']
+        if np.mean(a)>0:
+            sa = None
+        else:
+            sample = self.samples[name]
+            Pb4channel = S.get('methods')['Pb-Pb']['Pb204']
+            tt = sample.total_time(self.method,[Pb4channel])
+            sa = 3.688879/1.96/float(tt.iloc[0])
+        return Ellipse.acbc2ellipse(a,b,c,sa=sa)
 
     def process(self):
         self.results = Results()
@@ -104,10 +112,9 @@ class Calibrator:
                 lines[group]['colour'] = colour
                 lines[group]['A'] = settings.get_Pb76(sample.group)
                 lines[group]['B'] = settings.get_Pb74_0(sample.group)
-            x,y = self.get_xy(name)
-            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor=colour,
-                               edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+            mx, sx, my, sy, rho = self.get_ellipse(name)
+            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,alpha=0.25,
+                                   facecolor=colour,edgecolor='black',zorder=0)
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
@@ -116,7 +123,6 @@ class Calibrator:
             if group == 'sample':
                 pass
             else:
-                pass
                 ymin = lines[group]['A'] + lines[group]['B'] * xmin
                 ax.axline((xmin,ymin),slope=lines[group]['B'],color=val['colour'])
         fig.tight_layout()
@@ -132,10 +138,9 @@ class Processor:
         np.random.seed(1)
         results = self.results.average()
         for sname, sample in self.samples.items():
-            x, y = self.get_xy(sname)
-            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor='blue',
-                               edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+            mx, sx, my, sy, rho = self.get_ellipse(sname)
+            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,alpha=0.25,
+                                   facecolor='blue',edgecolor='black',zorder=0)
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)

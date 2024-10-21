@@ -77,6 +77,11 @@ class Cameca_Sample(Sample.Sample):
         return pd.DataFrame({'time': self.time[channel],
                              'cps': blank_corrected_cps})
 
+    def total_time(self,method,channels):
+        dwelltime = self.channels.loc[channels,'dwelltime']
+        num_cycles = self.signal.shape[0]
+        return dwelltime*num_cycles
+
 def skip_block(rows,n=1):
     for _ in range(n-1):
         next(rows)
