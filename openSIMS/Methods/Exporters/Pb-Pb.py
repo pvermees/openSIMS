@@ -1,5 +1,7 @@
+requirements = ['Pb-Pb']
+
 def csv(simplex,path):
-    if simplex.hasMethods(['Pb-Pb']):
+    if simplex.hasMethods(requirements):
         df = simplex.results['Pb-Pb'].average()
         df.to_csv(path)
     else:
@@ -11,3 +13,4 @@ def json(simplex,path):
 def help():
     return "Contains the following columns:\n" + \
         "X=204Pb/206Pb, s[X], Y=207Pb/206Pb, s[Y], rho[X,Y]."
+    

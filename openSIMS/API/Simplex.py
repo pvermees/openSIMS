@@ -132,8 +132,8 @@ class Simplex:
 
     def exporters(self):
         import openSIMS.Methods.Exporters
-        exporters = pkgutil.iter_modules(openSIMS.Methods.Exporters.__path__)
-        return [name for importer, name, ispkg in exporters]
+        generator = pkgutil.iter_modules(openSIMS.Methods.Exporters.__path__)
+        return [name for importer, name, ispkg in generator]
 
     def export_timeresolved(self,path):
         pass

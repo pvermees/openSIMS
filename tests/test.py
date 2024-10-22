@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
         self.loadMonaziteData()
         S.calibrate()
         S.process()
-        
+
     def process_O(self):
         self.calibrate_O()
         S.process()
@@ -172,7 +172,7 @@ class Test(unittest.TestCase):
         S.standards(Temora=[0,1,3,5,7,9,10,12,14,16,18,19])
         S.calibrate()
         S.process()
-        S.plot_calibration('Pb-Pb')
+        S.plot_calibration('U-Pb')
         S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
         
 if __name__ == '__main__':
