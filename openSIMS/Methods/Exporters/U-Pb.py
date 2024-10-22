@@ -1,3 +1,5 @@
+requirements = ['U-Pb']
+
 def csv(simplex,path):
     if simplex.hasMethods(['U-Pb']):
         df = simplex.results['U-Pb'].average()

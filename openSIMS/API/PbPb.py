@@ -128,7 +128,7 @@ class Processor:
         if fig is None or ax is None:
             fig, ax = plt.subplots()
         np.random.seed(1)
-        for result in self.results:
+        for method, result in self.results.items():
             mx, sx, my, sy, rho = result.average()
             Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,alpha=0.25,
                                    facecolor='blue',edgecolor='black',zorder=0)

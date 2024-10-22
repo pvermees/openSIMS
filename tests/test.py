@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
         self.loadMonaziteData()
         S.calibrate()
         S.process()
-        
+
     def process_O(self):
         self.calibrate_O()
         S.process()

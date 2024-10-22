@@ -28,9 +28,10 @@ class Geochron:
     def get_xy(self,name,b=0.0,y0=0.0):
         settings = S.settings(self.method)
         P, POx, D, d = self.get_cps(name)
-        drift = np.exp(b*D['time']/60)
+        Drift = np.exp(b*D['time']/60)
+        drift = np.exp(b*d['time']/60)
         x = np.log(POx['cps']) - np.log(P['cps'])
-        y = np.log(drift*D['cps']-y0*d['cps']) - np.log(P['cps'])
+        y = np.log(Drift*D['cps']-y0*drift*d['cps']) - np.log(P['cps'])
         return x, y
 
     def get_tPDd(self,name,x,y):
@@ -38,9 +39,11 @@ class Geochron:
         y_1Ma = self.pars['A'] + self.pars['B']*x
         DP_1Ma = S.settings(self.method).get_DP_1Ma()
         DP = np.exp(y-y_1Ma) * DP_1Ma
-        drift = np.exp(self.pars['b']*(d['time']-D['time'])/60)
-        tout = D['time']
-        Dout = D['cps']
+        b = self.pars['b']
+        Drift = np.exp(b*D['time']/60)
+        drift = np.exp(b*d['time']/60)
+        tout = P['time']
+        Dout = Drift*D['cps']
         Pout = Dout/DP
         dout = drift*d['cps']
         return pd.DataFrame({'t':tout,'P':Pout,'D':Dout,'d':dout})
