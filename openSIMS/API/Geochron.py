@@ -52,10 +52,11 @@ class Geochron:
 
     def get_result(self,name,sample):
         s0 = dict()
-        for ion, channel in S.get('methods')[self.method].items():
+        P, POx, D, d = S.settings(self.method)['ions']
+        for label, ion in {'P':P,'D':D,'d':d}.items():
+            channel = S.get('methods')[self.method][ion]
             tt = sample.total_time(self.method,[channel])
-            breakpoint()
-            s0[ion] = 3.688879/1.96/float(tt)
+            s0[label] = 3.688879/1.96/float(tt.iloc[0])
         x, y = self.get_xy(name,b=self.pars['b'])
         df = self.get_tPDd(name,x,y)
         return Result(df,s0)
@@ -102,6 +103,7 @@ class Calibrator:
         return self.get_xy(name,b=b,y0=y0)
 
     def plot(self,fig=None,ax=None):
+        settings = S.settings(self.method)
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
@@ -117,12 +119,10 @@ class Calibrator:
                 lines[group]['colour'] = colour
                 if group != 'sample':
                     lines[group]['offset'] = self.offset(name)
-            result = self.get_result(name,sample)
-            mx, sx, my, sy, rho = result.average()
-            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,
-                                   alpha=0.25,facecolor=colour,
-                                   edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+            y0 = settings.get_y0(sample.group)
+            x, y = self.get_xy(name,p['b'],y0=y0)
+            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor=colour,
+                               edgecolor='black',zorder=0)
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
@@ -142,11 +142,11 @@ class Processor:
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
-        for result in self.results():
-            mx, sx, my, sy, rho = result.average()
-            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,
-                                   alpha=0.25,facecolor='blue',
-                                   edgecolor='black',zorder=0)
+        results = self.results.average()
+        for sname, sample in self.samples.items():
+            x, y = self.get_xy(sname,p['b'])
+            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor='blue',
+                               edgecolor='black',zorder=0)
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
@@ -190,4 +190,25 @@ class Result():
         return PD, dD
 
     def average(self):
-        pass
+        d = self.df['d']
+        P = self.df['P']
+        D = self.df['D']
+        md = np.mean(d)
+        mP = np.mean(P)
+        mD = np.mean(D)
+        mPD = mP/mD
+        mdD = md/mD
+        cov = np.cov(np.array([d,P,D]))/self.df.shape[0]
+        if np.sum(d)==0:
+            cov[0,0] = self.s0['d']**2
+        if np.sum(P)==0:
+            cov[1,1] = self.s0['P']**2
+        if np.sum(D)==0:
+            cov[2,2] = self.s0['D']**2
+        J = np.array([[0.0,1/mD,-mP/mD**2],
+                      [1/mD,0.0,-md/mD**2]])
+        E = J @ cov @ np.transpose(J)
+        sPD = np.sqrt(E[0,0])
+        sdD = np.sqrt(E[1,1])
+        pearson = E[0,1]/(sdD*sPD)
+        return [mPD,sPD,mdD,sdD,pearson]
