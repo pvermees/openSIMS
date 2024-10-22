@@ -66,20 +66,31 @@ class Geochron:
 
 class Calibrator:
 
-    def calibrate(self):
-        res = minimize(self.misfit,0.0,method='nelder-mead')
+    def calibrate(self,B=None):
+        if B is None:
+            res = minimize(self.ABmisfit,0.0,method='nelder-mead')
+        else:
+            res = minimize(self.Amisfit,0.0,args=(B),method='nelder-mead')
         b = res.x[0]
-        x, y, A, B = self.fit(b)
+        x, y, A, B = self.fit(b=b,B=B)
         self.pars = {'A':A, 'B':B, 'b':b}
    
-    def misfit(self,b=0.0):
-        x, y, A, B = self.fit(b)
+    def ABmisfit(self,b):
+        x, y, A, B = self.fit(b=b)
         SS = sum((A+B*x-y)**2)
         return SS
 
-    def fit(self,b=0.0):
+    def Amisfit(self,b,B):
+        x, y, A, B = self.fit(b=b,B=B)
+        SS = sum((A+B*x-y)**2)
+        return SS
+
+    def fit(self,b=0.0,B=None):
         x, y = self.pooled_calibration_data(b=b)
-        A, B = Toolbox.linearfit(x,y)
+        if B is None:
+            A, B = Toolbox.linearfit(x,y,B=B)
+        else:
+            A = np.mean(y-B*x)
         return x, y, A, B
 
     def offset(self,name):

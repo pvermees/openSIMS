@@ -36,7 +36,7 @@ class Stable:
 
 class Calibrator:
 
-    def calibrate(self):
+    def calibrate(self,**kwargs):
         df_list = []
         for name, standard in self.samples.items():
             logratios = self.raw_logratios(name)

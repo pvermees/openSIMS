@@ -17,7 +17,7 @@ def get_datetime(dtstring,patterns):
             pass
     raise ValueError('Invalid datetime string.')
 
-def linearfit(x,y):
+def linearfit(x,y,B=None):
     D = np.vstack([x, np.ones(len(x))]).T
     y = y[:, np.newaxis]
     res = np.dot((np.dot(np.linalg.inv(np.dot(D.T,D)),D.T)),y)

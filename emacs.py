@@ -4,7 +4,7 @@ import tests
 
 t = tests.Test()
 
-if True:
+if False:
     S.gui()
 else:
-    t.test_exporters()
+    t.test_fix_B()

@@ -47,7 +47,7 @@ class PbPb:
 
 class Calibrator:
 
-    def calibrate(self):
+    def calibrate(self,**kwargs):
         res = minimize(self.misfit,[0.0,0.0],method='nelder-mead')
         a = res.x[0]
         b = res.x[1]

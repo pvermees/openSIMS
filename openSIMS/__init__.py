@@ -32,8 +32,8 @@ def reset():
 def read():
     __simplex.read()
 
-def calibrate():
-    __simplex.calibrate()
+def calibrate(**kwargs):
+    __simplex.calibrate(**kwargs)
 
 def process():
     __simplex.process()
