@@ -34,18 +34,15 @@ class PbPb:
         return pd.DataFrame({'t':tt7,'Pb7':cps7['cps'],'Pb6':Pb6,'Pb4':Pb4})
 
     def get_ellipse(self,name):
-        cps7, cps6, cps4 = self.get_cps(name)
-        a = cps4['cps']
-        b = cps7['cps']
-        c = cps6['cps']
-        if np.mean(a)>0:
-            sa = None
+        df = self.get_tPb764(name)
+        if np.mean(df['Pb4'])>0:
+            s4 = None
         else:
             sample = self.samples[name]
             Pb4channel = S.get('methods')['Pb-Pb']['Pb204']
             tt = sample.total_time(self.method,[Pb4channel])
-            sa = 3.688879/1.96/float(tt.iloc[0])
-        return Ellipse.acbc2ellipse(a,b,c,sa=sa)
+            s4 = 3.688879/1.96/float(tt.iloc[0])
+        return Ellipse.xzyz2ellipse(df['Pb4'],df['Pb7'],df['Pb6'],sx=s4)
 
     def process(self):
         self.results = Results()

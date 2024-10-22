@@ -6,27 +6,27 @@ import numpy as np
 import matplotlib.transforms as transforms
 from matplotlib.patches import Ellipse
 
-# a, b and c are lists of raw data
-def acbc2ellipse(a,b,c,sa=None,sb=None,sc=None):
-    ma = np.mean(a)
-    mb = np.mean(b)
-    mc = np.mean(c)
-    mx = np.mean(ma/mc)
-    my = np.mean(mb/mc)
-    cov = np.cov(np.array([a,b,c]))/a.size
-    if sa is not None:
-        cov[0,0] = sa**2
-    if sb is not None:
-        cov[1,1] = sb**2
-    if sc is not None:
-        cov[2,2] = sc**2
-    J = np.array([[1/mc,0.0,-ma/mc**2],
-                  [0.0,1/mc,-mb/mc**2]])
+# x, y and z are lists of raw data
+def xzyz2ellipse(x,y,z,sx=None,sy=None,sz=None):
+    mx = np.mean(x)
+    my = np.mean(y)
+    mz = np.mean(z)
+    mxz = np.mean(mx/mz)
+    myz = np.mean(my/mz)
+    cov = np.cov(np.array([x,y,z]))/x.size
+    if sx is not None:
+        cov[0,0] = sx**2
+    if sy is not None:
+        cov[1,1] = sy**2
+    if sz is not None:
+        cov[2,2] = sz**2
+    J = np.array([[1/mz,0.0,-mx/mz**2],
+                  [0.0,1/mz,-my/mz**2]])
     E = J @ cov @ np.transpose(J)
-    sx = np.sqrt(E[0,0])
-    sy = np.sqrt(E[1,1])
-    pearson = E[0,1]/(sx*sy)
-    return mx, sx, my, sy, pearson
+    sxz = np.sqrt(E[0,0])
+    syz = np.sqrt(E[1,1])
+    pearson = E[0,1]/(sxz*syz)
+    return mxz, sxz, myz, syz, pearson
 
 # x and y are lists of logratios
 def xy2ellipse(x, y,
