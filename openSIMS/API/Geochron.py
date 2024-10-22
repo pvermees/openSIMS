@@ -48,9 +48,17 @@ class Geochron:
     def process(self):
         self.results = Results(self.method)
         for name, sample in self.samples.items():
-            x, y = self.get_xy(name,b=self.pars['b'])
-            df = self.get_tPDd(name,x,y)
-            self.results[name] = Result(df)
+            self.results[name] = self.get_result(name,sample)
+
+    def get_result(self,name,sample):
+        s0 = dict()
+        for ion, channel in S.get('methods')[self.method].items():
+            tt = sample.total_time(self.method,[channel])
+            breakpoint()
+            s0[ion] = 3.688879/1.96/float(tt)
+        x, y = self.get_xy(name,b=self.pars['b'])
+        df = self.get_tPDd(name,x,y)
+        return Result(df,s0)
 
 class Calibrator:
 
@@ -109,9 +117,11 @@ class Calibrator:
                 lines[group]['colour'] = colour
                 if group != 'sample':
                     lines[group]['offset'] = self.offset(name)
-            x, y = self.get_xy(name,p['b'])
-            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor=colour,
-                               edgecolor='black',zorder=0)
+            result = self.get_result(name,sample)
+            mx, sx, my, sy, rho = result.average()
+            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,
+                                   alpha=0.25,facecolor=colour,
+                                   edgecolor='black',zorder=0)
             ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
@@ -132,14 +142,11 @@ class Processor:
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
-        lines = dict()
-        np.random.seed(1)
-        results = self.results.average()
-        for sname, sample in self.samples.items():
-            x, y = self.get_xy(sname,p['b'])
-            Ellipse.xy2ellipse(x,y,ax,alpha=0.25,facecolor='blue',
-                               edgecolor='black',zorder=0)
-            ax.scatter(np.mean(x),np.mean(y),s=3,c='black')
+        for result in self.results():
+            mx, sx, my, sy, rho = result.average()
+            Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,
+                                   alpha=0.25,facecolor='blue',
+                                   edgecolor='black',zorder=0)
         xmin = ax.get_xlim()[0]
         xlabel, ylabel = self.get_labels()
         ax.set_xlabel(xlabel)
@@ -156,7 +163,7 @@ class Results(dict):
     def average(self):
         lst = []
         for name, result in self.items():
-            lst.append(result.avg_PDdD())
+            lst.append(result.average())
         out = pd.DataFrame(lst)
         labels = ['']*5
         labels[0] = self.labels['P'] + '/' + self.labels['D']
@@ -168,7 +175,11 @@ class Results(dict):
         out.index = list(self.keys())
         return out
 
-class Result(pd.DataFrame):
+class Result():
+
+    def __init__(self,tPb764,s0):
+        self.df = tPb764
+        self.s0 = s0
 
     def ages(self):
         pass
@@ -178,20 +189,5 @@ class Result(pd.DataFrame):
         dD = self['d']/self['D']
         return PD, dD
 
-    def avg_PDdD(self):
-        mean_P = np.mean(self['P'])
-        mean_D = np.mean(self['D'])
-        mean_d = np.mean(self['d'])
-        stderr_P = sp.stats.sem(self['P'])
-        stderr_D = sp.stats.sem(self['D'])
-        stderr_d = sp.stats.sem(self['d'])
-        PD = mean_P/mean_D
-        dD = mean_d/mean_D
-        J = np.array([[1/mean_D,-mean_P/mean_D**2,0],
-                      [0,-mean_d/mean_D**2,1/mean_D]])
-        E = np.diag([stderr_P,stderr_D,stderr_d])**2
-        covmat = J @ E @ np.transpose(J)
-        s_PD = np.sqrt(covmat[0,0])
-        s_dD = np.sqrt(covmat[1,1])
-        rho = covmat[0,1]/(s_PD*s_dD)
-        return [PD,s_PD,dD,s_dD,rho]
+    def average(self):
+        pass

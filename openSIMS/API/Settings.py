@@ -22,7 +22,7 @@ class Settings(dict):
                 self[method_name] = stable_setting(method_name,method)
             else:
                 raise ValueError('Invalid method type')
-            
+
     def ions2channels(self,method,**kwargs):
         if method not in self.keys():
             raise ValueError('Invalid method')
