@@ -1,6 +1,6 @@
 import copy
 import openSIMS as S
-from . import Geochron, Stable
+from . import Geochron, Stable, PbPb
 
 class Standards():
 
@@ -16,14 +16,13 @@ class Standards():
             if sample.group == 'sample' or name in simplex.ignore:
                 self.samples.drop(name,inplace=True)
 
-class GeochronStandards(Standards,
-                        Geochron.Geochron,
-                        Geochron.Calibrator):
+class GeochronStandards(Standards,Geochron.Geochron,Geochron.Calibrator):
     pass
 
-class StableStandards(Standards,
-                      Stable.Stable,
-                      Stable.Calibrator):
+class StableStandards(Standards,Stable.Stable,Stable.Calibrator):
+    pass
+
+class PbPbStandards(Standards,PbPb.PbPb,PbPb.Calibrator):
     pass
 
 def get_standards(simplex,method=None):
@@ -34,3 +33,5 @@ def get_standards(simplex,method=None):
         return GeochronStandards(simplex,method)
     elif datatype == 'stable':
         return StableStandards(simplex,method)
+    elif datatype == 'geochron_PbPb':
+        return PbPbStandards(simplex,method)

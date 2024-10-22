@@ -16,6 +16,8 @@ class Settings(dict):
             method = json.loads(json_string)
             if method['type'] == 'geochron':
                 self[method_name] = geochron_setting(method_name,method)
+            elif method['type'] == 'geochron_PbPb':
+                self[method_name] = PbPb_setting(method_name,method)
             elif method['type'] == 'stable':
                 self[method_name] = stable_setting(method_name,method)
             else:
@@ -62,7 +64,7 @@ class geochron_setting(setting):
     def get_labels(self):
         ions = self['ions']
         return {'P':ions[0],'D':ions[2],'d':ions[3]}
-        
+
 class stable_setting(setting):
 
     def __init__(self,method_name,pars):
@@ -76,3 +78,17 @@ class stable_setting(setting):
     def get_labels(self):
         num, den = self.get_num_den()
         return [f"{n}/{d}" for n, d in zip(num, den)]
+
+class PbPb_setting(setting):
+
+    def __init__(self,method_name,pars):
+        super().__init__(method_name,pars)
+
+    def get_Pb76(self,refmat):
+        L5, L8  = self['lambda']
+        t = self['refmats']['t'][refmat]
+        U58 = 1/self['U238U235']
+        return U58*(np.exp(L5*t)-1)/(np.exp(L8*t)-1)
+
+    def get_Pb74_0(self,refmat):
+        return self['refmats']['Pb74_0'][refmat]
