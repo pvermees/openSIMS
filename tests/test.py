@@ -173,8 +173,7 @@ class Test(unittest.TestCase):
         S.calibrate()
         S.process()
         S.plot_calibration('Pb-Pb')
-        plt.show()
-        #S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
+        S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
         
 if __name__ == '__main__':
     unittest.main()

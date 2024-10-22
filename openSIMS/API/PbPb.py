@@ -33,22 +33,17 @@ class PbPb:
         Pb6 = cps6['cps']/np.exp(a+b*tt7)
         return pd.DataFrame({'t':tt7,'Pb7':cps7['cps'],'Pb6':Pb6,'Pb4':Pb4})
 
-    def get_ellipse(self,name):
-        df = self.get_tPb764(name)
-        if np.mean(df['Pb4'])>0:
-            s4 = None
-        else:
-            sample = self.samples[name]
-            Pb4channel = S.get('methods')['Pb-Pb']['Pb204']
-            tt = sample.total_time(self.method,[Pb4channel])
-            s4 = 3.688879/1.96/float(tt.iloc[0])
-        return Ellipse.xzyz2ellipse(df['Pb4'],df['Pb7'],df['Pb6'],sx=s4)
-
     def process(self):
         self.results = Results()
         for name, sample in self.samples.items():
-            df = self.get_tPb764(name)
-            self.results[name] = Result(df)
+            self.results[name] = self.get_result(name,sample)
+
+    def get_result(self,name,sample):
+        Pb4channel = S.get('methods')['Pb-Pb']['Pb204']
+        df = self.get_tPb764(name)
+        tt = sample.total_time('Pb-Pb',[Pb4channel])
+        s4 = 3.688879/1.96/float(tt.iloc[0])
+        return Result(df,s4)
 
 class Calibrator:
 
@@ -109,7 +104,8 @@ class Calibrator:
                 lines[group]['colour'] = colour
                 lines[group]['A'] = settings.get_Pb76(sample.group)
                 lines[group]['B'] = settings.get_Pb74_0(sample.group)
-            mx, sx, my, sy, rho = self.get_ellipse(name)
+            result = self.get_result(name,sample)
+            mx, sx, my, sy, rho = result.average()
             Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,alpha=0.25,
                                    facecolor=colour,edgecolor='black',zorder=0)
         xmin = ax.get_xlim()[0]
@@ -131,11 +127,9 @@ class Processor:
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
-        lines = dict()
         np.random.seed(1)
-        results = self.results.average()
-        for sname, sample in self.samples.items():
-            mx, sx, my, sy, rho = self.get_ellipse(sname)
+        for result in self.results:
+            mx, sx, my, sy, rho = result.average()
             Ellipse.result2ellipse(mx,sx,my,sy,rho,ax,alpha=0.25,
                                    facecolor='blue',edgecolor='black',zorder=0)
         xlabel, ylabel = self.get_labels()
@@ -152,7 +146,7 @@ class Results(dict):
     def average(self):
         lst = []
         for name, result in self.items():
-            lst.append(result.avg_Pb764())
+            lst.append(result.average())
         out = pd.DataFrame(lst)
         labels = ['']*5
         labels[0] = 'Pb204/Pb206'
@@ -164,25 +158,31 @@ class Results(dict):
         out.index = list(self.keys())
         return out
 
-class Result(pd.DataFrame):
+class Result():
+
+    def __init__(self,tPb764,s4):
+        self.df = tPb764
+        self.s4 = s4
 
     def ages(self):
         pass
 
-    def avg_Pb764(self):
-        mu7 = np.mean(self['Pb7'])
-        mu6 = np.mean(self['Pb6'])
-        mu4 = np.mean(self['Pb4'])
-        se7 = sp.stats.sem(self['Pb7'])
-        se6 = sp.stats.sem(self['Pb6'])
-        se4 = sp.stats.sem(self['Pb4'])
-        Pb46 = mu4/mu6
-        Pb76 = mu7/mu6
-        J = np.array([[0,-mu4/mu6**2,1/mu6],
-                      [1/mu6,-mu7/mu6**2,0]])
-        E = np.diag([se7,se6,se4])**2
-        covmat = J @ E @ np.transpose(J)
-        se46 = np.sqrt(covmat[0,0])
-        se76 = np.sqrt(covmat[1,1])
-        rho = 0.0 if se46==0 or se76==0 else covmat[0,1]/(se46*se76)
-        return [Pb46,se46,Pb76,se76,rho]
+    def average(self):
+        x = self.df['Pb4']
+        y = self.df['Pb7']
+        z = self.df['Pb6']
+        mx = np.mean(x)
+        my = np.mean(y)
+        mz = np.mean(z)
+        mxz = np.mean(mx/mz)
+        myz = np.mean(my/mz)
+        cov = np.cov(np.array([x,y,z]))/x.size
+        if np.sum(x)==0:
+            cov[0,0] = self.s4**2
+        J = np.array([[1/mz,0.0,-mx/mz**2],
+                      [0.0,1/mz,-my/mz**2]])
+        E = J @ cov @ np.transpose(J)
+        sxz = np.sqrt(E[0,0])
+        syz = np.sqrt(E[1,1])
+        pearson = E[0,1]/(sxz*syz)
+        return [mxz,sxz,myz,syz,pearson]
