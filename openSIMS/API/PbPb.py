@@ -7,6 +7,9 @@ from scipy.optimize import minimize
 
 class PbPb:
 
+    def fixable():
+        return {'a': 'fractionation', 'b': 'drift'}
+
     def get_cps(self,name):
         sample = self.samples.loc[name]
         settings = S.settings(self.method)

@@ -68,16 +68,19 @@ class Calibrator:
     def fixable():
         return {'b': 'drift','B': 'slope'}
 
-    def calibrate(self,B=None):
-        if B is None:
-            res = minimize(self.ABmisfit,0.0,method='nelder-mead')
-        else:
+    def calibrate(self,b=None,B=None):
+        if b is None and B is None:
+            res = minimize(self.bABmisfit,0.0,method='nelder-mead')
+            b = res.x[0]
+        elif b is None and B is not None:
             res = minimize(self.Amisfit,0.0,args=(B),method='nelder-mead')
-        b = res.x[0]
+            b = res.x[0]
+        else:
+            pass
         x, y, A, B = self.fit(b=b,B=B)
         self.pars = {'A':A, 'B':B, 'b':b}
    
-    def ABmisfit(self,b):
+    def bABmisfit(self,b):
         x, y, A, B = self.fit(b=b)
         SS = sum((A+B*x-y)**2)
         return SS
