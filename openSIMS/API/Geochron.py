@@ -66,6 +66,9 @@ class Geochron:
 
 class Calibrator:
 
+    def fixable():
+        return {'b': 'drift','B': 'slope'}
+
     def calibrate(self,B=None):
         if B is None:
             res = minimize(self.ABmisfit,0.0,method='nelder-mead')

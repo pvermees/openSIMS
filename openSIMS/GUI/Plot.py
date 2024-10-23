@@ -29,7 +29,8 @@ class PlotWindow(tk.Toplevel):
             label.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
             self.var = tk.StringVar()
             self.combo = ttk.Combobox(self,values=methods,
-                                      textvariable=self.var)
+                                      textvariable=self.var,
+                                      width=10)
             self.combo.bind("<<ComboboxSelected>>",self.on_change)
             self.var.set(self.top.method)
             self.combo.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
@@ -54,7 +55,9 @@ class CalibrationWindow(PlotWindow):
                          figure_type='calibration',
                          action=S.plot_calibration,
                          window_id=top.calibration_window)
-        
+        self.entry = ttk.Entry(self,width=5)
+        self.entry.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
+
 class ProcessWindow(PlotWindow):
 
     def __init__(self,top,button):
