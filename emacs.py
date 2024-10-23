@@ -1,5 +1,4 @@
 import openSIMS as S
-import matplotlib.pyplot as plt
 import tests
 
 t = tests.Test()

@@ -6,7 +6,8 @@ __simplex = Simplex.Simplex()
 __settings = Settings.Settings()
 
 def gui():
-    Main.gui()
+    gui = Main.gui()
+    gui.mainloop()
 
 def set(prop,val):
     setattr(__simplex,prop,val)
