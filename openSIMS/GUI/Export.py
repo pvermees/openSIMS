@@ -1,7 +1,5 @@
 import importlib
-import traceback
 import openSIMS as S
-import numpy as np
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd

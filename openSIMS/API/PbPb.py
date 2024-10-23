@@ -1,8 +1,7 @@
 import numpy as np
-import scipy as sp
 import pandas as pd
 import openSIMS as S
-from . import Toolbox, Ellipse
+from . import Ellipse
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 

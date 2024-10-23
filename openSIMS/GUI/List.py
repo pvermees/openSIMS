@@ -3,7 +3,6 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import os.path
 from . import Main
-from ..API import Settings
 
 class ListWindow(tk.Toplevel):
 

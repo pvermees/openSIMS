@@ -1,9 +1,7 @@
 import io
 import json
-import glob
 import pandas as pd
 import numpy as np
-from pathlib import Path
 from importlib.resources import files
 
 class Settings(dict):

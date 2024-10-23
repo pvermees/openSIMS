@@ -1,4 +1,3 @@
-import openSIMS as S
 from . import Sample
 
 class SHRIMP_Sample(Sample.Sample):
