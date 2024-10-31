@@ -16,6 +16,7 @@ class ExportWindow(tk.Toplevel):
         self.create_combo_box()
         self.create_OK_button()
         self.create_Help_button()
+        self.protocol("WM_DELETE_WINDOW",top.on_export)
 
     def create_combo_box(self):
         label = ttk.Label(self,text='Choose a format:')

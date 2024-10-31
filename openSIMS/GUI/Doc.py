@@ -14,6 +14,7 @@ class HelpWindow(tk.Toplevel):
         label.bind('<Configure>',
                    lambda e: label.config(wraplength=label.winfo_width()))
         label.pack(expand=True,fill=tk.BOTH)
+        self.protocol("WM_DELETE_WINDOW",top.on_help)
 
     def init_help(self):
         self.help = dict()

@@ -19,21 +19,22 @@ class ViewWindow(tk.Toplevel):
         canvas.draw()
   
         previous_button = ttk.Button(self,text='<',
-                                     command=lambda c=canvas,t=top:
-                                     self.view_previous(t,c))
+                                     command=lambda c=canvas:
+                                     self.view_previous(c))
         previous_button.pack(expand=tk.TRUE,side=tk.LEFT)
         next_button = ttk.Button(self,text='>',
-                                 command=lambda c=canvas,t=top:
-                                 self.view_next(t,c))
+                                 command=lambda c=canvas:
+                                 self.view_next(c))
         next_button.pack(expand=tk.TRUE,side=tk.LEFT)
+        self.protocol("WM_DELETE_WINDOW",top.on_view)
 
-    def view_previous(self,top,canvas):
-        self.refresh_canvas(top,canvas,-1)
+    def view_previous(self,canvas):
+        self.refresh_canvas(canvas,-1)
 
-    def view_next(self,top,canvas):
-        self.refresh_canvas(top,canvas,+1)
+    def view_next(self,canvas):
+        self.refresh_canvas(canvas,+1)
 
-    def refresh_canvas(self,top,canvas,di):
+    def refresh_canvas(self,canvas,di):
         ns = len(S.get('samples'))
         i = (S.get('i') + di) % ns
         S.set('i',i)

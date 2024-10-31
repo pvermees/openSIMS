@@ -11,26 +11,22 @@ class OpenWindow(tk.Toplevel):
         self.title('Choose an instrument')
         self.help_window = None
         Main.offset(button,self)
-        self.create_Cameca_button(top)
-        self.create_SHRIMP_button(top)
-        self.create_Help_button(top)
-        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+        self.create_Cameca_button()
+        self.create_SHRIMP_button()
+        self.create_Help_button()
+        self.protocol("WM_DELETE_WINDOW",top.on_open)
 
-    def on_closing(self):
-        setattr(self.top,'open_window',None)
-        self.destroy()
-
-    def create_Cameca_button(self,top):
+    def create_Cameca_button(self):
         button = ttk.Button(self,text='Cameca')
         button.bind("<Button-1>",self.on_Cameca)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_SHRIMP_button(self,top):
+    def create_SHRIMP_button(self):
         button = ttk.Button(self,text='SHRIMP')
         button.bind("<Button-1>",self.on_SHRIMP)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_Help_button(self,top):
+    def create_Help_button(self):
         button = ttk.Button(self,text='Help')
         button.bind("<Button-1>",self.on_Help)
         button.pack(expand=True,fill=tk.BOTH)

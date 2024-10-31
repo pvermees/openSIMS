@@ -18,11 +18,7 @@ class MethodWindow(tk.Toplevel):
                                    command = lambda m=method:
                                    self.set_channels(m))
             check.pack(anchor='w')
-        self.protocol("WM_DELETE_WINDOW",self.on_closing)
-
-    def on_closing(self):
-        setattr(self.top,'method_window',None)
-        self.destroy()
+        self.protocol("WM_DELETE_WINDOW",top.on_method)
 
     def sorted_methods(self):
         methods = np.array([])

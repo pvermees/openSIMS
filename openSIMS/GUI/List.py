@@ -8,8 +8,9 @@ class ListWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
+        self.top = top
         self.title('Select standards')
-        
+
         samples = S.get('samples')
         snames = list(samples.keys())
         refmats = ['sample'] + self.shared_refmats()
@@ -25,7 +26,7 @@ class ListWindow(tk.Toplevel):
                                      command=canvas.yview)
             scrollbar.grid(row=0,column=1,sticky="ns")
             canvas.configure(yscrollcommand=scrollbar.set)
-        
+
         row = 0
         for sname, sample in samples.items():
             label = ttk.Label(canvas,text=sname)
@@ -40,9 +41,10 @@ class ListWindow(tk.Toplevel):
             self.combo_boxes.append(combo)
             row += 1
 
-        button = ttk.Button(self,text='Save',
-                            command=lambda t=top: self.on_click(t))
+        button = ttk.Button(self,text='Save',command=self.on_click)
         button.grid(row=1,column=0)
+
+        self.protocol("WM_DELETE_WINDOW",top.on_standard)
 
     def on_change(self,event):
         i = self.combo_boxes.index(event.widget)
@@ -100,7 +102,7 @@ class ListWindow(tk.Toplevel):
             refmats = refmats & set(S.settings(method)['refmats'].index)
         return list(refmats)
 
-    def on_click(self,top):
+    def on_click(self):
         groups = dict()
         for i, var in enumerate(self.combo_vars):
             group = var.get()
@@ -114,4 +116,4 @@ class ListWindow(tk.Toplevel):
         for group, indices in groups.items():
             blocks.append(group + "=[" + ",".join(map(str,indices)) + "]")
         cmd = "S.standards(" + ",".join(blocks) + ")"
-        top.run(cmd)
+        self.top.run(cmd)
