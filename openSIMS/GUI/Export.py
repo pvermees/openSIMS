@@ -9,7 +9,6 @@ class ExportWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('Export')
         Main.offset(button,self)
         self.help_window = None
@@ -19,7 +18,7 @@ class ExportWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'export_window',None)
+        setattr(self.master,'export_window',None)
         self.destroy()
 
     def create_combo_box(self):
@@ -28,7 +27,7 @@ class ExportWindow(tk.Toplevel):
         self.exporters = S.simplex().exporters()
         self.var = tk.StringVar()
         combo = ttk.Combobox(self,values=self.exporters,textvariable=self.var)
-        self.var.set(self.top.exporter)
+        self.var.set(self.master.exporter)
         combo.pack(side=tk.TOP,fill=tk.X,pady=2)
         
     def create_OK_button(self):
@@ -48,8 +47,8 @@ class ExportWindow(tk.Toplevel):
             S.export_csv(path,fmt=fmt)
         except ValueError as e:
             tk.messagebox.showwarning(message=e)
-        self.top.exporter = fmt
-        self.top.export_window = None
+        self.master.exporter = fmt
+        self.master.export_window = None
         self.destroy()
 
     def on_help(self,event):

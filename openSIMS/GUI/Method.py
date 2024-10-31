@@ -8,7 +8,6 @@ class MethodWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('Choose methods')
         Main.offset(button,self)
         self.variables = self.create_vars()
@@ -21,7 +20,7 @@ class MethodWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'method_window',None)
+        setattr(self.master,'method_window',None)
         self.destroy()
 
     def sorted_methods(self):
@@ -46,15 +45,14 @@ class MethodWindow(tk.Toplevel):
             self.win = ChannelWindow(self,method)
         elif method in S.list_methods():
             cmd = "S.remove_method('{m}')".format(m=method)
-            self.top.run(cmd)
+            self.master.run(cmd)
         else:
             self.win.destroy()
     
 class ChannelWindow(tk.Toplevel):
 
     def __init__(self,parent,m):
-        super().__init__(parent.top)
-        self.top = parent.top
+        super().__init__(parent.master)
         self.title('Pair the ions with the channels')
         Main.offset(parent,self)
         methods = S.get('methods')
@@ -95,5 +93,5 @@ class ChannelWindow(tk.Toplevel):
             val = selections[key].get()
             cmd += "," + key + "='" + val + "'"
         cmd += ")"
-        self.top.run(cmd)
+        self.master.run(cmd)
         self.destroy()

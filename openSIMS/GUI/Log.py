@@ -9,7 +9,6 @@ class LogWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('log')
         Main.offset(button,self)
         
@@ -26,7 +25,7 @@ class LogWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'log_window',None)
+        setattr(self.master,'log_window',None)
         self.destroy()
 
     def show(self,run=False):

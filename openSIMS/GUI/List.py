@@ -8,7 +8,6 @@ class ListWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('Select standards')
 
         samples = S.get('samples')
@@ -47,7 +46,7 @@ class ListWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'standard_window',None)
+        setattr(self.master,'standard_window',None)
         self.destroy()
 
     def on_change(self,event):
@@ -120,4 +119,4 @@ class ListWindow(tk.Toplevel):
         for group, indices in groups.items():
             blocks.append(group + "=[" + ",".join(map(str,indices)) + "]")
         cmd = "S.standards(" + ",".join(blocks) + ")"
-        self.top.run(cmd)
+        self.master.run(cmd)

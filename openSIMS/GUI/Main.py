@@ -31,7 +31,10 @@ class gui(tk.Tk):
         self.create_settings_button()
         self.create_help_button()
         self.exporter = 'default'
-        self.protocol("WM_DELETE_WINDOW",self.destroy)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        self.destroy()
 
     def run(self,cmd):
         S.get('stack').append(cmd)

@@ -7,7 +7,6 @@ class OpenWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('Choose an instrument')
         self.help_window = None
         Main.offset(button,self)
@@ -17,7 +16,7 @@ class OpenWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'open_window',None)
+        setattr(self.master,'open_window',None)
         self.destroy()
 
     def create_Cameca_button(self):
@@ -51,8 +50,8 @@ class OpenWindow(tk.Toplevel):
             self.help_window = None
         
     def read(self,path,instrument):
-        self.top.run("S.set('instrument','{i}')".format(i=instrument))
-        self.top.run("S.set('path','{p}')".format(p=path))
-        self.top.run("S.read()")
-        self.top.open_window = None
+        self.master.run("S.set('instrument','{i}')".format(i=instrument))
+        self.master.run("S.set('path','{p}')".format(p=path))
+        self.master.run("S.read()")
+        self.master.open_window = None
         self.destroy()

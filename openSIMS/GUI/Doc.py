@@ -5,7 +5,6 @@ class HelpWindow(tk.Toplevel):
 
     def __init__(self,top,button,item='top',text=None):
         super().__init__(top)
-        self.top = top
         self.title('Help')
         Main.offset(button,self)
         self.init_help()
@@ -18,7 +17,7 @@ class HelpWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        setattr(self.top,'help_window',None)
+        setattr(self.master,'help_window',None)
         self.destroy()
 
     def init_help(self):
