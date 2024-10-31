@@ -44,7 +44,11 @@ class ListWindow(tk.Toplevel):
         button = ttk.Button(self,text='Save',command=self.on_click)
         button.grid(row=1,column=0)
 
-        self.protocol("WM_DELETE_WINDOW",top.on_standard)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        setattr(self.top,'standard_window',None)
+        self.destroy()
 
     def on_change(self,event):
         i = self.combo_boxes.index(event.widget)

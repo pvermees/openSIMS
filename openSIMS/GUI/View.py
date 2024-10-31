@@ -8,7 +8,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 class ViewWindow(tk.Toplevel):
     
     def __init__(self,top,button):
-        super().__init__()
+        super().__init__(top)
+        self.top = top
         self.title('View')
         Main.offset(button,self)
 
@@ -26,7 +27,11 @@ class ViewWindow(tk.Toplevel):
                                  command=lambda c=canvas:
                                  self.view_next(c))
         next_button.pack(expand=tk.TRUE,side=tk.LEFT)
-        self.protocol("WM_DELETE_WINDOW",top.on_view)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        setattr(self.top,'view_window',None)
+        self.destroy()
 
     def view_previous(self,canvas):
         self.refresh_canvas(canvas,-1)

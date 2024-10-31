@@ -14,7 +14,11 @@ class OpenWindow(tk.Toplevel):
         self.create_Cameca_button()
         self.create_SHRIMP_button()
         self.create_Help_button()
-        self.protocol("WM_DELETE_WINDOW",top.on_open)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        setattr(self.top,'open_window',None)
+        self.destroy()
 
     def create_Cameca_button(self):
         button = ttk.Button(self,text='Cameca')

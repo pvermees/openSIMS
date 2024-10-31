@@ -8,17 +8,21 @@ class MethodWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
+        self.top = top
         self.title('Choose methods')
         Main.offset(button,self)
         self.variables = self.create_vars()
         self.win = None
-        self.top = top
         for method, variable in self.variables.items():
             check = tk.Checkbutton(self,text=method,variable=variable,
                                    command = lambda m=method:
                                    self.set_channels(m))
             check.pack(anchor='w')
-        self.protocol("WM_DELETE_WINDOW",top.on_method)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        setattr(self.top,'method_window',None)
+        self.destroy()
 
     def sorted_methods(self):
         methods = np.array([])
