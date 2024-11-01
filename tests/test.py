@@ -125,7 +125,7 @@ class Test(unittest.TestCase):
 
     def test_calibrate_O(self):
         self.calibrate_O()
-        S.plot_calibration(show=True)
+        S.plot_calibration()
 
     def test_calibrate_O_2_standards(self):
         self.calibrate_O_2_standards()

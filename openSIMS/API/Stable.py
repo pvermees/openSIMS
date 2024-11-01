@@ -62,9 +62,7 @@ class Calibrator:
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        if fig is None or ax is None:
-            fig = Figure()
-            ax = [None]*num_panels
+        fig, ax = init_fig(fig,ax,num_panels,nr,nc)
         lines = dict()
         self.process()
         deltap = self.results.average()
@@ -82,7 +80,6 @@ class Calibrator:
             for i, rname in enumerate(ratio_names):
                 y = deltap.loc[sname,rname]
                 sy = deltap.loc[sname,'s['+rname+']']
-                ax[i] = fig.add_subplot(nr,nc,i+1)
                 ax[i].scatter(sname,y,s=5,color='black',zorder=2)
                 ax[i].plot([sname,sname],[y-sy,y+sy],
                            '-',color=colour,zorder=1)
@@ -107,15 +104,12 @@ class Processor:
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        if fig is None or ax is None:
-            fig = Figure()
-            ax = [None]*num_panels
+        fig, ax = init_fig(fig,ax,num_panels,nr,nc)
         deltap = self.results.average()
         for sname, standard in self.samples.items():
             for i, rname in enumerate(ratio_names):
                 y = deltap.loc[sname,rname]
                 sy = deltap.loc[sname,'s['+rname+']']
-                ax[i] = fig.add_subplot(nr,nc,i+1)
                 ax[i].scatter(sname,y,s=5,color='black',zorder=2)
                 ax[i].plot([sname,sname],[y-sy,y+sy],
                            '-',color='black',zorder=1)
@@ -167,3 +161,11 @@ class Result(pd.DataFrame):
             out.append(np.sqrt(covmat.iloc[i,i])*multiplier)
         rho = cormat.iloc[np.triu_indices(nc,k=1)].values.flatten()
         return np.hstack((out,rho))
+
+def init_fig(fig,ax,num_panels,nr,nc):
+    if fig is None or ax is None:
+        fig = Figure()
+        ax = [None]*num_panels
+        for i in range(num_panels):
+            ax[i] = fig.add_subplot(nr,nc,i+1)
+    return fig, ax

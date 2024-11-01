@@ -23,7 +23,7 @@ class Sample(ABC):
     def cps(self,method,ion):
         pass
 
-    def view(self,channels=None,title=None,show=True):
+    def view(self,channels=None,title=None,show=False):
         if channels is None:
             channels = self.signal.columns
         num_panels = len(channels)
@@ -37,5 +37,5 @@ class Sample(ABC):
             ax[i] = fig.add_subplot(nr,nc,i+1)
             ax[i].scatter(self.time[channel],self.signal[channel])
             ax[i].set_title(channel)
-        if show: Toolbox.show_figure()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
