@@ -29,7 +29,7 @@ class Sample(ABC):
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
         fig = Figure()
-        ax = [None]*nr*nc
+        ax = [None]*num_panels
         if title is not None:
             fig.suptitle(title)
         for i, channel in enumerate(channels):

@@ -11,9 +11,9 @@ class ViewWindow(tk.Toplevel):
         self.title('View')
         Main.offset(button,self)
 
-        self.fig, self.ax = S.view()        
+        fig, self.ax = S.view()        
         
-        self.canvas = FigureCanvasTkAgg(self.fig,master=self)
+        self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
   
