@@ -22,7 +22,11 @@ class LogWindow(tk.Toplevel):
         clear_button = ttk.Button(self,text='Clear',command=self.clear)
         clear_button.pack(expand=True,side=tk.LEFT)
         
-        self.protocol('WM_DELETE_WINDOW',top.on_log)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def on_closing(self):
+        setattr(self.master,'log_window',None)
+        self.destroy()
 
     def show(self,run=False):
         for cmd in S.get('stack'):

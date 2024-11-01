@@ -1,7 +1,6 @@
 import openSIMS as S
 import pandas as pd
 import csv
-import os
 import datetime
 from . import Sample, Toolbox
 

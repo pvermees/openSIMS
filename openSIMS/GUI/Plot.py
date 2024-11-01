@@ -9,10 +9,9 @@ class PlotWindow(tk.Toplevel):
 
     def __init__(self,top,button,title=None,
                  figure_type=None,action=None,window_id=None):
-        super().__init__()
+        super().__init__(top)
         self.title(title)
         top.set_method_if_None()
-        self.top = top
         self.action = action
         self.window_id = window_id
         Main.offset(button,self)
@@ -20,7 +19,7 @@ class PlotWindow(tk.Toplevel):
         fig = plt.figure(top.figures[figure_type])
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        self.canvas.figure, axs = action(self.top.method)
+        self.canvas.figure, axs = action(self.master.method)
         self.canvas.draw()
 
         methods = S.list_methods()
@@ -29,21 +28,22 @@ class PlotWindow(tk.Toplevel):
             label.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
             self.var = tk.StringVar()
             self.combo = ttk.Combobox(self,values=methods,
-                                      textvariable=self.var)
+                                      textvariable=self.var,
+                                      width=10)
             self.combo.bind("<<ComboboxSelected>>",self.on_change)
-            self.var.set(self.top.method)
+            self.var.set(self.master.method)
             self.combo.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
 
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        self.window_id = None
+        setattr(self.master,self.window_id,None)
         self.destroy()
         
     def on_change(self,event):
-        self.top.method = self.combo.get()
+        self.master.method = self.combo.get()
         self.canvas.figure.clf()
-        self.canvas.figure, axs = self.action(self.top.method)
+        self.canvas.figure, axs = self.action(self.master.method)
         self.canvas.draw()
 
 class CalibrationWindow(PlotWindow):
@@ -53,8 +53,10 @@ class CalibrationWindow(PlotWindow):
                          title='Calibration',
                          figure_type='calibration',
                          action=S.plot_calibration,
-                         window_id=top.calibration_window)
-        
+                         window_id='calibration_window')
+        self.entry = ttk.Entry(self,width=5)
+        self.entry.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
+
 class ProcessWindow(PlotWindow):
 
     def __init__(self,top,button):
@@ -63,4 +65,4 @@ class ProcessWindow(PlotWindow):
                          title='Samples',
                          figure_type='process',
                          action=S.plot_processed,
-                         window_id=top.process_window)
+                         window_id='process_window')

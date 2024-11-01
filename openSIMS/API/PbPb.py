@@ -1,12 +1,14 @@
 import numpy as np
-import scipy as sp
 import pandas as pd
 import openSIMS as S
-from . import Toolbox, Ellipse
+from . import Ellipse
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
 class PbPb:
+
+    def fixable():
+        return {'a': 'fractionation', 'b': 'drift'}
 
     def get_cps(self,name):
         sample = self.samples.loc[name]
@@ -47,7 +49,7 @@ class PbPb:
 
 class Calibrator:
 
-    def calibrate(self):
+    def calibrate(self,**kwargs):
         res = minimize(self.misfit,[0.0,0.0],method='nelder-mead')
         a = res.x[0]
         b = res.x[1]

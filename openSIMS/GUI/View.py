@@ -3,41 +3,42 @@ import tkinter as tk
 import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
 from . import Main
-from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class ViewWindow(tk.Toplevel):
     
     def __init__(self,top,button):
-        super().__init__()
+        super().__init__(top)
         self.title('View')
         Main.offset(button,self)
 
-        fig = plt.figure(top.figures['view'])
-        canvas = FigureCanvasTkAgg(fig,master=self)
-        canvas.figure, axs = S.view()
-        canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        canvas.draw()
+        self.fig = plt.figure(top.figures['view'])
+        self.canvas = FigureCanvasTkAgg(self.fig,master=self)
+        self.canvas.figure, axs = S.view()
+        self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
+        self.canvas.draw()
   
-        previous_button = ttk.Button(self,text='<',
-                                     command=lambda c=canvas,t=top:
-                                     self.view_previous(t,c))
+        previous_button = ttk.Button(self,text='<',command=self.view_previous)
         previous_button.pack(expand=tk.TRUE,side=tk.LEFT)
-        next_button = ttk.Button(self,text='>',
-                                 command=lambda c=canvas,t=top:
-                                 self.view_next(t,c))
+        next_button = ttk.Button(self,text='>',command=self.view_next)
         next_button.pack(expand=tk.TRUE,side=tk.LEFT)
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
-    def view_previous(self,top,canvas):
-        self.refresh_canvas(top,canvas,-1)
+    def on_closing(self):
+        plt.close(self.fig)
+        setattr(self.master,'view_window',None)
+        self.destroy()
 
-    def view_next(self,top,canvas):
-        self.refresh_canvas(top,canvas,+1)
+    def view_previous(self):
+        self.refresh_canvas(-1)
 
-    def refresh_canvas(self,top,canvas,di):
+    def view_next(self):
+        self.refresh_canvas(+1)
+
+    def refresh_canvas(self,di):
         ns = len(S.get('samples'))
         i = (S.get('i') + di) % ns
         S.set('i',i)
-        canvas.figure.clf()
-        canvas.figure, axs = S.view()
-        canvas.draw()
+        self.canvas.figure.clf()
+        self.canvas.figure, axs = S.view()
+        self.canvas.draw()

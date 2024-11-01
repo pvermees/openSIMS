@@ -1,13 +1,10 @@
 import os
 import glob
-import math
 import pkgutil
 import importlib
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from . import Cameca, Calibration, Process
-from .. import Methods
 from pathlib import Path
 
 class Simplex:
@@ -55,10 +52,10 @@ class Simplex:
     def hasMethods(self,methods):
         return set(methods).issubset(set(self.methods.keys()))
 
-    def calibrate(self):
+    def calibrate(self,**kwargs):
         for method, channels in self.methods.items():
             standards = Calibration.get_standards(self,method)
-            standards.calibrate()
+            standards.calibrate(**kwargs)
             self.pars[method] = standards.pars
 
     def process(self):

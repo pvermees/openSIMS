@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 class Stable:
 
+    def fixable():
+        return None
+
     def get_cps(self,name):
         sample = self.samples.loc[name]
         settings = S.settings(self.method)
@@ -36,7 +39,7 @@ class Stable:
 
 class Calibrator:
 
-    def calibrate(self):
+    def calibrate(self,**kwargs):
         df_list = []
         for name, standard in self.samples.items():
             logratios = self.raw_logratios(name)

@@ -6,7 +6,8 @@ __simplex = Simplex.Simplex()
 __settings = Settings.Settings()
 
 def gui():
-    Main.gui()
+    gui = Main.gui()
+    gui.mainloop()
 
 def set(prop,val):
     setattr(__simplex,prop,val)
@@ -32,8 +33,8 @@ def reset():
 def read():
     __simplex.read()
 
-def calibrate():
-    __simplex.calibrate()
+def calibrate(**kwargs):
+    __simplex.calibrate(**kwargs)
 
 def process():
     __simplex.process()

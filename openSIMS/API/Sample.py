@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import math
-import openSIMS as S
 from abc import ABC, abstractmethod
 
 class Sample(ABC):

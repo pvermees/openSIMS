@@ -1,4 +1,3 @@
-import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
 import tkinter.filedialog as fd
@@ -8,25 +7,29 @@ class OpenWindow(tk.Toplevel):
 
     def __init__(self,top,button):
         super().__init__(top)
-        self.top = top
         self.title('Choose an instrument')
         self.help_window = None
         Main.offset(button,self)
-        self.create_Cameca_button(top)
-        self.create_SHRIMP_button(top)
-        self.create_Help_button(top)
+        self.create_Cameca_button()
+        self.create_SHRIMP_button()
+        self.create_Help_button()
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
-    def create_Cameca_button(self,top):
+    def on_closing(self):
+        setattr(self.master,'open_window',None)
+        self.destroy()
+
+    def create_Cameca_button(self):
         button = ttk.Button(self,text='Cameca')
         button.bind("<Button-1>",self.on_Cameca)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_SHRIMP_button(self,top):
+    def create_SHRIMP_button(self):
         button = ttk.Button(self,text='SHRIMP')
         button.bind("<Button-1>",self.on_SHRIMP)
         button.pack(expand=True,fill=tk.BOTH)
 
-    def create_Help_button(self,top):
+    def create_Help_button(self):
         button = ttk.Button(self,text='Help')
         button.bind("<Button-1>",self.on_Help)
         button.pack(expand=True,fill=tk.BOTH)
@@ -47,8 +50,8 @@ class OpenWindow(tk.Toplevel):
             self.help_window = None
         
     def read(self,path,instrument):
-        self.top.run("S.set('instrument','{i}')".format(i=instrument))
-        self.top.run("S.set('path','{p}')".format(p=path))
-        self.top.run("S.read()")
-        self.top.open_window = None
+        self.master.run("S.set('instrument','{i}')".format(i=instrument))
+        self.master.run("S.set('path','{p}')".format(p=path))
+        self.master.run("S.read()")
+        self.master.open_window = None
         self.destroy()

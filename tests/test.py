@@ -174,6 +174,10 @@ class Test(unittest.TestCase):
         S.process()
         S.plot_calibration('U-Pb')
         S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
+
+    def test_fix_B(self):
+        self.loadMonaziteData()
+        S.calibrate(B=1.0)
         
 if __name__ == '__main__':
     unittest.main()
