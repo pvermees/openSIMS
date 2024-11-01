@@ -121,7 +121,7 @@ class Calibrator:
         y0 = settings.get_y0(standard.group)
         return self.get_xy(name,b=b,y0=y0)
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         settings = S.settings(self.method)
         p = self.pars
         if fig is None or ax is None:
@@ -154,11 +154,12 @@ class Calibrator:
                 ymin = p['A'] + val['offset'] + p['B'] * xmin
                 ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:
     
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         p = self.pars
         if fig is None or ax is None:
             fig = Figure()
@@ -173,6 +174,7 @@ class Processor:
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Results(dict):

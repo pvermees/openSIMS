@@ -8,7 +8,6 @@ class gui(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title('openSIMS')
-        self.figures = {'view':100,'calibration':101,'process':102}
         self.method = None
         self.open_window = None
         self.method_window = None

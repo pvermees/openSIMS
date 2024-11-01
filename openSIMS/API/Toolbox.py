@@ -24,3 +24,12 @@ def linearfit(x,y,B=None):
     slope = res[0][0]
     intercept = res[1][0]
     return intercept, slope
+
+def show_figure(fig):
+    import tkinter as tk
+    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+    root = tk.Tk()
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().pack()
+    root.mainloop()

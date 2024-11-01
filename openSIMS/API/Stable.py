@@ -2,6 +2,7 @@ import math
 import pandas as pd
 import numpy as np
 import openSIMS as S
+from . import Toolbox
 from matplotlib.figure import Figure
 
 class Stable:
@@ -56,7 +57,7 @@ class Calibrator:
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(1+delta/1000)*multiplier
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
@@ -96,11 +97,12 @@ class Calibrator:
                                  color=val['colour'],
                                  zorder=0)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
@@ -121,6 +123,7 @@ class Processor:
             title = r"$\delta$'" + "(" + rname + ")"
             ax[i].set_title(title)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax    
     
 class Results(dict):
