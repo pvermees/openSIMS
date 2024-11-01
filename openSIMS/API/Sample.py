@@ -1,6 +1,6 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 import math
+from matplotlib.figure import Figure
 from abc import ABC, abstractmethod
 
 class Sample(ABC):
@@ -28,14 +28,12 @@ class Sample(ABC):
         num_panels = len(channels)
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        fig, ax = plt.subplots(nr,nc)
+        fig = Figure()
+        ax = [None]*nr*nc
         if title is not None:
-            plt.suptitle(title)
+            fig.suptitle(title)
         for i, channel in enumerate(channels):
-            ax.ravel()[i].scatter(self.time[channel],self.signal[channel])
-            ax.ravel()[i].set_title(channel)
-        for empty_axis in range(len(channels),nr*nc):
-            fig.delaxes(ax.flatten()[empty_axis])
-        plt.subplots_adjust(left=0.1,top=0.9,right=0.9,bottom=0.1,
-                            hspace=0.5,wspace=0.5)
+            ax[i] = fig.add_subplot(nr,nc,i+1)
+            ax[i].scatter(self.time[channel],self.signal[channel])
+            ax[i].set_title(channel)
         return fig, ax

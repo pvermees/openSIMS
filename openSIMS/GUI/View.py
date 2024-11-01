@@ -1,7 +1,6 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-import matplotlib.pyplot as plt
 from . import Main
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -12,9 +11,9 @@ class ViewWindow(tk.Toplevel):
         self.title('View')
         Main.offset(button,self)
 
-        self.fig = plt.figure(top.figures['view'])
+        self.fig, self.ax = S.view()        
+        
         self.canvas = FigureCanvasTkAgg(self.fig,master=self)
-        self.canvas.figure, axs = S.view()
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
   
@@ -25,7 +24,6 @@ class ViewWindow(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
     def on_closing(self):
-        plt.close(self.fig)
         setattr(self.master,'view_window',None)
         self.destroy()
 
