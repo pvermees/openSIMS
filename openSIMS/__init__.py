@@ -33,8 +33,17 @@ def reset():
 def read():
     __simplex.read()
 
-def calibrate(fixed={}):
-    __simplex.calibrate(fixed=fixed)
+def fix_pars(method,**kwargs):
+    __simplex.fixed[method] = kwargs
+
+def unfix_pars(method=None):
+    if method is None:
+        __simplex.fixed = {}
+    else:
+        __simplex.fixed.pop(method,None)
+
+def calibrate():
+    __simplex.calibrate()
 
 def process():
     __simplex.process()

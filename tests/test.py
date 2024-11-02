@@ -177,12 +177,13 @@ class Test(unittest.TestCase):
 
     def test_fix_bB(self):
         self.loadMonaziteData()
-        S.calibrate(fixed={'U-Pb': {'B':1.0,'b':0.0},
-                           'Th-Pb': {'B':1.0}
-                           })
+        S.fix_pars('U-Pb',B=1.0,b=0.0)
+        S.fix_pars('Th-Pb',B=1.0)
+        S.calibrate()
+        S.unfix_pars('U-Pb')
 
     def test_gui(self):
-        S.gui()
+        #S.gui()
         pass
         
 if __name__ == '__main__':

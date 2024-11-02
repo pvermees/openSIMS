@@ -54,8 +54,7 @@ class Simplex:
     def hasMethods(self,methods):
         return set(methods).issubset(set(self.methods.keys()))
 
-    def calibrate(self,fixed={}):
-        self.fixed = fixed
+    def calibrate(self):
         for method, channels in self.methods.items():
             standards = Calibration.get_standards(self,method)
             standards.calibrate()
