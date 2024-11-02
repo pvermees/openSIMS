@@ -181,6 +181,13 @@ class Test(unittest.TestCase):
         S.fix_pars('Th-Pb',B=1.0)
         S.calibrate()
         S.unfix_pars('U-Pb')
+        S.unfix_pars()
+
+    def test_fix_ab(self):
+        self.loadCamecaData()
+        S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        S.fix_pars('Pb-Pb',a=0.0)
+        S.calibrate()
 
     def test_gui(self):
         S.gui()

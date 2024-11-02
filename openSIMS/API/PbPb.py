@@ -49,14 +49,25 @@ class PbPb:
 
 class Calibrator:
 
-    def calibrate(self,**kwargs):
-        res = minimize(self.misfit,[0.0,0.0],method='nelder-mead')
-        a = res.x[0]
-        b = res.x[1]
+    def calibrate(self):
+        if 'a' in self.fixed and 'b' not in self.fixed:
+            a = self.fixed['a']
+            res = minimize(self.misfit_b,0.0,args=(a),method='nelder-mead')
+            b = res.x[0]
+        elif 'b' in self.fixed and 'a' not in self.fixed:
+            b = self.fixed['b']
+            res = minimize(self.misfit_a,0.0,args=(b),method='nelder-mead')
+            a = res.x[0]
+        elif 'a' in self.fixed and 'b' in self.fixed:
+            a = self.fixed['a']
+            b = self.fixed['b']
+        else:
+            res = minimize(self.misfit_ab,[0.0,0.0],method='nelder-mead')
+            a = res.x[0]
+            b = res.x[1]
         self.pars = {'a':a,'b':b}
-        
-    def misfit(self,ab=[0.0,0.0]):
-        a, b = ab
+
+    def misfit(self,a=0.0,b=0.0):
         SS = 0.0
         for name in self.samples.keys():
             standard = self.samples.loc[name]
@@ -65,6 +76,15 @@ class Calibrator:
             B = settings.get_Pb74_0(standard.group)
             SS += self.get_SS(name,A,B,a=a,b=b)
         return SS
+
+    def misfit_ab(self,ab=[0.0,0.0]):
+        return self.misfit(a=ab[0],b=ab[1])
+
+    def misfit_a(self,a,b=0.0):
+        return self.misfit(a=a[0],b=b)
+
+    def misfit_b(self,b,a=0.0):
+        return self.misfit(a=a,b=b[0])
 
     def get_SS(self,name,A,B,a=0.0,b=0.0):
         Pb7, Pb6, Pb4 = self.get_cps(name)
