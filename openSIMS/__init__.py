@@ -42,8 +42,8 @@ def unfix_pars(method=None):
     else:
         __simplex.fixed.pop(method,None)
 
-def calibrate():
-    __simplex.calibrate()
+def calibrate(method=None):
+    __simplex.calibrate(method=method)
 
 def process():
     __simplex.process()

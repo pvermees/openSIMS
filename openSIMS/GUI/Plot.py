@@ -114,7 +114,7 @@ class CalibrationWindow(PlotWindow):
             else:
                 fixed[fixable[par]] = float(val)
         S.fix_pars(self.current_method,**fixed)
-        S.calibrate()
+        S.calibrate(self.current_method)
         self.on_change_helper()
 
 class ProcessWindow(PlotWindow):

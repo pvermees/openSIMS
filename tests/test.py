@@ -186,8 +186,9 @@ class Test(unittest.TestCase):
     def test_fix_ab(self):
         self.loadCamecaData()
         S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
-        S.fix_pars('Pb-Pb',a=0.0)
         S.calibrate()
+        S.fix_pars('Pb-Pb',a=0.0)
+        S.calibrate(method='Pb-Pb')
 
     def test_gui(self):
         S.gui()
