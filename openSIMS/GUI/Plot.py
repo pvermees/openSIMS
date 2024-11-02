@@ -57,9 +57,11 @@ class CalibrationWindow(PlotWindow):
                          figure_type='calibration',
                          action=S.plot_calibration,
                          window_id='calibration_window')
-        self.add_entries()
+        methods = S.list_methods()
+        if len(methods)>1:
+            self.add_entries()
 
-    def add_entries(self):        
+    def add_entries(self):
         current_method = self.combo.get()
         fixable = self.get_fixable(current_method)
         self.labels = dict()
@@ -68,11 +70,19 @@ class CalibrationWindow(PlotWindow):
             self.labels[key] = ttk.Label(self,text=key+':')
             self.labels[key].pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
             self.entries[key] = ttk.Entry(self,width=5)
-            self.entries[key].insert(0,"auto")
+            self.entries[key].insert(0,self.get_fixed_entry(key))
             self.entries[key].pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
         self.button = ttk.Button(self,text='Recalibrate')
         self.button.bind("<Button-1>", self.recalibrate)
         self.button.pack(expand=True,fill=tk.BOTH)
+
+    def get_fixed_entry(self,par):
+        current_method = self.combo.get()
+        fixed = S.get('fixed')
+        if par in fixed[current_method].keys():
+            return fixed[current_method][par]
+        else:
+            return 'auto'
 
     def refresh_entries(self):
         for key in self.entries:

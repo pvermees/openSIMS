@@ -67,12 +67,15 @@ class Calibrator:
 
     def calibrate(self,b=None,B=None):
         if b is None and B is None:
+            self.fixed = {}
             res = minimize(self.bABmisfit,0.0,method='nelder-mead')
             b = res.x[0]
         elif b is None and B is not None:
+            self.fixed = {'B':B}
             res = minimize(self.Amisfit,0.0,args=(B),method='nelder-mead')
             b = res.x[0]
         else:
+            self.fixed = {'b':b,'B':B}
             pass
         x, y, A, B = self.fit(b=b,B=B)
         self.pars = {'A':A, 'B':B, 'b':b}
