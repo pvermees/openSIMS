@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import openSIMS as S
 from . import Toolbox, Ellipse
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from scipy.optimize import minimize
 
 class Geochron:
@@ -121,11 +121,12 @@ class Calibrator:
         y0 = settings.get_y0(standard.group)
         return self.get_xy(name,b=b,y0=y0)
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         settings = S.settings(self.method)
         p = self.pars
         if fig is None or ax is None:
-            fig, ax = plt.subplots()
+            fig = Figure()
+            ax = fig.add_subplot()
         lines = dict()
         np.random.seed(1)
         for name, sample in self.samples.items():
@@ -153,14 +154,16 @@ class Calibrator:
                 ymin = p['A'] + val['offset'] + p['B'] * xmin
                 ax.axline((xmin,ymin),slope=p['B'],color=val['colour'])
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:
     
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         p = self.pars
         if fig is None or ax is None:
-            fig, ax = plt.subplots()
+            fig = Figure()
+            ax = fig.add_subplot()
         results = self.results.average()
         for sname, sample in self.samples.items():
             x, y = self.get_xy(sname,p['b'])
@@ -171,8 +174,9 @@ class Processor:
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
-    
+
 class Results(dict):
 
     def __init__(self,method):

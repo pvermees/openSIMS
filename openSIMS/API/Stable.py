@@ -2,7 +2,8 @@ import math
 import pandas as pd
 import numpy as np
 import openSIMS as S
-import matplotlib.pyplot as plt
+from . import Toolbox
+from matplotlib.figure import Figure
 
 class Stable:
 
@@ -56,13 +57,12 @@ class Calibrator:
         delta = settings['refmats'][ratios].loc[standard.group]
         return np.log(1+delta/1000)*multiplier
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(nrows=nr,ncols=nc)
+        fig, ax = init_fig(fig,ax,num_panels,nr,nc)
         lines = dict()
         self.process()
         deltap = self.results.average()
@@ -80,47 +80,44 @@ class Calibrator:
             for i, rname in enumerate(ratio_names):
                 y = deltap.loc[sname,rname]
                 sy = deltap.loc[sname,'s['+rname+']']
-                ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
-                ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
-                                   '-',color=colour,zorder=1)
+                ax[i].scatter(sname,y,s=5,color='black',zorder=2)
+                ax[i].plot([sname,sname],[y-sy,y+sy],
+                           '-',color=colour,zorder=1)
         for i, rname in enumerate(ratio_names):
             title = r"$\delta$'" + "(" + rname + ")"
-            ax.ravel()[i].set_title(title)
+            ax[i].set_title(title)
         for group, val in lines.items():
             if group != 'sample':
                 for i, rname in enumerate(ratio_names):
-                    ax.ravel()[i].axline((0.0,val['truth'][rname]),
-                                         slope=0.0,
-                                         color=val['colour'],
-                                         zorder=0)
-        for empty_axis in range(len(ratio_names),nr*nc):
-            fig.delaxes(ax.flatten()[empty_axis])
+                    ax[i].axline((0.0,val['truth'][rname]),
+                                 slope=0.0,
+                                 color=val['colour'],
+                                 zorder=0)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         num_panels = len(self.pars)
         ratio_names = self.pars.index.to_list()
         nr = math.ceil(math.sqrt(num_panels))
         nc = math.ceil(num_panels/nr)
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(nrows=nr,ncols=nc)
+        fig, ax = init_fig(fig,ax,num_panels,nr,nc)
         deltap = self.results.average()
         for sname, standard in self.samples.items():
             for i, rname in enumerate(ratio_names):
                 y = deltap.loc[sname,rname]
                 sy = deltap.loc[sname,'s['+rname+']']
-                ax.ravel()[i].scatter(sname,y,s=5,color='black',zorder=2)
-                ax.ravel()[i].plot([sname,sname],[y-sy,y+sy],
-                                   '-',color='black',zorder=1)
+                ax[i].scatter(sname,y,s=5,color='black',zorder=2)
+                ax[i].plot([sname,sname],[y-sy,y+sy],
+                           '-',color='black',zorder=1)
         for i, rname in enumerate(ratio_names):
             title = r"$\delta$'" + "(" + rname + ")"
-            ax.ravel()[i].set_title(title)
-        for empty_axis in range(len(ratio_names),nr*nc):
-            fig.delaxes(ax.flatten()[empty_axis])
+            ax[i].set_title(title)
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax    
     
 class Results(dict):
@@ -164,3 +161,11 @@ class Result(pd.DataFrame):
             out.append(np.sqrt(covmat.iloc[i,i])*multiplier)
         rho = cormat.iloc[np.triu_indices(nc,k=1)].values.flatten()
         return np.hstack((out,rho))
+
+def init_fig(fig,ax,num_panels,nr,nc):
+    if fig is None or ax is None:
+        fig = Figure()
+        ax = [None]*num_panels
+        for i in range(num_panels):
+            ax[i] = fig.add_subplot(nr,nc,i+1)
+    return fig, ax

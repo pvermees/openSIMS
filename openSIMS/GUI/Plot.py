@@ -1,7 +1,7 @@
 import openSIMS as S
 import tkinter as tk
 import tkinter.ttk as ttk
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from . import Main
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -16,10 +16,10 @@ class PlotWindow(tk.Toplevel):
         self.window_id = window_id
         Main.offset(button,self)
 
-        fig = plt.figure(top.figures[figure_type])
+        fig, axs = action(self.master.method)
+        
         self.canvas = FigureCanvasTkAgg(fig,master=self)
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
-        self.canvas.figure, axs = action(self.master.method)
         self.canvas.draw()
 
         methods = S.list_methods()

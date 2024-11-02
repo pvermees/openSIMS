@@ -39,16 +39,16 @@ def calibrate(**kwargs):
 def process():
     __simplex.process()
 
-def view(i=None,sname=None):
+def view(i=None,sname=None,show=False):
     if i is None and sname is None:
         i = __simplex.i
-    return __simplex.view(i=i,sname=sname)
+    return __simplex.view(i=i,sname=sname,show=show)
 
-def plot_calibration(method=None):
-    return __simplex.plot_calibration(method=method)
+def plot_calibration(method=None,show=False):
+    return __simplex.plot_calibration(method=method,show=show)
 
-def plot_processed(method=None):
-    return __simplex.plot_processed(method=method)
+def plot_processed(method=None,show=False):
+    return __simplex.plot_processed(method=method,show=show)
 
 def export_csv(path,fmt='default'):
     __simplex.export_csv(path,fmt=fmt)

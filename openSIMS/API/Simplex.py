@@ -75,7 +75,7 @@ class Simplex:
             dates = np.append(dates,sample.date)
         return dates
 
-    def view(self,i=None,sname=None):
+    def view(self,i=None,sname=None,show=True):
         snames = self.samples.index
         if sname in snames:
             self.i = snames.index(sname)
@@ -83,13 +83,13 @@ class Simplex:
             if i is not None:
                 self.i = i % len(snames)
             sname = snames[self.i]
-        return self.samples[sname].view(title=sname)
+        return self.samples[sname].view(title=sname,show=show)
 
-    def plot_calibration(self,method=None):
+    def plot_calibration(self,method=None,show=True):
         toplot = Calibration.get_standards(self,method)
-        return toplot.plot()
+        return toplot.plot(show=show)
 
-    def plot_processed(self,method=None):
+    def plot_processed(self,method=None,show=True):
         toplot = Process.get_samples(self,method)
         return toplot.plot()
 
