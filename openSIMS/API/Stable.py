@@ -7,9 +7,6 @@ from matplotlib.figure import Figure
 
 class Stable:
 
-    def fixable():
-        return None
-
     def get_cps(self,name):
         sample = self.samples.loc[name]
         settings = S.settings(self.method)

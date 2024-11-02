@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from . import Ellipse
+from . import Toolbox, Ellipse
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
@@ -89,7 +89,7 @@ class Calibrator:
             (t6*np.exp(b*tt6+a)-m6)**2 + (A*t6+B*t4-m7)**2
         return sum(SS)
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
@@ -121,6 +121,7 @@ class Calibrator:
                 ymin = lines[group]['A'] + lines[group]['B'] * xmin
                 ax.axline((xmin,ymin),slope=lines[group]['B'],color=val['colour'])
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:

@@ -16,7 +16,7 @@ class Geochron:
         D = sample.cps(self.method,ions[2])
         d = sample.cps(self.method,ions[3])
         return P, POx, D, d
-    
+
     def get_labels(self):
         P, POx, D, d  = S.settings(self.method)['ions']
         channels = S.get('methods')[self.method]
@@ -65,9 +65,6 @@ class Geochron:
 
 class Calibrator:
 
-    def fixable():
-        return {'b': 'drift','B': 'slope'}
-
     def calibrate(self,b=None,B=None):
         if b is None and B is None:
             res = minimize(self.bABmisfit,0.0,method='nelder-mead')
@@ -79,7 +76,7 @@ class Calibrator:
             pass
         x, y, A, B = self.fit(b=b,B=B)
         self.pars = {'A':A, 'B':B, 'b':b}
-   
+
     def bABmisfit(self,b):
         x, y, A, B = self.fit(b=b)
         SS = sum((A+B*x-y)**2)
