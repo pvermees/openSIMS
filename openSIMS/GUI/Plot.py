@@ -96,7 +96,7 @@ class CalibrationWindow(PlotWindow):
         if method['type'] == 'geochron':
             return {'slope': 'B', 'drift': 'b'}
         elif method['type'] == 'geochron_PbPb':
-            return {'mass fractionation': 'a', 'drift': 'b'}
+            return {'massfrac': 'a', 'drift': 'b'}
         elif method['type'] == 'stable':
             return None
 
@@ -106,15 +106,21 @@ class CalibrationWindow(PlotWindow):
 
     def recalibrate(self,event):
         fixable = self.get_fixable(self.current_method)
-        fixed = {}
+        args = []
         for par, entry in self.entries.items():
             val = entry.get()
             if val == 'auto':
                 pass
             else:
-                fixed[fixable[par]] = float(val)
-        S.fix_pars(self.current_method,**fixed)
-        S.calibrate(self.current_method)
+                args.append(fixable[par] + '=' + val)
+        if len(args)>0:
+            fixcmd = "S.fix_pars('" + self.current_method + "'," + ','.join(args) + ")"
+            calcmd = "S.calibrate('" + self.current_method + "')"
+        else:
+            fixcmd = "S.unfix_pars('" + self.current_method + "')"
+            calcmd = "S.calibrate()"
+        self.master.run(fixcmd)
+        self.master.run(calcmd)
         self.on_change_helper()
 
 class ProcessWindow(PlotWindow):
