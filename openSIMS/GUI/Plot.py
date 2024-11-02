@@ -79,7 +79,7 @@ class CalibrationWindow(PlotWindow):
     def get_fixed_entry(self,par):
         current_method = self.combo.get()
         fixed = S.get('fixed')
-        if par in fixed[current_method].keys():
+        if current_method in fixed and par in fixed[current_method]:
             return fixed[current_method][par]
         else:
             return 'auto'
