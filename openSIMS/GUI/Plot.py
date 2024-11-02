@@ -62,8 +62,8 @@ class CalibrationWindow(PlotWindow):
             self.add_entries()
 
     def add_entries(self):
-        current_method = self.combo.get()
-        fixable = self.get_fixable(current_method)
+        self.current_method = self.combo.get()
+        fixable = self.get_fixable(self.current_method)
         self.labels = dict()
         self.entries = dict()
         for key in fixable:
@@ -73,14 +73,14 @@ class CalibrationWindow(PlotWindow):
             self.entries[key].insert(0,self.get_fixed_entry(key))
             self.entries[key].pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
         self.button = ttk.Button(self,text='Recalibrate')
-        self.button.bind("<Button-1>", self.recalibrate)
+        self.button.bind("<Button-1>",self.recalibrate)
         self.button.pack(expand=True,fill=tk.BOTH)
 
     def get_fixed_entry(self,par):
-        current_method = self.combo.get()
+        self.current_method = self.combo.get()
         fixed = S.get('fixed')
-        if current_method in fixed and par in fixed[current_method]:
-            return fixed[current_method][par]
+        if self.current_method in fixed and par in fixed[self.current_method]:
+            return fixed[self.current_method][par]
         else:
             return 'auto'
 
@@ -105,7 +105,17 @@ class CalibrationWindow(PlotWindow):
         self.refresh_entries()
 
     def recalibrate(self,event):
-        pass
+        fixable = self.get_fixable(self.current_method)
+        fixed = {}
+        for par, entry in self.entries.items():
+            val = entry.get()
+            if val == 'auto':
+                pass
+            else:
+                fixed[fixable[par]] = float(val)
+        S.fix_pars(self.current_method,**fixed)
+        S.calibrate()
+        self.on_change_helper()
 
 class ProcessWindow(PlotWindow):
 

@@ -183,7 +183,7 @@ class Test(unittest.TestCase):
         S.unfix_pars('U-Pb')
 
     def test_gui(self):
-        #S.gui()
+        S.gui()
         pass
         
 if __name__ == '__main__':
