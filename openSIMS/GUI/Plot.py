@@ -22,6 +22,11 @@ class PlotWindow(tk.Toplevel):
         self.canvas.get_tk_widget().pack(expand=tk.TRUE,fill=tk.BOTH)
         self.canvas.draw()
 
+        self.add_combo()
+
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
+
+    def add_combo(self):
         methods = S.list_methods()
         if len(methods)>1:
             label = ttk.Label(self,text='Methods:')
@@ -34,17 +39,15 @@ class PlotWindow(tk.Toplevel):
             self.var.set(self.master.method)
             self.combo.pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
 
-        self.protocol("WM_DELETE_WINDOW",self.on_closing)
-
-    def on_closing(self):
-        setattr(self.master,self.window_id,None)
-        self.destroy()
-        
-    def on_change(self,event):
+    def on_change_helper(self):
         self.master.method = self.combo.get()
         self.canvas.figure.clf()
         self.canvas.figure, axs = self.action(self.master.method)
         self.canvas.draw()
+
+    def on_closing(self):
+        setattr(self.master,self.window_id,None)
+        self.destroy()
 
 class CalibrationWindow(PlotWindow):
 
@@ -54,20 +57,29 @@ class CalibrationWindow(PlotWindow):
                          figure_type='calibration',
                          action=S.plot_calibration,
                          window_id='calibration_window')
-        
+        self.add_entries()
+
+    def add_entries(self):        
         current_method = self.combo.get()
         fixable = self.get_fixable(current_method)
-        self.entries = dict()
         self.labels = dict()
+        self.entries = dict()
         for key in fixable:
             self.labels[key] = ttk.Label(self,text=key+':')
             self.labels[key].pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
             self.entries[key] = ttk.Entry(self,width=5)
             self.entries[key].insert(0,"auto")
             self.entries[key].pack(expand=tk.TRUE,side=tk.LEFT,pady=2)
-        button = ttk.Button(self,text='Recalibrate')
-        button.bind("<Button-1>", self.recalibrate)
-        button.pack(expand=True,fill=tk.BOTH)
+        self.button = ttk.Button(self,text='Recalibrate')
+        self.button.bind("<Button-1>", self.recalibrate)
+        self.button.pack(expand=True,fill=tk.BOTH)
+
+    def refresh_entries(self):
+        for key in self.entries:
+            self.labels[key].pack_forget()
+            self.entries[key].pack_forget()
+        self.button.pack_forget()
+        self.add_entries()
 
     def get_fixable(self,method_name):
         method = S.settings()[method_name]
@@ -77,6 +89,10 @@ class CalibrationWindow(PlotWindow):
             return {'mass fractionation': 'a', 'drift': 'b'}
         elif method['type'] == 'stable':
             return None
+
+    def on_change(self,event):
+        self.on_change_helper()
+        self.refresh_entries()
 
     def recalibrate(self,event):
         pass
@@ -90,3 +106,6 @@ class ProcessWindow(PlotWindow):
                          figure_type='process',
                          action=S.plot_processed,
                          window_id='process_window')
+
+    def on_change(self,event):
+        self.on_change_helper()
