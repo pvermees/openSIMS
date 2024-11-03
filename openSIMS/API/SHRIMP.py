@@ -20,14 +20,27 @@ class SHRIMP_run(pd.Series):
 
     def read_op(self,f):
         while True:
-            line = f.readline().strip()
+            line = f.readline()
             if not line:
                 break
             else:
                 sname = line
                 self[sname] = SHRIMP_sample()
                 self[sname].read_op(f)
-    
+
+    def read_pd(self,f):
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            elif '***' in line:
+                header = [f.readline().strip() for _ in range(4)]
+                namedate = header[0].split(', ')
+                sname = namedate[0]
+                self[sname] = SHRIMP_sample()
+                self[sname].date = ' '.join(namedate[1:3])
+                self[sname].read_pd(f,header)
+
 class SHRIMP_sample(Sample.Sample):
         
     def __init__(self):
@@ -54,6 +67,36 @@ class SHRIMP_sample(Sample.Sample):
         for ion in ions:
             self.sbm[ion] = self.read_numbers(f)
         _ = f.readline().strip() # empty line
+
+    def split_mixed(self,line,i,j):
+        chunk = line.split(', ')[i]
+        return chunk.split(' ')[j]
+
+    def read_pd(self,f,header):
+        self.set = int(self.split_mixed(header[1],0,1))
+        nscans = int(self.split_mixed(header[1],1,0))
+        nions = int(self.split_mixed(header[1],2,0))
+        self.sbmbkg = float(self.split_mixed(header[1],4,2))
+        self.deadtime = float(self.split_mixed(header[1],3,0))
+        ion_block = [f.readline().strip() for _ in range(nions)]
+        ion_table = pd.DataFrame([line.split() for line in ion_block])
+        ions = ion_table[0].tolist()
+        self.dwelltime = ion_table[3].astype(float).values
+        self.detector = ion_table[10].tolist()
+        self.dtype = ['Fc' if det == 'COUNTER' else 'Em' for det in self.detector]
+        self.time = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
+        self.signal = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
+        self.sbm = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
+        block_data = [f.readline().strip() for _ in range(1 + nscans * nions * 2)][1:]
+        for row in range(nscans):
+            for col in range(nions):
+                ion = ions[col]
+                i = row * nions * 2 + col * 2
+                time_data = block_data[i].split()
+                sbm_data = block_data[i+1].split()
+                self.time.loc[row,ion] = float(time_data[2])
+                self.signal.loc[row,ion] = sum(map(float,time_data[4:]))
+                self.sbm.loc[row,ion] = sum(map(float,sbm_data))
 
     def parse_line(self,line,remove=None):
         parsed = [elem.strip() for elem in line.split('\t')]
