@@ -30,7 +30,7 @@ def xzyz2ellipse(x,y,z,sx=None,sy=None,sz=None):
 
 # x and y are lists of logratios
 def xy2ellipse(x, y,
-               ax, n_std=1.0, facecolor='none', **kwargs):
+               ax, n_std=2.0, facecolor='none', **kwargs):
     cov = np.cov(x,y) / x.size
     sx = np.sqrt(cov[0,0])
     sy = np.sqrt(cov[1,1])
@@ -39,7 +39,7 @@ def xy2ellipse(x, y,
                           n_std=n_std,facecolor=facecolor,**kwargs)
 
 def result2ellipse(mean_x, sx, mean_y, sy, pearson,
-                   ax, n_std=1.0, facecolor='none', **kwargs):
+                   ax, n_std=2.0, facecolor='none', **kwargs):
     ell_radius_x = np.sqrt(1 + pearson)
     ell_radius_y = np.sqrt(1 - pearson)
     ellipse = Ellipse((0, 0), width=ell_radius_x * 2, height=ell_radius_y * 2,

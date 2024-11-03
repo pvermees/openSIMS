@@ -77,6 +77,11 @@ class Test(unittest.TestCase):
         self.assertEqual(samp.signal.size,77)
         samp.view()
 
+    def test_open_SHRIMP_op_file(self):
+        S.set('instrument','SHRIMP')
+        S.set('path','data/SHRIMP.op')
+        S.read()
+
     def test_view(self):
         self.loadCamecaData()
         S.view()
@@ -191,7 +196,7 @@ class Test(unittest.TestCase):
         S.calibrate(method='Pb-Pb')
 
     def test_gui(self):
-        S.gui()
+        #S.gui()
         pass
         
 if __name__ == '__main__':

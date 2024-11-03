@@ -4,7 +4,7 @@ import pkgutil
 import importlib
 import pandas as pd
 import numpy as np
-from . import Cameca, Calibration, Process
+from . import Cameca, SHRIMP, Calibration, Process
 from pathlib import Path
 
 class Simplex:
@@ -26,15 +26,16 @@ class Simplex:
         self.results = dict()
 
     def read(self):
-        self.samples = pd.Series()
         if self.instrument == 'Cameca':
+            self.samples = pd.Series()
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
                 sname = Path(fname).stem
-                self.samples[sname] = Cameca.Cameca_Sample()
+                self.samples[sname] = Cameca.Cameca_sample()
                 self.samples[sname].read(fname)
         elif self.instrument == 'SHRIMP':
-            self.TODO(self)
+            self.samples = SHRIMP.SHRIMP_run()
+            self.samples.read(self.path)
         else:
             raise ValueError('Unrecognised instrument type.')
         self.sort_samples()

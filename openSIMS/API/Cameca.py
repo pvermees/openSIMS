@@ -4,7 +4,7 @@ import csv
 import datetime
 from . import Sample, Toolbox
 
-class Cameca_Sample(Sample.Sample):
+class Cameca_sample(Sample.Sample):
 
     def __init__(self):
         super().__init__()
