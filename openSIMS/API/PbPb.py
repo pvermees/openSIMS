@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import openSIMS as S
-from . import Ellipse
+from . import Toolbox, Ellipse
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 
@@ -49,14 +49,25 @@ class PbPb:
 
 class Calibrator:
 
-    def calibrate(self,**kwargs):
-        res = minimize(self.misfit,[0.0,0.0],method='nelder-mead')
-        a = res.x[0]
-        b = res.x[1]
+    def calibrate(self):
+        if 'a' in self.fixed and 'b' not in self.fixed:
+            a = self.fixed['a']
+            res = minimize(self.misfit_b,0.0,args=(a),method='nelder-mead')
+            b = res.x[0]
+        elif 'b' in self.fixed and 'a' not in self.fixed:
+            b = self.fixed['b']
+            res = minimize(self.misfit_a,0.0,args=(b),method='nelder-mead')
+            a = res.x[0]
+        elif 'a' in self.fixed and 'b' in self.fixed:
+            a = self.fixed['a']
+            b = self.fixed['b']
+        else:
+            res = minimize(self.misfit_ab,[0.0,0.0],method='nelder-mead')
+            a = res.x[0]
+            b = res.x[1]
         self.pars = {'a':a,'b':b}
-        
-    def misfit(self,ab=[0.0,0.0]):
-        a, b = ab
+
+    def misfit(self,a=0.0,b=0.0):
         SS = 0.0
         for name in self.samples.keys():
             standard = self.samples.loc[name]
@@ -65,6 +76,15 @@ class Calibrator:
             B = settings.get_Pb74_0(standard.group)
             SS += self.get_SS(name,A,B,a=a,b=b)
         return SS
+
+    def misfit_ab(self,ab=[0.0,0.0]):
+        return self.misfit(a=ab[0],b=ab[1])
+
+    def misfit_a(self,a,b=0.0):
+        return self.misfit(a=a[0],b=b)
+
+    def misfit_b(self,b,a=0.0):
+        return self.misfit(a=a,b=b[0])
 
     def get_SS(self,name,A,B,a=0.0,b=0.0):
         Pb7, Pb6, Pb4 = self.get_cps(name)
@@ -89,7 +109,7 @@ class Calibrator:
             (t6*np.exp(b*tt6+a)-m6)**2 + (A*t6+B*t4-m7)**2
         return sum(SS)
 
-    def plot(self,fig=None,ax=None):
+    def plot(self,fig=None,ax=None,show=False):
         p = self.pars
         if fig is None or ax is None:
             fig, ax = plt.subplots()
@@ -121,6 +141,7 @@ class Calibrator:
                 ymin = lines[group]['A'] + lines[group]['B'] * xmin
                 ax.axline((xmin,ymin),slope=lines[group]['B'],color=val['colour'])
         fig.tight_layout()
+        if show: Toolbox.show_figure(fig)
         return fig, ax
 
 class Processor:

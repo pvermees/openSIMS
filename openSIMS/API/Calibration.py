@@ -7,6 +7,7 @@ class Standards():
     def __init__(self,simplex,method):
         self.method = method
         self.pars = simplex.get_pars(method)
+        self.fixed = simplex.get_fixed(method)
         if method in simplex.results:
             self.results = simplex.results[method]
         else:

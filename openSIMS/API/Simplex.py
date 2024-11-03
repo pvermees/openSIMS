@@ -22,6 +22,7 @@ class Simplex:
         self.ignore = set()
         self.methods = dict()
         self.pars = dict()
+        self.fixed = dict()
         self.results = dict()
 
     def read(self):
@@ -46,16 +47,18 @@ class Simplex:
             if not set(method_channels).issubset(all_channels):
                 self.methods = dict()
                 self.pars = dict()
+                self.fixed = dict()
                 self.results = dict()
                 return
 
     def hasMethods(self,methods):
         return set(methods).issubset(set(self.methods.keys()))
 
-    def calibrate(self,**kwargs):
-        for method, channels in self.methods.items():
+    def calibrate(self,method=None):
+        methods = self.methods.keys() if method is None else [method]
+        for method in methods:
             standards = Calibration.get_standards(self,method)
-            standards.calibrate(**kwargs)
+            standards.calibrate()
             self.pars[method] = standards.pars
 
     def process(self):
@@ -124,6 +127,12 @@ class Simplex:
     def get_pars(self,method):
         if method in self.pars.keys():
             return self.pars[method]
+        else:
+            return dict()
+
+    def get_fixed(self,method):
+        if method in self.fixed.keys():
+            return self.fixed[method]
         else:
             return dict()
 

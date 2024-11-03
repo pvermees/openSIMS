@@ -175,9 +175,24 @@ class Test(unittest.TestCase):
         S.plot_calibration('U-Pb')
         S.simplex().export_csv('tests/out/UPb5.csv',fmt='U-Pb-Pb')
 
-    def test_fix_B(self):
+    def test_fix_bB(self):
         self.loadMonaziteData()
-        S.calibrate(B=1.0)
+        S.fix_pars('U-Pb',B=1.0,b=0.0)
+        S.fix_pars('Th-Pb',B=1.0)
+        S.calibrate()
+        S.unfix_pars('U-Pb')
+        S.unfix_pars()
+
+    def test_fix_ab(self):
+        self.loadCamecaData()
+        S.add_method('Pb-Pb',Pb204='204Pb',Pb206='206Pb',Pb207='207Pb')
+        S.calibrate()
+        S.fix_pars('Pb-Pb',a=0.0)
+        S.calibrate(method='Pb-Pb')
+
+    def test_gui(self):
+        S.gui()
+        pass
         
 if __name__ == '__main__':
     unittest.main()
