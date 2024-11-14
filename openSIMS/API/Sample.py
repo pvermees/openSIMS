@@ -16,10 +16,6 @@ class Sample(ABC):
         self.group = 'sample'
 
     @abstractmethod
-    def read(self,fname):
-        pass
-
-    @abstractmethod
     def cps(self,method,ion):
         pass
 

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "openSIMS"
-version = "0.6.3"
+version = "0.6.4"
 authors = [
   { name="Pieter Vermeesch", email="p.vermeesch@ucl.ac.uk" },
 ]
@@ -27,5 +27,7 @@ dependencies = [
 Homepage = "https://github.com/pvermees/openSIMS"
 Issues = "https://github.com/pvermees/openSIMS/issues"
 
-[tool.setuptools.packages.find]
-where = [""]
+
+[tool.setuptools]
+packages = ["openSIMS", "openSIMS.API", "openSIMS.GUI", "openSIMS.Methods",
+	    "openSIMS.Methods.json", "openSIMS.Methods.csv", "openSIMS.Methods.Exporters"]

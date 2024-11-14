@@ -7,6 +7,7 @@ class gui(tk.Tk):
 
     def __init__(self):
         super().__init__()
+        self.resizable(False,False)
         self.title('openSIMS')
         self.method = None
         self.open_window = None
