@@ -25,7 +25,7 @@ class SHRIMP_run(pd.Series):
                 break
             else:
                 sname = line
-                self[sname] = SHRIMP_sample()
+                self[sname] = SHRIMP_Sample()
                 self[sname].read_op(f)
 
     def read_pd(self,f):
@@ -37,11 +37,11 @@ class SHRIMP_run(pd.Series):
                 header = [f.readline().strip() for _ in range(4)]
                 namedate = header[0].split(', ')
                 sname = namedate[0]
-                self[sname] = SHRIMP_sample()
+                self[sname] = SHRIMP_Sample()
                 self[sname].date = ' '.join(namedate[1:3])
                 self[sname].read_pd(f,header)
 
-class SHRIMP_sample(Sample.Sample):
+class SHRIMP_Sample(Sample.Sample):
         
     def __init__(self):
         super().__init__()

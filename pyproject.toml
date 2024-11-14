@@ -27,5 +27,7 @@ dependencies = [
 Homepage = "https://github.com/pvermees/openSIMS"
 Issues = "https://github.com/pvermees/openSIMS/issues"
 
-[tool.setuptools.packages.find]
-where = [""]
+
+[tool.setuptools]
+packages = ["openSIMS", "openSIMS.API", "openSIMS.GUI", "openSIMS.Methods",
+	    "openSIMS.Methods.json", "openSIMS.Methods.csv", "openSIMS.Methods.Exporters"]

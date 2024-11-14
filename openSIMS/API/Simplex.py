@@ -31,7 +31,7 @@ class Simplex:
             fnames = glob.glob(os.path.join(self.path,'*.asc'))
             for fname in fnames:
                 sname = Path(fname).stem
-                self.samples[sname] = Cameca.Cameca_sample()
+                self.samples[sname] = Cameca.Cameca_Sample()
                 self.samples[sname].read(fname)
         elif self.instrument == 'SHRIMP':
             self.samples = SHRIMP.SHRIMP_run()

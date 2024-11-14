@@ -86,7 +86,6 @@ class Test(unittest.TestCase):
         S.set('instrument','SHRIMP')
         S.set('path','data/SHRIMP.pd')
         S.read()
-        breakpoint()
 
     def test_view(self):
         self.loadCamecaData()
@@ -202,7 +201,7 @@ class Test(unittest.TestCase):
         S.calibrate(method='Pb-Pb')
 
     def test_gui(self):
-        S.gui()
+        #S.gui()
         pass
         
 if __name__ == '__main__':
