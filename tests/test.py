@@ -18,6 +18,13 @@ class Test(unittest.TestCase):
                      U238='238U',UOx='238U 16O2',
                      Pb204='204Pb',Pb206='206Pb')
         
+    def loadSHRIMPUPbMethod(self):
+        self.test_open_SHRIMP_pd_file()
+        S.add_method('U-Pb',
+            U238='238U',UOx='254UO',
+            Pb204='204Pb',Pb206='206Pb',
+            bkg='Bkgnd')
+        
     def loadOxygen(self):
         S.set('instrument','Cameca')
         S.set('path','data/Cameca_O')
@@ -120,11 +127,7 @@ class Test(unittest.TestCase):
         self.assertEqual(Pb206.loc[0,'cps'],3213.8858032128287)
 
     def test_cps_SHRIMP(self):
-        self.test_open_SHRIMP_pd_file()
-        S.add_method('U-Pb',
-                     U238='238U',UOx='254UO',
-                     Pb204='204Pb',Pb206='206Pb',
-                     bkg='Bkgnd')
+        self.loadSHRIMPUPbMethod()
         Pb206 = S.get('samples')['M127.1.2'].cps('U-Pb','Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],55114.49680322917)
 
@@ -166,7 +169,17 @@ class Test(unittest.TestCase):
     def test_process_O(self):
         self.process_O()
         S.plot_processed()
-        
+
+    def test_process_SHRIMP_UPb(self):
+        self.loadSHRIMPUPbMethod()
+        S.standards(Temora=['TEM.3.1','TEM.4.1','TEM.5.1','TEM.6.1','TEM.7.1','TEM.8.1',
+                            'TEM.9.1','TEM.10.1','TEM.11.1','TEM.12.1','TEM.13.1','TEM.14.1',
+                            'TEM.15.1','TEM.16.1','TEM.17.1','TEM.18.1','TEM.19.1','TEM.20.1',
+                            'TEM.21.1','TEM.22.1','TEM.23.1','TEM.24.1','TEM.25.1','TEM.26.1',
+                            'TEM.27.1','TEM.28.1','TEM.29.1','TEM.30.1','TEM.31.1'])
+        S.calibrate()
+        S.plot_calibration()
+
     def test_export_monazite(self):
         self.process_monazite()
         S.simplex().export_csv('tests/out/monazite.csv',fmt='U-Pb')
@@ -211,7 +224,7 @@ class Test(unittest.TestCase):
         S.calibrate(method='Pb-Pb')
 
     def test_gui(self):
-        #S.gui()
+        S.gui()
         pass
         
 if __name__ == '__main__':

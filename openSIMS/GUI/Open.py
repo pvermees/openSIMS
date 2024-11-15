@@ -39,7 +39,7 @@ class OpenWindow(tk.Toplevel):
         self.read(path,'Cameca')
 
     def on_SHRIMP(self,event):
-        path = fd.askopenfile()
+        path = fd.askopenfilename()
         self.read(path,'SHRIMP')
         
     def on_Help(self,event):

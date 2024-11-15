@@ -18,7 +18,7 @@ class Geochron:
         return P, POx, D, d
 
     def get_labels(self):
-        P, POx, D, d  = S.settings(self.method)['ions']
+        P, POx, D  = S.settings(self.method)['ions'][1:4]
         channels = S.get('methods')[self.method]
         xlabel = 'ln(' + channels[POx] + '/' + channels[P] + ')'
         ylabel = 'ln(' + channels[D] + '/' + channels[P] + ')'
