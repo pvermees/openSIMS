@@ -114,12 +114,22 @@ class Test(unittest.TestCase):
         self.assertEqual(DP,0.06678381721936288)
         self.assertEqual(y0,18.05283)
 
-    def test_cps(self):
+    def test_cps_Cameca(self):
         self.loadCamecaUPbMethod()
         Pb206 = S.get('samples')['Tem@1'].cps('U-Pb','Pb206')
         self.assertEqual(Pb206.loc[0,'cps'],3213.8858032128287)
 
+    def test_cps_SHRIMP(self):
+        self.test_open_SHRIMP_pd_file()
+        S.add_method('U-Pb',
+                     U238='238U',UOx='254UO',
+                     Pb204='204Pb',Pb206='206Pb',
+                     bkg='Bkgnd')
+        Pb206 = S.get('samples')['M127.1.2'].cps('U-Pb','Pb206')
+        self.assertEqual(Pb206.loc[0,'cps'],55114.49680322917)
+
     def test_misfit(self,b=0.0):
+        self.test_open_SHRIMP_op_file()
         self.loadMonaziteData()
         standards = Calibration.get_standards(S.simplex())
         np.random.seed(0)

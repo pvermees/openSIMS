@@ -1,7 +1,7 @@
-import openSIMS as S
-import pandas as pd
 import csv
 import datetime
+import openSIMS as S
+import pandas as pd
 from . import Sample, Toolbox
 
 class Cameca_Sample(Sample.Sample):

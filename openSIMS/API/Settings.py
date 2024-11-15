@@ -21,13 +21,15 @@ class Settings(dict):
             else:
                 raise ValueError('Invalid method type')
 
-    def ions2channels(self,method,**kwargs):
+    def ions2channels(self,method,instrument,**kwargs):
         if method not in self.keys():
             raise ValueError('Invalid method')
         else:
             channels = dict()
+            ions = self[method]['ions']
+            if instrument == 'SHRIMP': ions += ['bkg']
             for ion, channel in kwargs.items():
-                if ion in self[method]['ions']:
+                if ion in ions:
                     channels[ion] = channel
                 else:
                     channels[ion] = None

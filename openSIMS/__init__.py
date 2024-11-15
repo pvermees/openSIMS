@@ -16,7 +16,8 @@ def get(prop):
     return getattr(__simplex,prop)
 
 def add_method(method,**kwargs):
-    __simplex.methods[method] = __settings.ions2channels(method,**kwargs)
+    inst = __simplex.instrument
+    __simplex.methods[method] = __settings.ions2channels(method,inst,**kwargs)
 
 def list_methods():
     return list(__simplex.methods.keys())

@@ -19,6 +19,11 @@ class Sample(ABC):
     def cps(self,method,ion):
         pass
 
+    def total_time(self,method,channels):
+        dwelltime = self.channels.loc[channels,'dwelltime']
+        num_cycles = self.signal.shape[0]
+        return dwelltime*num_cycles
+
     def view(self,channels=None,title=None,show=False):
         if channels is None:
             channels = self.signal.columns

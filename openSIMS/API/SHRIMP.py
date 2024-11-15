@@ -1,4 +1,5 @@
 import os
+import openSIMS as S
 import pandas as pd
 import numpy as np
 from . import Sample
@@ -24,7 +25,7 @@ class SHRIMP_run(pd.Series):
             if not line:
                 break
             else:
-                sname = line
+                sname = line.replace('\n','').replace('\r','')
                 self[sname] = SHRIMP_Sample()
                 self[sname].read_op(f)
 
@@ -36,7 +37,7 @@ class SHRIMP_run(pd.Series):
             elif '***' in line:
                 header = [f.readline().strip() for _ in range(4)]
                 namedate = header[0].split(', ')
-                sname = namedate[0]
+                sname = namedate[0].replace('\n','').replace('\r','')
                 self[sname] = SHRIMP_Sample()
                 self[sname].date = ' '.join(namedate[1:3])
                 self[sname].read_pd(f,header)
@@ -52,10 +53,11 @@ class SHRIMP_Sample(Sample.Sample):
         nscans = int(self.read_numbers(f)[0]) # nscans, not used
         nions = int(self.read_numbers(f)[0])
         self.deadtime = 0
-        self.dwelltime = self.read_numbers(f)
+        dd = {'dwelltime': self.read_numbers(f)}
+        dd['detector'] = ['COUNTER'] * nions
+        dd['dtype'] = ['Em'] * nions
         ions = [f'm{i+1}' for i in range(nions)]
-        self.detector = ['COUNTER'] * nions
-        self.dtype = ['Em'] * nions
+        self.channels = pd.DataFrame(dd,index=ions)
         self.time = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
         for ion in ions:
             self.time[ion] = self.read_numbers(f)
@@ -81,9 +83,10 @@ class SHRIMP_Sample(Sample.Sample):
         ion_block = [f.readline().strip() for _ in range(nions)]
         ion_table = pd.DataFrame([line.split() for line in ion_block])
         ions = ion_table[0].tolist()
-        self.dwelltime = ion_table[3].astype(float).values
-        self.detector = ion_table[10].tolist()
-        self.dtype = ['Fc' if det == 'COUNTER' else 'Em' for det in self.detector]
+        dd = {'dwelltime': ion_table[3].astype(float).values}
+        dd['detector'] = ion_table[10].tolist()
+        dd['dtype'] = ['Fc' if det == 'COUNTER' else 'Em' for det in dd['detector']]
+        self.channels = pd.DataFrame(dd,index=ions)
         self.time = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
         self.signal = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
         self.sbm = pd.DataFrame(0,index=np.arange(nscans),columns=ions)
@@ -113,6 +116,16 @@ class SHRIMP_Sample(Sample.Sample):
     def read_numbers(self,f,remove=None):
         parsed = self.read_text(f,remove=remove)
         return [float(x) for x in parsed]
-    
+
     def cps(self,method,ion):
-        pass
+        channel = S.get('methods')[method][ion]
+        bkg_channel = S.get('methods')[method]['bkg']
+        dwelltime = self.channels.loc[channel,'dwelltime']
+        raw_cps = self.signal[channel]
+        counts = raw_cps*dwelltime
+        adjusted_dwelltime = dwelltime - counts*self.deadtime/1e9
+        adjusted_cps = counts/adjusted_dwelltime
+        blank_cps = self.signal[bkg_channel]
+        blank_corrected_cps = adjusted_cps - blank_cps
+        return pd.DataFrame({'time': self.time[channel],
+                             'cps': blank_corrected_cps})
