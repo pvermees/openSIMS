@@ -16,8 +16,12 @@ def get(prop):
     return getattr(__simplex,prop)
 
 def add_method(method,**kwargs):
-    inst = __simplex.instrument
-    __simplex.methods[method] = __settings.ions2channels(method,inst,**kwargs)
+    if method not in __settings.keys():
+        raise ValueError('Invalid method')
+    else:
+        instrument = __simplex.instrument
+        ions = __settings.get_ions(method,instrument)
+        __simplex.methods[method] = __settings.ions2channels(ions,**kwargs)
 
 def list_methods():
     return list(__simplex.methods.keys())

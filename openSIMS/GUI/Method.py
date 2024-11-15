@@ -58,7 +58,8 @@ class ChannelWindow(tk.Toplevel):
         methods = S.get('methods')
         refresh = (m not in methods.keys())
         oldselections = None if refresh else methods[m]
-        ions = S.settings(m)['ions']
+        instrument = S.get('instrument')
+        ions = S.settings().get_ions(m,instrument)
         channels = S.simplex().all_channels()
         newselections = dict.fromkeys(ions,None)
         row = 0

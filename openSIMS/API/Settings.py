@@ -21,24 +21,26 @@ class Settings(dict):
             else:
                 raise ValueError('Invalid method type')
 
-    def ions2channels(self,method,instrument,**kwargs):
-        if method not in self.keys():
-            raise ValueError('Invalid method')
+    def get_ions(self,method,instrument):
+        if instrument == 'SHRIMP': 
+            return self[method]['ions'] + ['bkg']
         else:
-            channels = dict()
-            ions = self[method]['ions']
-            if instrument == 'SHRIMP': ions += ['bkg']
-            for ion, channel in kwargs.items():
-                if ion in ions:
-                    channels[ion] = channel
-                else:
-                    channels[ion] = None
+            return self[method]['ions']
+
+    def ions2channels(self,ions,**kwargs):
+        channels = dict()
+        for ion, channel in kwargs.items():
+            if ion in ions:
+                channels[ion] = channel
+            else:
+                channels[ion] = None
         return channels
 
 class setting(dict):
     
     def __init__(self,method_name,pars):
         super().__init__(pars)
+        self.name = method_name
         f = files('openSIMS.Methods.csv').joinpath(method_name + '.csv')
         csv_string = f.read_text()
         csv_stringio = io.StringIO(csv_string)
